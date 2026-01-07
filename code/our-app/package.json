@@ -1,10 +1,10 @@
 {
   "name": "our-app",
   "version": "1.0.0",
-  "description": "An Electron application with React and TypeScript",
+  "description": "Ứng dụng nghe nhạc SkyBard",
   "main": "./out/main/index.js",
-  "author": "example.com",
-  "homepage": "https://electron-vite.org",
+
+
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint --cache .",
@@ -31,18 +31,21 @@
     "@types/node": "^22.19.1",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^5.1.1",
-    "electron": "^39.2.6",
-    "electron-builder": "^26.0.12",
+    "@vitejs/plugin-react": "^5.1.2",
+    "electron": "^39.2.7",
+    "electron-builder": "^26.4.0",
     "electron-vite": "^5.0.0",
-    "eslint": "^9.39.1",
+    "eslint": "^9.39.2",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
     "prettier": "^3.7.4",
-    "react": "^19.2.1",
-    "react-dom": "^19.2.1",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
     "typescript": "^5.9.3",
-    "vite": "^7.2.6"
-  }
+    "vite": "^7.3.1"
+  },
+  "keywords": [],
+  "license": "ISC",
+  "type": "commonjs"
 }
