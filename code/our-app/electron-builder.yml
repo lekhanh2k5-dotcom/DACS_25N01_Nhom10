@@ -1,5 +1,5 @@
-appId: com.electron.app
-productName: our-app
+appId: com.ourapp.app
+productName: OUR-APP 
 directories:
   buildResources: build
 files:
@@ -8,7 +8,6 @@ files:
   - '!electron.vite.config.{js,ts,mjs,cjs}'
   - '!{.eslintcache,eslint.config.mjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
-  - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
 asarUnpack:
   - resources/**
 win:
