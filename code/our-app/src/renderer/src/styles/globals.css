@@ -11,6 +11,8 @@
     --text-sub: #b3b3b3;
     --accent-red: #e74c3c;
     --accent-gold: #f1c40f;
+    --border: #333333;
+    --card-bg: #181818;
 }
 
 * {

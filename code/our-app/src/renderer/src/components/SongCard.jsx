@@ -2,15 +2,21 @@ import { useApp } from '../contexts/AppContext';
 import './SongCard.css';
 
 export default function SongCard({ song, songKey, onPlay }) {
-    const { buySong, toggleFavorite } = useApp();
+    const { buySong, deleteSong } = useApp();
 
     const handleClick = () => {
-        if (onPlay) onPlay();
+        if (song.isOwned) {
+            if (onPlay) {
+                onPlay();
+            }
+        } else {
+            buySong(songKey, song.price);
+        }
     };
 
-    const handleFavorite = (e) => {
+    const handleDelete = (e) => {
         e.stopPropagation();
-        toggleFavorite(songKey);
+        deleteSong(songKey);
     };
 
     return (
@@ -20,25 +26,27 @@ export default function SongCard({ song, songKey, onPlay }) {
             <div className="card-info">
                 <div className="card-title">{song.name}</div>
                 <div className="card-meta">
-                    <span>🎤 {song.author}</span>
-                    {song.composer && <span>✍️ {song.composer}</span>}
+                    <span title="Ca sĩ gốc">🎤 {song.author}</span>
+                    <span title="Người soạn nhạc">✍️ {song.composer || 'Ẩn danh'}</span>
                 </div>
             </div>
 
-            <div className="card-actions">
-                {song.isOwned ? (
-                    <>
-                        <button
-                            className="btn-favorite"
-                            onClick={handleFavorite}
-                            title={song.isFavorite ? "Bỏ yêu thích" : "Yêu thích"}
-                        >
-                            {song.isFavorite ? '❤️' : '🤍'}
-                        </button>
+            <div className="card-action">
+                {song.isFromFirebase ? (
+                    song.isOwned ? (
                         <span className="card-owned">✅ Đã sở hữu</span>
-                    </>
+                    ) : (
+                        <span className="card-price">💰 {song.price} xu</span>
+                    )
                 ) : (
-                    <span className="card-price">💰 {song.price} xu</span>
+                    <button
+                        className="btn-delete-song"
+                        onClick={handleDelete}
+                        title="Xóa bài hát"
+                    >
+                        <span>🗑️</span>
+                        <span>Xóa</span>
+                    </button>
                 )}
             </div>
         </div>

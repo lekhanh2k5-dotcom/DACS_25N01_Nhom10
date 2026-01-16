@@ -16,7 +16,6 @@ export default function Store() {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedRegion, setSelectedRegion] = useState('all');
 
-    // Add custom CSS for dropdown options
     React.useEffect(() => {
         const style = document.createElement('style');
         style.textContent = `
@@ -47,8 +46,7 @@ export default function Store() {
 
     return (
         <div id="view-store" className="content-view active">
-            {/* Row 1: Title and Search */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                 <h2 className="view-title" style={{ margin: 0 }}>🏪 Cửa hàng</h2>
                 <input
                     type="text"
@@ -71,7 +69,6 @@ export default function Store() {
                 />
             </div>
 
-            {/* Row 2: Song Count and Region Filter */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                 <p style={{ fontSize: '14px', color: 'var(--text-sub)', margin: 0 }}>
                     {filteredSongs.length} bài hát

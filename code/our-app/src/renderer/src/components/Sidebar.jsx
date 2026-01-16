@@ -13,9 +13,9 @@ export default function Sidebar({ onLoginClick }) {
     };
 
     const navItems = [
-        { id: 'store', label: 'Cửa hàng', icon: '🏪' },
-        { id: 'library', label: 'Thư viện', icon: '📚' },
-        { id: 'settings', label: 'Cài đặt', icon: '⚙️' },
+        { id: 'store', label: '🏪 Cửa hàng', icon: '🏪' },
+        { id: 'library', label: '📚 Thư viện', icon: '📚' },
+        { id: 'settings', label: '⚙️ Cài đặt', icon: '⚙️' },
     ];
 
     return (
@@ -28,11 +28,12 @@ export default function Sidebar({ onLoginClick }) {
                 {navItems.map((item) => (
                     <li
                         key={item.id}
+                        id={`nav-${item.id}`}
                         className={`nav-item ${activeTab === item.id ? 'active' : ''}`}
                         onClick={() => setActiveTab(item.id)}
                     >
                         <span>{item.icon}</span>
-                        {item.label}
+                        {item.label.replace(/^[^\s]+\s/, '')}
                     </li>
                 ))}
             </ul>
@@ -41,6 +42,7 @@ export default function Sidebar({ onLoginClick }) {
                 className="user-profile"
                 onClick={handleLoginClick}
                 style={{ cursor: !user ? 'pointer' : 'default' }}
+                title={!user ? 'Click để đăng nhập' : ''}
             >
                 <div className="user-avatar">
                     {user ? '👤' : '🔒'}

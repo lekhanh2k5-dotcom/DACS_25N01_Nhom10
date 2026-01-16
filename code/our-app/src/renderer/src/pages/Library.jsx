@@ -35,9 +35,7 @@ export default function Library() {
     return (
         <div id="view-library" className="content-view active">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <div>
-                    <h2 className="view-title">📚 Thư viện</h2>
-                </div>
+                <h2 className="view-title" style={{ margin: 0 }}>📚 Thư viện</h2>
                 <input
                     type="text"
                     placeholder="🔍 Tìm kiếm bài hát..."
