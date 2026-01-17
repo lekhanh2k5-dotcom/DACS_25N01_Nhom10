@@ -1,7 +1,7 @@
 {
   "name": "our-app",
   "version": "1.0.0",
-  "description": "Ứng dụng nghe nhạc SkyBard",
+  "description": "SkyBard",
   "main": "./out/main/index.js",
   "scripts": {
     "format": "prettier --write .",

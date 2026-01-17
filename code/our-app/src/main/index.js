@@ -43,9 +43,11 @@ app.whenReady().then(() => {
 // auto  
 
   ipcMain.on('auto-play:start', async (event, songNotes) => {
-    console.log('Nhận tín hiệu Play. Chờ 3 giây để người dùng chuyển cửa sổ...')
-    
-    await new Promise((resolve) => setTimeout(resolve, 3000))
+    console.log('Nhận tín hiệu Play')
+    const win = BrowserWindow.fromWebContents(event.sender)
+    win?.minimize()
+
+    await new Promise((resolve) => setTimeout(resolve, 120))
     playerService.start(songNotes)
   })
 

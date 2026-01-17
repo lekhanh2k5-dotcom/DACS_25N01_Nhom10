@@ -115,12 +115,10 @@ export default function PlayerBar() {
 
                     <button id="btnMainPlay" className="btn-control btn-play" onClick={() => {
                         togglePlayback();
-                        // Bật auto-play khi ấn Play
                         if (!isPlaying && currentSong?.songNotes?.length > 0) {
                             console.log(`🎵 Auto-play: ${currentSong.name}`);
                             window.api.autoPlay.start(currentSong.songNotes);
                         } else if (isPlaying) {
-                            // Dừng auto-play khi ấn Pause
                             window.api.autoPlay.stop();
                         }
                     }}>
