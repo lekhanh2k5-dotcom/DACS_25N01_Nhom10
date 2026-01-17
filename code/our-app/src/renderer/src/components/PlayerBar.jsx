@@ -113,7 +113,17 @@ export default function PlayerBar() {
                         </svg>
                     </button>
 
-                    <button id="btnMainPlay" className="btn-control btn-play" onClick={togglePlayback}>
+                    <button id="btnMainPlay" className="btn-control btn-play" onClick={() => {
+                        togglePlayback();
+                        // Bật auto-play khi ấn Play
+                        if (!isPlaying && currentSong?.songNotes?.length > 0) {
+                            console.log(`🎵 Auto-play: ${currentSong.name}`);
+                            window.api.autoPlay.start(currentSong.songNotes);
+                        } else if (isPlaying) {
+                            // Dừng auto-play khi ấn Pause
+                            window.api.autoPlay.stop();
+                        }
+                    }}>
                         <svg width="24" height="24" viewBox="0 0 16 16" fill="currentColor">
                             {isPlaying ? (
                                 <path d="M5 2h2v12H5V2zm4 0h2v12H9V2z" />

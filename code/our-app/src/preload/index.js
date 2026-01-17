@@ -1,8 +1,14 @@
-import { contextBridge } from 'electron'
+import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 
 // Custom APIs for renderer
-const api = {}
+const api = {
+  // Auto-play API
+  autoPlay: {
+    start: (songNotes) => ipcRenderer.send('auto-play:start', songNotes),
+    stop: () => ipcRenderer.send('auto-play:stop')
+  }
+}
 
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise
