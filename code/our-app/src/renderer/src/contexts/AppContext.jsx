@@ -30,6 +30,28 @@ export const AppProvider = ({ children }) => {
         setLoading(false);
     }, []);
 
+    useEffect(() => {
+        if (!isPlaying) return;
+
+        const start = performance.now();
+        const base = currentTime;
+
+        const id = setInterval(() => {
+            const elapsed = performance.now() - start;
+            const t = base + elapsed * playbackSpeed;
+
+            setCurrentTime(Math.min(t, duration));
+
+            if (t >= duration) {
+                setIsPlaying(false);
+                clearInterval(id);
+            }
+        }, 100);
+
+        return () => clearInterval(id);
+    }, [isPlaying, playbackSpeed, duration]);
+
+
     // Chọn bài hát
     const selectSong = (songKey) => {
         const song = songs[songKey];

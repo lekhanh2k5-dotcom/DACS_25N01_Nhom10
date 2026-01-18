@@ -1,61 +1,71 @@
 import { keyboard } from "@nut-tree-fork/nut-js";
 import { KEY_MAP } from "./key-mapping";
 
-keyboard.config.autoDelayMs = 0; 
+keyboard.config.autoDelayMs = 0;
 
 let isPlaying = false;
 let timeoutId = null;
 
+const sleep = (ms) =>
+  new Promise((resolve) => {
+    timeoutId = setTimeout(resolve, ms);
+  });
+
 export const playerService = {
-    
   async playChord(keys) {
-    const nutKeys = keys.map(k => KEY_MAP[k]).filter(Boolean);
-    
-    await Promise.all(nutKeys.map(key => keyboard.pressKey(key)));
-    await Promise.all(nutKeys.map(key => keyboard.releaseKey(key)));
+    const nutKeys = keys.map((k) => KEY_MAP[k]).filter(Boolean);
+
+    await Promise.all(nutKeys.map((key) => keyboard.pressKey(key)));
+    await Promise.all(nutKeys.map((key) => keyboard.releaseKey(key)));
   },
 
   stop() {
     isPlaying = false;
     if (timeoutId) clearTimeout(timeoutId);
+    timeoutId = null;
     console.log("--- Đã dừng Auto ---");
   },
 
-  async start(songNotes) {
+  async start(songNotes, playbackSpeed = 1.0) {
     if (isPlaying) return;
     isPlaying = true;
 
     const chords = songNotes.reduce((acc, note) => {
-      if (!acc[note.time]) acc[note.time] = [];
-      acc[note.time].push(note.key);
+      const t = Number(note.time) || 0;
+      if (!acc[t]) acc[t] = [];
+      acc[t].push(note.key);
       return acc;
     }, {});
 
-    const timePoints = Object.keys(chords).map(Number).sort((a, b) => a - b);
-    
+    const timePoints = Object.keys(chords)
+      .map(Number)
+      .sort((a, b) => a - b);
+
     console.log(`--- Bắt đầu chơi: ${timePoints.length} mốc thời gian ---`);
+
+    const startAt = performance.now();
 
     for (let i = 0; i < timePoints.length; i++) {
       if (!isPlaying) break;
 
-      const currentTime = timePoints[i];
-      const keys = chords[currentTime];
+      const t0 = timePoints[i];           
+      const targetTime = t0 / playbackSpeed; 
 
-      await this.playChord(keys);
+      const target = startAt + targetTime;
+      const now = performance.now();
+      const waitMs = target - now;
 
-      if (i < timePoints.length - 1) {
-        const nextTime = timePoints[i + 1];
-        const delay = nextTime - currentTime;
-
-        if (delay > 0) {
-          await new Promise(resolve => {
-            timeoutId = setTimeout(resolve, delay);
-          });
-        }
+      if (waitMs > 0) {
+        await sleep(waitMs);
       }
+      if (!isPlaying) break;
+
+     
+      await this.playChord(chords[t0]);
     }
 
     isPlaying = false;
+    timeoutId = null;
     console.log("--- Hoàn thành bài hát ---");
   }
 };
