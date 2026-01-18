@@ -5,9 +5,11 @@ import { electronAPI } from '@electron-toolkit/preload'
 const api = {
   // Auto-play API
   autoPlay: {
-    start: (songNotes) => ipcRenderer.send('auto-play:start', songNotes),
-    stop: () => ipcRenderer.send('auto-play:stop')
-  }
+  start: (songNotes, offsetMs = 0) =>
+    ipcRenderer.send('auto-play:start', { songNotes, offsetMs }),
+  stop: () => ipcRenderer.send('auto-play:stop')
+}
+
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

@@ -71,8 +71,15 @@ export const AppProvider = ({ children }) => {
     // Toggle phát/dừng
     const togglePlayback = () => {
         if (!currentSong) return;
-        setIsPlaying(!isPlaying);
+        if (!isPlaying) {
+            setIsPlaying(true);
+            window.api.autoPlay.start(currentSong.songNotes, currentTime);
+        } else {
+            setIsPlaying(false);
+            window.api.autoPlay.stop();
+        }
     };
+
 
     // Tua đến thời điểm
     const seekTo = (timeMs) => {

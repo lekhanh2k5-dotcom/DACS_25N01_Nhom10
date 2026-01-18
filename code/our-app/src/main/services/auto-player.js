@@ -26,46 +26,46 @@ export const playerService = {
     console.log("--- Đã dừng Auto ---");
   },
 
-  async start(songNotes, playbackSpeed = 1.0) {
-    if (isPlaying) return;
-    isPlaying = true;
+async start(songNotes, playbackSpeed = 1.0, offsetMs = 0) {
+  if (isPlaying) return;
+  isPlaying = true;
 
-    const chords = songNotes.reduce((acc, note) => {
-      const t = Number(note.time) || 0;
-      if (!acc[t]) acc[t] = [];
-      acc[t].push(note.key);
-      return acc;
-    }, {});
+  const offset = Number.isFinite(Number(offsetMs)) ? Number(offsetMs) : 0;
 
-    const timePoints = Object.keys(chords)
-      .map(Number)
-      .sort((a, b) => a - b);
+  const chords = songNotes.reduce((acc, note) => {
+    const t = Number(note.time) || 0;
+    if (!acc[t]) acc[t] = [];
+    acc[t].push(note.key);
+    return acc;
+  }, {});
 
-    console.log(`--- Bắt đầu chơi: ${timePoints.length} mốc thời gian ---`);
+  const timePoints = Object.keys(chords).map(Number).sort((a, b) => a - b);
 
-    const startAt = performance.now();
+  const startAt = performance.now() - offset / playbackSpeed;
 
-    for (let i = 0; i < timePoints.length; i++) {
-      if (!isPlaying) break;
+  for (let i = 0; i < timePoints.length; i++) {
+    if (!isPlaying) break;
 
-      const t0 = timePoints[i];           
-      const targetTime = t0 / playbackSpeed; 
+    const t0 = timePoints[i];
 
-      const target = startAt + targetTime;
-      const now = performance.now();
-      const waitMs = target - now;
+    if (t0 < offset) continue;
 
-      if (waitMs > 0) {
-        await sleep(waitMs);
-      }
-      if (!isPlaying) break;
+    const targetTime = t0 / playbackSpeed;
+    const target = startAt + targetTime;
+    const now = performance.now();
+    const waitMs = target - now;
 
-     
-      await this.playChord(chords[t0]);
+    if (waitMs > 0) {
+      await sleep(waitMs);
     }
+    if (!isPlaying) break;
 
-    isPlaying = false;
-    timeoutId = null;
-    console.log("--- Hoàn thành bài hát ---");
+    await this.playChord(chords[t0]);
   }
+
+  isPlaying = false;
+  timeoutId = null;
+  console.log("--- Hoàn thành bài hát ---");
+}
+
 };
