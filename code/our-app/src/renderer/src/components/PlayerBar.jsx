@@ -115,12 +115,6 @@ export default function PlayerBar() {
 
                     <button id="btnMainPlay" className="btn-control btn-play" onClick={() => {
                         togglePlayback();
-                        if (!isPlaying && currentSong?.songNotes?.length > 0) {
-                            console.log(`🎵 Auto-play: ${currentSong.name}`);
-                            window.api.autoPlay.start(currentSong.songNotes);
-                        } else if (isPlaying) {
-                            window.api.autoPlay.stop();
-                        }
                     }}>
                         <svg width="24" height="24" viewBox="0 0 16 16" fill="currentColor">
                             {isPlaying ? (

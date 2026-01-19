@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { mockSongs } from '../data/songs';
 
 const AppContext = createContext();
@@ -24,6 +24,14 @@ export const AppProvider = ({ children }) => {
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
 
+    const playRef = useRef({ startedAt: 0, baseTime: 0 })
+
+    useEffect(() => {
+        if (!isPlaying) return
+        playRef.current.startedAt = performance.now()
+        playRef.current.baseTime = currentTime
+    }, [isPlaying, currentTime])
+
     // Load songs khi mount
     useEffect(() => {
         setSongs(mockSongs);
@@ -31,25 +39,25 @@ export const AppProvider = ({ children }) => {
     }, []);
 
     useEffect(() => {
-        if (!isPlaying) return;
-
-        const start = performance.now();
-        const base = currentTime;
+        if (!isPlaying) return
 
         const id = setInterval(() => {
-            const elapsed = performance.now() - start;
-            const t = base + elapsed * playbackSpeed;
+            const { startedAt, baseTime } = playRef.current
+            const elapsed = performance.now() - startedAt
+            const t = baseTime + elapsed * playbackSpeed
 
-            setCurrentTime(Math.min(t, duration));
+            const clamped = Math.min(t, duration)
+            setCurrentTime(clamped)
 
-            if (t >= duration) {
-                setIsPlaying(false);
-                clearInterval(id);
+            if (clamped >= duration) {
+                setIsPlaying(false)
+                clearInterval(id)
             }
-        }, 100);
+        }, 100)
 
-        return () => clearInterval(id);
-    }, [isPlaying, playbackSpeed, duration]);
+        return () => clearInterval(id)
+    }, [isPlaying, playbackSpeed, duration])
+
 
 
     // Chọn bài hát
@@ -73,7 +81,7 @@ export const AppProvider = ({ children }) => {
         if (!currentSong) return;
         if (!isPlaying) {
             setIsPlaying(true);
-            window.api.autoPlay.start(currentSong.songNotes, currentTime);
+            window.api.autoPlay.start(currentSong.songNotes, currentTime, playbackSpeed);
         } else {
             setIsPlaying(false);
             window.api.autoPlay.stop();

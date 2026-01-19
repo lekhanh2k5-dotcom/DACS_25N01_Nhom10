@@ -4,8 +4,8 @@ import { electronAPI } from '@electron-toolkit/preload'
 // Custom APIs for renderer
 const api = {
   autoPlay: {
-  start: (songNotes, offsetMs = 0) =>
-    ipcRenderer.send('auto-play:start', { songNotes, offsetMs }),
+  start: (songNotes, offsetMs = 0, playbackSpeed = 1.0) =>
+    ipcRenderer.send('auto-play:start', { songNotes, offsetMs, playbackSpeed }),
   stop: () => ipcRenderer.send('auto-play:stop')
   },
   sheet: {
