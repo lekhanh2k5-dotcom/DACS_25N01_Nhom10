@@ -1,4 +1,5 @@
 import { useApp } from '../contexts/AppContext';
+import { useState } from 'react';
 import './PlayerBar.css';
 
 export default function PlayerBar() {
@@ -17,6 +18,8 @@ export default function PlayerBar() {
         playPrev,
         importSongFile
     } = useApp();
+
+    const [speedInput, setSpeedInput] = useState(playbackSpeed.toFixed(2));
 
     const formatTime = (ms) => {
         const totalSeconds = Math.floor(ms / 1000);
@@ -54,9 +57,17 @@ export default function PlayerBar() {
     };
 
     const handleSpeedChange = (e) => {
-        const value = parseFloat(e.target.value);
-        if (value >= 0.5 && value <= 2.0) {
-            setPlaybackSpeed(value);
+        setSpeedInput(e.target.value);
+    };
+
+    const handleSpeedBlur = () => {
+        const value = parseFloat(speedInput);
+        if (!isNaN(value)) {
+            const clampedValue = Math.max(0.50, Math.min(2.00, value));
+            setPlaybackSpeed(clampedValue);
+            setSpeedInput(clampedValue.toFixed(2));
+        } else {
+            setSpeedInput(playbackSpeed.toFixed(2));
         }
     };
 
@@ -136,13 +147,13 @@ export default function PlayerBar() {
                         <input
                             type="number"
                             id="speedInput"
-                            min="0.5"
-                            max="2.0"
-                            step="0.1"
-                            value={playbackSpeed}
+                            min="0.50"
+                            max="2.00"
+                            step="0.01"
+                            value={speedInput}
                             onChange={handleSpeedChange}
+                            onBlur={handleSpeedBlur}
                         />
-                        <span className="speed-unit">×</span>
                     </div>
                 </div>
 
