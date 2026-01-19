@@ -3,13 +3,14 @@ import { electronAPI } from '@electron-toolkit/preload'
 
 // Custom APIs for renderer
 const api = {
-  // Auto-play API
   autoPlay: {
   start: (songNotes, offsetMs = 0) =>
     ipcRenderer.send('auto-play:start', { songNotes, offsetMs }),
   stop: () => ipcRenderer.send('auto-play:stop')
-}
-
+  },
+  sheet: {
+    open: () => ipcRenderer.invoke('sheet:open')
+ }
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

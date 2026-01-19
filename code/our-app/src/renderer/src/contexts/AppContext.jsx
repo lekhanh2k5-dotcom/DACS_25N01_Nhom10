@@ -124,9 +124,65 @@ export const AppProvider = ({ children }) => {
     };
 
     // Import bài hát
-    const importSongFile = () => {
-        alert('Chức năng import bị tắt trong chế độ demo!');
-    };
+    const importSongFile = async () => {
+        const result = await window.api.sheet.open()
+        if (!result || result.ok === false) {
+            if (result?.canceled) return
+            alert(result?.message || 'Không đọc được file sheet')
+            return
+        }
+
+        const { filePath, data } = result
+        console.log('IMPORT filePath:', filePath)
+        console.log('IMPORT data:', data)
+
+        if (!data) {
+            alert('Lỗi: data không tồn tại')
+            return
+        }
+        let songData = data
+        if (Array.isArray(data)) {
+            if (data.length === 0) {
+                alert('File JSON là array rỗng')
+                return
+            }
+            songData = data[0]
+        }
+        console.log('IMPORT songData:', songData)
+        console.log('IMPORT songData.songNotes:', songData?.songNotes)
+        const songKey = filePath
+
+        const song = {
+            ...songData,
+            key: songKey,
+            name: songData?.name || 'Untitled',
+            author: songData?.author || 'Unknown',
+            transcribedBy: songData?.transcribedBy || 'Unknown',
+            songNotes: Array.isArray(songData?.songNotes) ? songData.songNotes : [],
+            isOwned: true,
+            isImported: true
+        }
+
+        if (song.songNotes.length === 0) {
+            alert(`File sheet không có songNotes hoặc songNotes rỗng.\n\nThông tin file:\n- Keys: ${Object.keys(data).join(', ')}\n- songNotes type: ${typeof data?.songNotes}\n- songNotes: ${JSON.stringify(data?.songNotes)?.slice(0, 100)}`)
+            return
+        }
+
+        setSongs(prev => ({
+            ...prev,
+            [songKey]: song
+        }))
+
+        setCurrentSong(song)
+        setIsPlaying(false)
+        setCurrentTime(0)
+
+        const maxTime = Math.max(...song.songNotes.map(n => Number(n.time) || 0))
+        setDuration(maxTime + 1000)
+
+        alert('✅ Import thành công!')
+    }
+
 
     // Xóa bài hát
     const deleteSong = () => {

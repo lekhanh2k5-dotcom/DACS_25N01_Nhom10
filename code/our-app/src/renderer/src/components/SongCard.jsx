@@ -27,7 +27,7 @@ export default function SongCard({ song, songKey, onPlay }) {
                 <div className="card-title">{song.name}</div>
                 <div className="card-meta">
                     <span title="Ca sĩ gốc">🎤 {song.author}</span>
-                    <span title="Người soạn nhạc">✍️ {song.composer || 'Ẩn danh'}</span>
+                    <span title="Người soạn nhạc">✍️ {song.transcribedBy || 'Ẩn danh'}</span>
                 </div>
             </div>
 
