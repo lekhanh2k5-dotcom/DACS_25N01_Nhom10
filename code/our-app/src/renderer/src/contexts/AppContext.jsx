@@ -193,8 +193,33 @@ export const AppProvider = ({ children }) => {
 
 
     // Xóa bài hát
-    const deleteSong = () => {
-        alert('Chức năng xóa bị tắt trong chế độ demo!');
+    const deleteSong = (songKey) => {
+        if (!songKey) return;
+
+        const song = songs[songKey];
+        if (!song) return;
+
+        if (!song.isImported) {
+            alert('Chỉ có thể xóa bài đã import từ máy.');
+            return;
+        }
+
+        const ok = window.confirm(`Xóa bài "${song.name}" khỏi thư viện?`);
+        if (!ok) return;
+
+        if (currentSong?.key === songKey) {
+            window.api.autoPlay.stop();
+            setIsPlaying(false);
+            setCurrentSong(null);
+            setCurrentTime(0);
+            setDuration(0);
+        }
+
+        setSongs(prev => {
+            const copy = { ...prev };
+            delete copy[songKey];
+            return copy;
+        });
     };
 
     const value = {
