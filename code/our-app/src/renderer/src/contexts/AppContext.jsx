@@ -32,11 +32,39 @@ export const AppProvider = ({ children }) => {
         playRef.current.baseTime = currentTime
     }, [isPlaying, currentTime])
 
-    // Load songs khi mount
     useEffect(() => {
-        setSongs(mockSongs);
+        const loadedSongs = { ...mockSongs };
+
+        try {
+            const savedImportedSongs = localStorage.getItem('importedSongs');
+            if (savedImportedSongs) {
+                const importedSongs = JSON.parse(savedImportedSongs);
+                Object.assign(loadedSongs, importedSongs);
+            }
+        } catch (e) {
+            console.error('Không load được imported songs:', e);
+        }
+
+        setSongs(loadedSongs);
         setLoading(false);
     }, []);
+
+    useEffect(() => {
+        if (loading) return;
+
+        const importedSongs = {};
+        Object.entries(songs).forEach(([key, song]) => {
+            if (song.isImported) {
+                importedSongs[key] = song;
+            }
+        });
+
+        try {
+            localStorage.setItem('importedSongs', JSON.stringify(importedSongs));
+        } catch (e) {
+            console.error('Không lưu được imported songs:', e);
+        }
+    }, [songs, loading]);
 
     useEffect(() => {
         if (!isPlaying) return
@@ -69,7 +97,6 @@ export const AppProvider = ({ children }) => {
         setIsPlaying(false);
         setCurrentTime(0);
 
-        // Tính duration từ last note
         if (song.songNotes && song.songNotes.length > 0) {
             const lastNote = song.songNotes[song.songNotes.length - 1];
             setDuration(lastNote ? lastNote.time + 1000 : 0);
