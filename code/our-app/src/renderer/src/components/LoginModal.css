@@ -162,7 +162,8 @@
 }
 
 /* ===== ERROR MESSAGE ===== */
-.modal-error {2px 14px;
+.modal-error {
+    padding: 12px 14px;
     background: rgba(231, 76, 60, 0.15);
     border: 1px solid rgba(231, 76, 60, 0.4);
     border-radius: 12px;
@@ -171,8 +172,7 @@
     text-align: center;
     font-weight: 500;
     animation: shake 0.4s ease-in-out;
-    font-family: inheri
-    animation: shake 0.4s ease-in-out;
+    font-family: inherit;
 }
 
 @keyframes shake {
@@ -214,12 +214,12 @@
 
 /* ===== DIVIDER ===== */
 .modal-divider {
-    text-aliccc;
+    text-align: center;
+    color: #ccc;
     font-size: 12px;
     position: relative;
     margin: 8px 0;
-    font-family: inherittive;
-    margin: 12px 0;
+    font-family: inherit;
 }
 
 .modal-divider::before,
@@ -268,16 +268,20 @@
     opacity: 0.6;
     cursor: not-allowed;
 }
-
+/* ===== GOOGLE ICON ===== */
+.google-icon {
+    width: 18px;
+    height: 18px;
+}
 /* ===== FOOTER ===== */
-.modal-footer {0px;
+.modal-footer {
+    margin-top: 20px;
     text-align: center;
     padding-top: 18px;
     border-top: 1px solid rgba(102, 126, 234, 0.1);
     color: #666;
     font-size: 13px;
-    font-family: inherit
-    font-size: 14px;
+    font-family: inherit;
 }
 
 .modal-btn-toggle {
@@ -305,7 +309,8 @@
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 480px) {
-    .login-modal-28px 20px;
+    .login-modal-box {
+        padding: 28px 20px;
         max-width: 90%;
         border-radius: 20px;
     }
