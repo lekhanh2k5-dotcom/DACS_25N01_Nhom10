@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { mockSongs } from '../data/songs';
+import { loadSongsFromFirebase } from '../firebase/songService';
 
 const AppContext = createContext();
 
@@ -33,20 +34,29 @@ export const AppProvider = ({ children }) => {
     }, [isPlaying, currentTime])
 
     useEffect(() => {
-        const loadedSongs = { ...mockSongs };
-
-        try {
-            const savedImportedSongs = localStorage.getItem('importedSongs');
-            if (savedImportedSongs) {
-                const importedSongs = JSON.parse(savedImportedSongs);
-                Object.assign(loadedSongs, importedSongs);
+        const loadSongs = async () => {
+            const loadedSongs = { ...mockSongs };
+            try {
+                const savedImportedSongs = localStorage.getItem('importedSongs');
+                if (savedImportedSongs) {
+                    const importedSongs = JSON.parse(savedImportedSongs);
+                    Object.assign(loadedSongs, importedSongs);
+                }
+            } catch (e) {
+                console.error('Không load được imported songs:', e);
             }
-        } catch (e) {
-            console.error('Không load được imported songs:', e);
-        }
+            try {
+                const firebaseSongs = await loadSongsFromFirebase();
+                Object.assign(loadedSongs, firebaseSongs);
+            } catch (e) {
+                console.error('Không load được Firebase songs:', e);
+            }
 
-        setSongs(loadedSongs);
-        setLoading(false);
+            setSongs(loadedSongs);
+            setLoading(false);
+        };
+
+        loadSongs();
     }, []);
 
     useEffect(() => {

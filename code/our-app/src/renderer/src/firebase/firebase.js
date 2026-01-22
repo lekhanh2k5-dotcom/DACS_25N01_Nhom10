@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, enableIndexedDbPersistence } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBlc7v_nR3TF7LJB0Nbv15Fk2DdxGc12lg",
@@ -13,5 +13,16 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-// Firestore (phần 2 sẽ dùng)
-export const db = getFirestore(app);
+export const db = getFirestore(app, 'skysheet');
+
+enableIndexedDbPersistence(db)
+  .then(() => {
+    console.log('✅ Data được cache local');
+  })
+  .catch((err) => {
+    if (err.code === 'failed-precondition') {
+      console.warn('⚠️ Cache disabled: Multiple tabs open');
+    } else if (err.code === 'unimplemented') {
+      console.warn('⚠️ Cache disabled: Browser không hỗ trợ');
+    }
+  });
