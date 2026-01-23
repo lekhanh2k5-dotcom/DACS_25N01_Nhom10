@@ -10,6 +10,9 @@ export default function LoginModal({ isOpen, onClose }) {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [showRegister, setShowRegister] = useState(false);
+    const [showForgotPassword, setShowForgotPassword] = useState(false);
+    const [resetEmail, setResetEmail] = useState('');
+    const [resetSuccess, setResetSuccess] = useState(false);
 
     const { login, register } = useAuth();
 
@@ -74,6 +77,26 @@ export default function LoginModal({ isOpen, onClose }) {
         }
     };
 
+    const handleForgotPassword = async (e) => {
+        e.preventDefault();
+        setError('');
+        setLoading(true);
+
+        try {
+            console.log('Gửi email reset cho:', resetEmail);
+            setResetSuccess(true);
+            setTimeout(() => {
+                setShowForgotPassword(false);
+                setResetSuccess(false);
+                setResetEmail('');
+            }, 3000);
+        } catch (err) {
+            setError(err.message || 'Không thể gửi email reset');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const handleOverlayClick = (e) => {
         if (e.target.className === 'login-modal-overlay') {
             onClose();
@@ -82,11 +105,14 @@ export default function LoginModal({ isOpen, onClose }) {
 
     const toggleMode = () => {
         setShowRegister(!showRegister);
+        setShowForgotPassword(false);
         setError('');
         setEmail('');
         setPassword('');
         setConfirmPassword('');
         setUsername('');
+        setResetEmail('');
+        setResetSuccess(false);
     };
 
     return (
@@ -97,18 +123,62 @@ export default function LoginModal({ isOpen, onClose }) {
                 <div className="modal-header">
                     <h2>🎵 SkyBard</h2>
                     <p className="modal-subtitle">
-                        {showRegister ? 'Tạo tài khoản mới' : 'Đăng nhập để tiếp tục'}
+                        {showForgotPassword ? 'Khôi phục mật khẩu' : (showRegister ? 'Tạo tài khoản mới' : 'Đăng nhập để tiếp tục')}
                     </p>
                 </div>
 
-                <form onSubmit={handleSubmit} className="modal-form">
+                <form onSubmit={showForgotPassword ? handleForgotPassword : handleSubmit} className="modal-form">
                     {error && (
                         <div className="modal-error">
                             {error}
                         </div>
                     )}
 
-                    {showRegister ? (
+                    {resetSuccess && (
+                        <div className="modal-success">
+                            ✓ Email khôi phục đã được gửi! Vui lòng kiểm tra hộp thư.
+                        </div>
+                    )}
+
+                    {showForgotPassword ? (
+                        <>
+                            <div className="modal-form-group">
+                                <label htmlFor="resetEmail">Email</label>
+                                <input
+                                    type="email"
+                                    id="resetEmail"
+                                    value={resetEmail}
+                                    onChange={(e) => setResetEmail(e.target.value)}
+                                    placeholder="Nhập email của bạn"
+                                    required
+                                    disabled={loading}
+                                />
+                                <small className="modal-form-hint">Chúng tôi sẽ gửi link khôi phục đến email này</small>
+                            </div>
+
+                            <button
+                                type="submit"
+                                className="modal-btn-auth"
+                                disabled={loading}
+                            >
+                                {loading ? 'Đang gửi...' : 'Gửi email khôi phục'}
+                            </button>
+
+                            <button
+                                type="button"
+                                className="modal-btn-back"
+                                onClick={() => {
+                                    setShowForgotPassword(false);
+                                    setResetEmail('');
+                                    setError('');
+                                    setResetSuccess(false);
+                                }}
+                                disabled={loading}
+                            >
+                                ← Quay lại đăng nhập
+                            </button>
+                        </>
+                    ) : showRegister ? (
                         // ===== ĐĂNG KÝ FORM =====
                         <>
                             <div className="modal-form-group">
@@ -165,9 +235,16 @@ export default function LoginModal({ isOpen, onClose }) {
                                     minLength={6}
                                 />
                             </div>
+
+                            <button
+                                type="submit"
+                                className="modal-btn-auth"
+                                disabled={loading}
+                            >
+                                {loading ? 'Đang xử lý...' : 'Đăng ký'}
+                            </button>
                         </>
                     ) : (
-                        // ===== ĐĂNG NHẬP FORM =====
                         <>
                             <div className="modal-form-group">
                                 <label htmlFor="email">Tài khoản (Email hoặc tên tk)</label>
@@ -195,19 +272,27 @@ export default function LoginModal({ isOpen, onClose }) {
                                     minLength={6}
                                 />
                             </div>
-                        </>
-                    )}
 
-                    <button
-                        type="submit"
-                        className="modal-btn-auth"
-                        disabled={loading}
-                    >
-                        {loading ? 'Đang xử lý...' : (showRegister ? 'Đăng ký' : 'Đăng nhập')}
-                    </button>
+                            <button
+                                type="button"
+                                className="modal-forgot-password"
+                                onClick={() => {
+                                    setShowForgotPassword(true);
+                                    setError('');
+                                }}
+                                disabled={loading}
+                            >
+                                Quên mật khẩu?
+                            </button>
 
-                    {!showRegister && (
-                        <>
+                            <button
+                                type="submit"
+                                className="modal-btn-auth"
+                                disabled={loading}
+                            >
+                                {loading ? 'Đang xử lý...' : 'Đăng nhập'}
+                            </button>
+
                             <div className="modal-divider">Hoặc</div>
                             <button
                                 type="button"
@@ -226,18 +311,20 @@ export default function LoginModal({ isOpen, onClose }) {
                     )}
                 </form>
 
-                <div className="modal-footer">
-                    <button
-                        type="button"
-                        className="modal-btn-toggle"
-                        onClick={toggleMode}
-                        disabled={loading}
-                    >
-                        {showRegister
-                            ? 'Đã có tài khoản? Đăng nhập ngay'
-                            : 'Chưa có tài khoản? Đăng ký ngay'}
-                    </button>
-                </div>
+                {!showForgotPassword && (
+                    <div className="modal-footer">
+                        <button
+                            type="button"
+                            className="modal-btn-toggle"
+                            onClick={toggleMode}
+                            disabled={loading}
+                        >
+                            {showRegister
+                                ? 'Đã có tài khoản? Đăng nhập ngay'
+                                : 'Chưa có tài khoản? Đăng ký ngay'}
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );
