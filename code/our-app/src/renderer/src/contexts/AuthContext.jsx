@@ -8,7 +8,7 @@ import {
     createUserWithEmailAndPassword,
     signOut,
 } from "firebase/auth";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, collection, query, where, getDocs } from "firebase/firestore";
 
 const AuthContext = createContext();
 
@@ -53,12 +53,57 @@ export const AuthProvider = ({ children }) => {
         return () => unsub();
     }, []);
 
-    const login = async (email, password) => {
+    const login = async (accountOrEmail, password) => {
+        let email = accountOrEmail;
+
+        if (!accountOrEmail.includes('@')) {
+            console.log('🔍 Tìm email từ username:', accountOrEmail);
+
+            const usersRef = collection(db, "users");
+            const q = query(usersRef, where("displayName", "==", accountOrEmail));
+            const snapshot = await getDocs(q);
+
+            if (snapshot.empty) {
+                const error = new Error('Tên tài khoản không tồn tại');
+                error.code = 'auth/user-not-found';
+                throw error;
+            }
+
+            email = snapshot.docs[0].data().email;
+            console.log('✅ Tìm thấy email:', email);
+        }
+
         const cred = await signInWithEmailAndPassword(auth, email, password);
         return cred.user;
     };
 
     const register = async (email, password, username) => {
+        const usernameRegex = /^[a-zA-Z0-9_-]+$/;
+
+        if (username && !usernameRegex.test(username)) {
+            const error = new Error('Tên tài khoản chỉ được chứa chữ cái, số, dấu gạch dưới (_) và gạch ngang (-)');
+            error.code = 'auth/invalid-username';
+            throw error;
+        }
+
+        if (username && username.length < 3) {
+            const error = new Error('Tên tài khoản phải có ít nhất 3 ký tự');
+            error.code = 'auth/username-too-short';
+            throw error;
+        }
+
+        if (username) {
+            const usersRef = collection(db, "users");
+            const q = query(usersRef, where("displayName", "==", username));
+            const snapshot = await getDocs(q);
+
+            if (!snapshot.empty) {
+                const error = new Error('Tên tài khoản đã được sử dụng');
+                error.code = 'auth/username-already-exists';
+                throw error;
+            }
+        }
+
         const cred = await createUserWithEmailAndPassword(auth, email, password);
 
         await setDoc(doc(db, "users", cred.user.uid), {

@@ -69,6 +69,12 @@ export default function LoginModal({ isOpen, onClose }) {
                 setError('Email đã được sử dụng');
             } else if (err.code === 'auth/invalid-email') {
                 setError('Email không hợp lệ');
+            } else if (err.code === 'auth/invalid-username') {
+                setError('Tên tài khoản chỉ được chứa chữ cái, số, dấu _ và -');
+            } else if (err.code === 'auth/username-too-short') {
+                setError('Tên tài khoản phải có ít nhất 3 ký tự');
+            } else if (err.code === 'auth/username-already-exists') {
+                setError('Tên tài khoản đã được sử dụng');
             } else {
                 setError(err.message || 'Đã xảy ra lỗi');
             }
@@ -202,7 +208,11 @@ export default function LoginModal({ isOpen, onClose }) {
                                     placeholder="Nhập tên tài khoản"
                                     required
                                     disabled={loading}
+                                    pattern="[a-zA-Z0-9_-]+"
+                                    title="Chỉ được chứa chữ cái, số, dấu _ và -"
+                                    minLength={3}
                                 />
+                                <small className="modal-form-hint">Chỉ chữ cái, số, dấu _ và - (tối thiểu 3 ký tự)</small>
                             </div>
 
                             <div className="modal-form-group">
