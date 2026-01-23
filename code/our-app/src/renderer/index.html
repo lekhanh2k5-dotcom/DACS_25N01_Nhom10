@@ -4,8 +4,23 @@
 <head>
   <meta charset="UTF-8" />
   <title>OurApp - SkyBard</title>
-  <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https://www.google.com; connect-src 'self' https://firestore.googleapis.com https://*.googleapis.com https://identitytoolkit.googleapis.com;" />
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'unsafe-eval' 'unsafe-inline' http://localhost:*;
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+    font-src 'self' https://fonts.gstatic.com data:;
+    img-src 'self' data: https://www.google.com https://www.gstatic.com;
+    connect-src
+      'self'
+      http://localhost:* ws://localhost:*
+      https://firestore.googleapis.com
+      https://*.googleapis.com
+      https://www.googleapis.com
+      https://identitytoolkit.googleapis.com
+      https://securetoken.googleapis.com
+      https://firebaseinstallations.googleapis.com;
+  " />
+
 </head>
 
 <body>
