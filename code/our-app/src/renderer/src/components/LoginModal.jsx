@@ -14,7 +14,7 @@ export default function LoginModal({ isOpen, onClose }) {
     const [resetEmail, setResetEmail] = useState('');
     const [resetSuccess, setResetSuccess] = useState(false);
 
-    const { login, register, loginWithGoogle } = useAuth();
+    const { login, register, resetPassword } = useAuth();
 
     if (!isOpen) return null;
 
@@ -80,10 +80,12 @@ export default function LoginModal({ isOpen, onClose }) {
     const handleForgotPassword = async (e) => {
         e.preventDefault();
         setError('');
+        setResetSuccess(false);
         setLoading(true);
 
         try {
-            console.log('Gửi email reset cho:', resetEmail);
+            await resetPassword(resetEmail);
+            console.log('✅ Email reset đã được gửi tới:', resetEmail);
             setResetSuccess(true);
             setTimeout(() => {
                 setShowForgotPassword(false);
@@ -91,11 +93,21 @@ export default function LoginModal({ isOpen, onClose }) {
                 setResetEmail('');
             }, 3000);
         } catch (err) {
-            setError(err.message || 'Không thể gửi email reset');
+            console.error('❌ Lỗi reset password:', err);
+            if (err.code === 'auth/user-not-found') {
+                setError('Email không tồn tại trong hệ thống');
+            } else if (err.code === 'auth/invalid-email') {
+                setError('Email không hợp lệ');
+            } else if (err.code === 'auth/missing-email') {
+                setError('Vui lòng nhập email');
+            } else {
+                setError(err.message || 'Không thể gửi email khôi phục. Vui lòng thử lại.');
+            }
         } finally {
             setLoading(false);
         }
     };
+
 
     const handleOverlayClick = (e) => {
         if (e.target.className === 'login-modal-overlay') {

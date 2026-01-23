@@ -1,5 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { auth, db } from "../firebase/firebase";
+import { resetPassword as fbResetPassword } from "../firebase/auth";
+
 import {
     onAuthStateChanged,
     signInWithEmailAndPassword,
@@ -72,12 +74,26 @@ export const AuthProvider = ({ children }) => {
     const logout = async () => {
         await signOut(auth);
     };
+    const resetPassword = async (email) => {
+        await fbResetPassword(email);
+        return true;
+    };
 
+    const value = {
+        user,
+        userProfile,
+        loading: false,
+        login,
+        register,
+        logout,
+        resetPassword,
+    };
     return (
         <AuthContext.Provider
-            value={{ user, userProfile, loading, login, register, logout }}
+            value={value}
         >
             {children}
         </AuthContext.Provider>
     );
+
 };
