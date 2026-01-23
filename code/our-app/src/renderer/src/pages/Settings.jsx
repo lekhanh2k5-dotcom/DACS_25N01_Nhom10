@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { showConfirm, showAlert } from '../utils/alert';
 
 export default function Settings({ onLoginClick }) {
     const [selectedGame, setSelectedGame] = useState('sky');
@@ -232,10 +233,10 @@ export default function Settings({ onLoginClick }) {
                             </div>
 
                             <button
+                                // Đăng xuất
                                 onClick={async () => {
-                                    if (confirm('Bạn có chắc muốn đăng xuất?')) {
+                                    if (await showConfirm('Bạn có chắc muốn đăng xuất?')) {
                                         await logout();
-                                        console.log('✅ Đã đăng xuất');
                                     }
                                 }}
                                 style={{
@@ -276,11 +277,12 @@ export default function Settings({ onLoginClick }) {
                                 Đăng nhập để mua bài hát và đồng bộ dữ liệu
                             </p>
                             <button
-                                onClick={() => {
+                                // Đăng nhập chưa sẵn sàng
+                                onClick={async () => {
                                     if (onLoginClick) {
                                         onLoginClick();
                                     } else {
-                                        alert('Tính năng đăng nhập chưa sẵn sàng');
+                                        await showAlert('Tính năng đăng nhập chưa sẵn sàng');
                                     }
                                 }}
                                 style={{

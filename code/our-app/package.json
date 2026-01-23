@@ -20,7 +20,8 @@
     "@electron-toolkit/utils": "^4.0.0",
     "@nut-tree-fork/nut-js": "^4.2.6",
     "firebase": "^12.8.0",
-    "koffi": "^2.15.0"
+    "koffi": "^2.15.0",
+    "sweetalert2": "^11.26.17"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config-prettier": "^3.0.0",

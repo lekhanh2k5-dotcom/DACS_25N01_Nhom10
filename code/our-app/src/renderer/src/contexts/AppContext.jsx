@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { mockSongs } from '../data/songs';
 import { loadSongsFromFirebase } from '../firebase/songService';
+import { showAlert, showConfirm, showImportSuccess, showImportFail } from '../utils/alert';
 
 const AppContext = createContext();
 
@@ -163,8 +164,8 @@ export const AppProvider = ({ children }) => {
     };
 
     // Mua bài hát (demo mode)
-    const buySong = () => {
-        alert('Chức năng mua bị tắt trong chế độ demo!');
+    const buySong = async () => {
+        await showAlert('Chức năng mua bị tắt trong chế độ demo!');
         return false;
     };
 
@@ -173,7 +174,7 @@ export const AppProvider = ({ children }) => {
         const result = await window.api.sheet.open()
         if (!result || result.ok === false) {
             if (result?.canceled) return
-            alert(result?.message || 'Không đọc được file sheet')
+            await showImportFail(result?.message || 'Không đọc được file sheet')
             return
         }
 
@@ -182,13 +183,13 @@ export const AppProvider = ({ children }) => {
         console.log('IMPORT data:', data)
 
         if (!data) {
-            alert('Lỗi: data không tồn tại')
+            await showImportFail('Lỗi: data không tồn tại')
             return
         }
         let songData = data
         if (Array.isArray(data)) {
             if (data.length === 0) {
-                alert('File JSON là array rỗng')
+                await showImportFail('File JSON là array rỗng')
                 return
             }
             songData = data[0]
@@ -209,7 +210,7 @@ export const AppProvider = ({ children }) => {
         }
 
         if (song.songNotes.length === 0) {
-            alert(`File sheet không có songNotes hoặc songNotes rỗng.\n\nThông tin file:\n- Keys: ${Object.keys(data).join(', ')}\n- songNotes type: ${typeof data?.songNotes}\n- songNotes: ${JSON.stringify(data?.songNotes)?.slice(0, 100)}`)
+            await showImportFail(`File sheet không có songNotes hoặc songNotes rỗng.\n\nThông tin file:\n- Keys: ${Object.keys(data).join(', ')}\n- songNotes type: ${typeof data?.songNotes}\n- songNotes: ${JSON.stringify(data?.songNotes)?.slice(0, 100)}`)
             return
         }
 
@@ -225,23 +226,23 @@ export const AppProvider = ({ children }) => {
         const maxTime = Math.max(...song.songNotes.map(n => Number(n.time) || 0))
         setDuration(maxTime + 1000)
 
-        alert('✅ Import thành công!')
+        await showImportSuccess('Import thành công!')
     }
 
 
     // Xóa bài hát
-    const deleteSong = (songKey) => {
+    const deleteSong = async (songKey) => {
         if (!songKey) return;
 
         const song = songs[songKey];
         if (!song) return;
 
         if (!song.isImported) {
-            alert('Chỉ có thể xóa bài đã import từ máy.');
+            await showAlert('Chỉ có thể xóa bài đã import từ máy.');
             return;
         }
 
-        const ok = window.confirm(`Xóa bài "${song.name}" khỏi thư viện?`);
+        const ok = await showConfirm(`Xóa bài "${song.name}" khỏi thư viện?`);
         if (!ok) return;
 
         if (currentSong?.key === songKey) {
