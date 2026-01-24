@@ -2,6 +2,8 @@ import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { mockSongs } from '../data/songs';
 import { loadSongsFromFirebase } from '../firebase/songService';
 import { showAlert, showConfirm, showImportSuccess, showImportFail } from '../utils/alert';
+import { purchaseSong } from '../firebase/coinService';
+import { useAuth } from './AuthContext';
 
 const AppContext = createContext();
 
@@ -25,6 +27,7 @@ export const AppProvider = ({ children }) => {
     const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
+    const { currentUser } = useAuth();
 
     const playRef = useRef({ startedAt: 0, baseTime: 0 })
 
@@ -163,10 +166,38 @@ export const AppProvider = ({ children }) => {
         }));
     };
 
-    // Mua bài hát (demo mode)
-    const buySong = async () => {
-        await showAlert('Chức năng mua bị tắt trong chế độ demo!');
-        return false;
+    // Mua bài hát
+    const buySong = async (songKey, price) => {
+        console.log("Kiểm tra Auth:", {
+            user: currentUser,
+            uid: currentUser?.uid
+        });
+        if (!currentUser) {
+            await showAlert('Vui lòng đăng nhập để mua bài hát!');
+            return false;
+        }
+
+        const song = songs[songKey];
+        if (!song) return false;
+
+        const ok = await showConfirm(`Bạn có muốn dùng ${price} xu để mua bài "${song.name}" không?`);
+        if (!ok) return false;
+
+        try {
+            const result = await purchaseSong(currentUser.uid, { ...song, id: songKey, price });
+
+            if (result.success) {
+                await showAlert('Mua hàng thành công! Bài hát đã có trong thư viện của bạn.');
+                return true;
+            } else {
+                await showAlert(result.message || 'Giao dịch thất bại.');
+                return false;
+            }
+        } catch (error) {
+            console.error('Lỗi buySong:', error);
+            await showAlert('Đã xảy ra lỗi trong quá trình giao dịch.');
+            return false;
+        }
     };
 
     // Import bài hát

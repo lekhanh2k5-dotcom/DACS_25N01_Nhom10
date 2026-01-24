@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../contexts/AppContext';
 import SongCard from '../components/SongCard';
-
+import { useAuth } from '../contexts/AuthContext';
 const REGIONS = {
     all: { label: '🌏 Tất cả', icon: '🌏' },
     vietnam: { label: '🇻🇳 Việt Nam', icon: '🇻🇳' },
@@ -15,7 +15,7 @@ export default function Store() {
     const { songs, selectSong } = useApp();
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedRegion, setSelectedRegion] = useState('all');
-
+    const { userData } = useAuth();
     React.useEffect(() => {
         const style = document.createElement('style');
         style.textContent = `
@@ -34,8 +34,9 @@ export default function Store() {
 
     const filteredSongs = Object.keys(songs).filter(key => {
         const song = songs[key];
+        const isOwned = userData?.ownedSongs && userData.ownedSongs[key] === true;
         if (!song.isFromFirebase) return false;
-        if (song.isOwned) return false;
+        if (isOwned) return false;
         if (selectedRegion !== 'all' && song.region !== selectedRegion) return false;
 
         const query = searchQuery.toLowerCase();

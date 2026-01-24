@@ -1,14 +1,13 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { auth, db } from "../firebase/firebase";
 import { resetPassword as fbResetPassword } from "../firebase/auth";
-
 import {
     onAuthStateChanged,
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
     signOut,
 } from "firebase/auth";
-import { doc, getDoc, setDoc, collection, query, where, getDocs } from "firebase/firestore";
+import { onSnapshot, doc, getDoc, setDoc, collection, query, where, getDocs } from "firebase/firestore";
 
 const AuthContext = createContext();
 
@@ -24,33 +23,42 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const unsub = onAuthStateChanged(auth, async (u) => {
-            setUser(u || null);
+        let unsubscribeProfile = null;
 
+        const unsubAuth = onAuthStateChanged(auth, async (u) => {
+            setUser(u || null);
+            if (unsubscribeProfile) unsubscribeProfile();
             if (u) {
                 const ref = doc(db, "users", u.uid);
                 const snap = await getDoc(ref);
-
-                if (snap.exists()) {
-                    setUserProfile(snap.data());
-                } else {
+                if (!snap.exists()) {
                     const profile = {
                         email: u.email,
                         displayName: u.email?.split("@")[0] || "User",
                         coins: 1000,
                         createdAt: Date.now(),
+                        ownedSongs: {}
                     };
                     await setDoc(ref, profile);
-                    setUserProfile(profile);
                 }
+                unsubscribeProfile = onSnapshot(ref, (snapshot) => {
+                    if (snapshot.exists()) {
+                        console.log("Dữ liệu User cập nhật:", snapshot.data());
+                        setUserProfile(snapshot.data());
+                    }
+                    setLoading(false);
+                });
+
             } else {
                 setUserProfile(null);
+                setLoading(false);
             }
-
-            setLoading(false);
         });
 
-        return () => unsub();
+        return () => {
+            unsubAuth();
+            if (unsubscribeProfile) unsubscribeProfile();
+        };
     }, []);
 
     const login = async (accountOrEmail, password) => {
@@ -132,6 +140,8 @@ export const AuthProvider = ({ children }) => {
         register,
         logout,
         resetPassword,
+        currentUser: auth.currentUser,
+        userData: userProfile,
     };
     return (
         <AuthContext.Provider
