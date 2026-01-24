@@ -29,8 +29,10 @@ export const AppProvider = ({ children }) => {
     const [duration, setDuration] = useState(0);
     const { currentUser } = useAuth();
 
-    const playRef = useRef({ startedAt: 0, baseTime: 0 })
-
+    const playRef = useRef({
+        realStartTime: 0,
+        initialSongTime: 0
+    });
     useEffect(() => {
         if (!isPlaying) return
         playRef.current.startedAt = performance.now()
@@ -81,25 +83,28 @@ export const AppProvider = ({ children }) => {
     }, [songs, loading]);
 
     useEffect(() => {
-        if (!isPlaying) return
+        if (!isPlaying) return;
+        playRef.current.realStartTime = performance.now();
+        playRef.current.initialSongTime = currentTime;
 
         const id = setInterval(() => {
-            const { startedAt, baseTime } = playRef.current
-            const elapsed = performance.now() - startedAt
-            const t = baseTime + elapsed * playbackSpeed
+            const now = performance.now();
+            const realElapsed = now - playRef.current.realStartTime;
 
-            const clamped = Math.min(t, duration)
+            const nextTime = playRef.current.initialSongTime + (realElapsed * playbackSpeed);
 
-            setCurrentTime(clamped)
+            const clamped = Math.min(nextTime, duration);
+            setCurrentTime(clamped);
 
-            if (clamped >= duration) {
-                setIsPlaying(false)
-                clearInterval(id)
+            if (nextTime >= duration) {
+                setIsPlaying(false);
+                window.api.autoPlay.stop();
+                clearInterval(id);
             }
-        }, 100)
+        }, 16);
 
-        return () => clearInterval(id)
-    }, [isPlaying, playbackSpeed, duration])
+        return () => clearInterval(id);
+    }, [isPlaying, playbackSpeed, duration]); //
 
 
 
