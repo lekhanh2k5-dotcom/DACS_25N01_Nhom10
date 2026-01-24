@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import './LoginModal.css';
 
@@ -15,6 +15,35 @@ export default function LoginModal({ isOpen, onClose }) {
     const [resetSuccess, setResetSuccess] = useState(false);
 
     const { login, register, resetPassword } = useAuth();
+    const RESET_COOLDOWN_SECONDS = 60;
+    const RESET_COOLDOWN_KEY = "reset_pw_cooldown_until";
+
+    const [resetCooldown, setResetCooldown] = useState(0);
+
+    useEffect(() => {
+        const until = Number(localStorage.getItem(RESET_COOLDOWN_KEY) || 0);
+        const left = Math.max(0, Math.ceil((until - Date.now()) / 1000));
+        setResetCooldown(left);
+    }, []);
+
+    useEffect(() => {
+        if (resetCooldown <= 0) return;
+
+        const t = setInterval(() => {
+            const until = Number(localStorage.getItem(RESET_COOLDOWN_KEY) || 0);
+            const left = Math.max(0, Math.ceil((until - Date.now()) / 1000));
+            setResetCooldown(left);
+            if (left <= 0) clearInterval(t);
+        }, 500);
+
+        return () => clearInterval(t);
+    }, [resetCooldown]);
+
+    const startResetCooldown = (sec = RESET_COOLDOWN_SECONDS) => {
+        const until = Date.now() + sec * 1000;
+        localStorage.setItem(RESET_COOLDOWN_KEY, String(until));
+        setResetCooldown(sec);
+    };
 
     if (!isOpen) return null;
 
@@ -87,32 +116,30 @@ export default function LoginModal({ isOpen, onClose }) {
         e.preventDefault();
         setError('');
         setResetSuccess(false);
+
+        if (loading || resetCooldown > 0) return;
+
         setLoading(true);
 
         try {
             await resetPassword(resetEmail);
-            console.log('✅ Email reset đã được gửi tới:', resetEmail);
             setResetSuccess(true);
+            startResetCooldown(RESET_COOLDOWN_SECONDS);
+
             setTimeout(() => {
-                setShowForgotPassword(false);
+                //setShowForgotPassword(false);
                 setResetSuccess(false);
-                setResetEmail('');
+                //setResetEmail('');
             }, 3000);
         } catch (err) {
             console.error('❌ Lỗi reset password:', err);
-            if (err.code === 'auth/user-not-found') {
-                setError('Email không tồn tại trong hệ thống');
-            } else if (err.code === 'auth/invalid-email') {
-                setError('Email không hợp lệ');
-            } else if (err.code === 'auth/missing-email') {
-                setError('Vui lòng nhập email');
-            } else {
-                setError(err.message || 'Không thể gửi email khôi phục. Vui lòng thử lại.');
-            }
+            setResetSuccess(true);
+            startResetCooldown(30);
         } finally {
             setLoading(false);
         }
     };
+
 
 
     const handleOverlayClick = (e) => {
@@ -177,10 +204,15 @@ export default function LoginModal({ isOpen, onClose }) {
                             <button
                                 type="submit"
                                 className="modal-btn-auth"
-                                disabled={loading}
+                                disabled={loading || resetCooldown > 0}
                             >
-                                {loading ? 'Đang gửi...' : 'Gửi email khôi phục'}
+                                {loading
+                                    ? 'Đang gửi...'
+                                    : resetCooldown > 0
+                                        ? `Thử lại sau ${resetCooldown}s`
+                                        : 'Gửi email khôi phục'}
                             </button>
+
 
                             <button
                                 type="button"
