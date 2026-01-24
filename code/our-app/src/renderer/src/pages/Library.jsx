@@ -1,19 +1,28 @@
 import React, { useState, useMemo } from 'react';
 import { useApp } from '../contexts/AppContext';
 import SongCard from '../components/SongCard';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Library() {
     const { songs, activeLibraryTab, setActiveLibraryTab, selectSong, importSongFile } = useApp();
     const [searchQuery, setSearchQuery] = useState('');
+    const { userData } = useAuth();
 
     const ownedSongs = useMemo(() => {
         return Object.keys(songs)
             .filter(key => {
                 const song = songs[key];
-                return !song.isFromFirebase || song.isOwned;
+                if (!song.isFromFirebase) return true;
+                const isBought = userData?.ownedSongs?.[key] === true;
+                return isBought;
             })
-            .reduce((obj, key) => ({ ...obj, [key]: songs[key] }), {});
-    }, [songs]);
+            .reduce((obj, key) => {
+                obj[key] = { ...songs[key], isOwned: true };
+                return obj;
+            }, {});
+    }, [songs, userData]);
+
+
 
     const favoriteSongs = useMemo(() => {
         return Object.keys(songs)

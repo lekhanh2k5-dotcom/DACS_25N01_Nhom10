@@ -9,7 +9,9 @@ const api = {
   stop: () => ipcRenderer.send('auto-play:stop')
   },
   sheet: {
-    open: () => ipcRenderer.invoke('sheet:open')
+    open: () => ipcRenderer.invoke('sheet:open'),
+    readPath: (path) => ipcRenderer.invoke('sheet:read-path', path),
+    secureLoad: (txtFilePath) => ipcRenderer.invoke('sheet:secure-load', txtFilePath) 
  }
 }
 

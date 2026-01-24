@@ -89,6 +89,7 @@ export const AppProvider = ({ children }) => {
             const t = baseTime + elapsed * playbackSpeed
 
             const clamped = Math.min(t, duration)
+
             setCurrentTime(clamped)
 
             if (clamped >= duration) {
@@ -103,7 +104,7 @@ export const AppProvider = ({ children }) => {
 
 
     // Chọn bài hát
-    const selectSong = (songKey) => {
+    const selectSong = async (songKey) => {
         const song = songs[songKey];
         if (!song) return;
 
@@ -111,9 +112,29 @@ export const AppProvider = ({ children }) => {
         setIsPlaying(false);
         setCurrentTime(0);
 
-        if (song.songNotes && song.songNotes.length > 0) {
-            const lastNote = song.songNotes[song.songNotes.length - 1];
-            setDuration(lastNote ? lastNote.time + 1000 : 0);
+        // Nếu là bài cloud, tải songNotes từ Firebase Storage qua IPC
+        if (song.txtFilePath) {
+            const result = await window.api.sheet.secureLoad(song.txtFilePath);
+            if (result.ok) {
+                // Gán songNotes mới từ cloud
+                setCurrentSong(prev => ({
+                    ...prev,
+                    songNotes: result.songNotes
+                }));
+                // Cập nhật duration nếu cần
+                if (result.songNotes.length > 0) {
+                    const lastNote = result.songNotes[result.songNotes.length - 1];
+                    setDuration(lastNote ? lastNote.time + 1000 : 0);
+                }
+            } else {
+                await showAlert('Không tải được dữ liệu bài hát từ cloud: ' + result.message);
+            }
+        } else {
+            // ...xử lý như cũ cho bài local/import...
+            if (song.songNotes && song.songNotes.length > 0) {
+                const lastNote = song.songNotes[song.songNotes.length - 1];
+                setDuration(lastNote ? lastNote.time + 1000 : 0);
+            }
         }
     };
 
