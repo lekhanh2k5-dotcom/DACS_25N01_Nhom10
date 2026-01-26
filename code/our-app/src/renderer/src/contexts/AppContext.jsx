@@ -16,7 +16,6 @@ export const useApp = () => {
 };
 
 export const AppProvider = ({ children }) => {
-    // States
     const [songs, setSongs] = useState({});
     const [loading, setLoading] = useState(true);
     const [currentSong, setCurrentSong] = useState(null);
@@ -27,7 +26,7 @@ export const AppProvider = ({ children }) => {
     const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
-    const { currentUser } = useAuth();
+    const { currentUser, userData } = useAuth();
 
     const playRef = useRef({
         realStartTime: 0,
@@ -106,27 +105,34 @@ export const AppProvider = ({ children }) => {
         return () => clearInterval(id);
     }, [isPlaying, playbackSpeed, duration]); //
 
+    const hasPermission = (songKey) => {
+        const song = songs[songKey];
+        if (!song) return false;
+        if (song.isImported || !song.price || song.price === 0) return true;
+        return userData?.ownedSongs?.[songKey] === true;
+    };
 
-
-    // Chọn bài hát
     const selectSong = async (songKey) => {
         const song = songs[songKey];
         if (!song) return;
+        const isImported = song.isImported;
+        const isFromFirebase = song.isFromFirebase;
+        const isBought = userData?.ownedSongs?.[songKey] === true;
+        if (isFromFirebase && !isBought && !isImported) {
+            await showAlert(`Bạn cần mua bài "${song.name}" để phát.`);
+            return;
+        }
 
         setCurrentSong({ ...song, key: songKey });
         setIsPlaying(false);
         setCurrentTime(0);
-
-        // Nếu là bài cloud, tải songNotes từ Firebase Storage qua IPC
         if (song.txtFilePath) {
             const result = await window.api.sheet.secureLoad(song.txtFilePath);
             if (result.ok) {
-                // Gán songNotes mới từ cloud
                 setCurrentSong(prev => ({
                     ...prev,
                     songNotes: result.songNotes
                 }));
-                // Cập nhật duration nếu cần
                 if (result.songNotes.length > 0) {
                     const lastNote = result.songNotes[result.songNotes.length - 1];
                     setDuration(lastNote ? lastNote.time + 1000 : 0);
@@ -135,7 +141,6 @@ export const AppProvider = ({ children }) => {
                 await showAlert('Không tải được dữ liệu bài hát từ cloud: ' + result.message);
             }
         } else {
-            // ...xử lý như cũ cho bài local/import...
             if (song.songNotes && song.songNotes.length > 0) {
                 const lastNote = song.songNotes[song.songNotes.length - 1];
                 setDuration(lastNote ? lastNote.time + 1000 : 0);
@@ -143,7 +148,6 @@ export const AppProvider = ({ children }) => {
         }
     };
 
-    // Toggle phát/dừng
     const togglePlayback = () => {
         if (!currentSong) return;
         if (!isPlaying) {
@@ -156,32 +160,42 @@ export const AppProvider = ({ children }) => {
     };
 
 
-    // Tua đến thời điểm
     const seekTo = (timeMs) => {
         setCurrentTime(timeMs);
     };
 
-    // Phát bài tiếp theo
     const playNext = () => {
         const songKeys = Object.keys(songs);
         if (songKeys.length === 0 || !currentSong) return;
 
         const currentIndex = songKeys.findIndex(key => key === currentSong.key);
-        const nextIndex = (currentIndex + 1) % songKeys.length;
-        selectSong(songKeys[nextIndex]);
+        for (let i = 1; i <= songKeys.length; i++) {
+            const nextIndex = (currentIndex + i) % songKeys.length;
+            const nextKey = songKeys[nextIndex];
+
+            if (hasPermission(nextKey)) {
+                selectSong(nextKey);
+                return;
+            }
+        }
     };
 
-    // Phát bài trước
     const playPrev = () => {
         const songKeys = Object.keys(songs);
         if (songKeys.length === 0 || !currentSong) return;
 
         const currentIndex = songKeys.findIndex(key => key === currentSong.key);
-        const prevIndex = currentIndex - 1 < 0 ? songKeys.length - 1 : currentIndex - 1;
-        selectSong(songKeys[prevIndex]);
+        for (let i = 1; i <= songKeys.length; i++) {
+            const prevIndex = (currentIndex - i + songKeys.length) % songKeys.length;
+            const prevKey = songKeys[prevIndex];
+
+            if (hasPermission(prevKey)) {
+                selectSong(prevKey);
+                return;
+            }
+        }
     };
 
-    // Toggle yêu thích
     const toggleFavorite = (songKey) => {
         setSongs(prev => ({
             ...prev,
@@ -192,7 +206,6 @@ export const AppProvider = ({ children }) => {
         }));
     };
 
-    // Mua bài hát
     const buySong = async (songKey, price) => {
         console.log("Kiểm tra Auth:", {
             user: currentUser,
@@ -226,7 +239,6 @@ export const AppProvider = ({ children }) => {
         }
     };
 
-    // Import bài hát
     const importSongFile = async () => {
         const result = await window.api.sheet.open()
         if (!result || result.ok === false) {
@@ -287,7 +299,6 @@ export const AppProvider = ({ children }) => {
     }
 
 
-    // Xóa bài hát
     const deleteSong = async (songKey) => {
         if (!songKey) return;
 

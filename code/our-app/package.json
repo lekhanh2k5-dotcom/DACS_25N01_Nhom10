@@ -39,6 +39,23 @@
     "react-dom": "^19.2.3",
     "vite": "^7.3.1"
   },
+  "build": {
+    "appId": "com.skybard.app",
+    "productName": "SkyBard",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "portable",
+      "icon": "resources/icon.png"
+    },
+    "extraResources": [
+      {
+        "from": "serviceAccountKey.json",
+        "to": "serviceAccountKey.json"
+      }
+    ]
+  },
   "keywords": [],
   "license": "ISC",
   "type": "commonjs"
