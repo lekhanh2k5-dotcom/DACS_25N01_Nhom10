@@ -7,8 +7,10 @@ export default function Sidebar({ onLoginClick }) {
     const { user, userProfile } = useAuth();
 
     const handleLoginClick = () => {
-        if (!user && onLoginClick) {
-            onLoginClick();
+        if (!user) {
+            if (onLoginClick) onLoginClick();
+        } else {
+            setActiveTab('account');
         }
     };
 

@@ -5,6 +5,7 @@ import PlayerBar from './components/PlayerBar';
 import Store from './pages/Store';
 import Library from './pages/Library';
 import Settings from './pages/Settings';
+import AccountPage from './pages/AccountPage';
 import LoginModal from './components/LoginModal';
 import { useState } from 'react';
 
@@ -40,6 +41,7 @@ function AppContent() {
           {activeTab === 'store' && <Store />}
           {activeTab === 'library' && <Library />}
           {activeTab === 'settings' && <Settings onLoginClick={() => setIsLoginModalOpen(true)} />}
+          {activeTab === 'account' && <AccountPage />}
         </main>
       </div>
 

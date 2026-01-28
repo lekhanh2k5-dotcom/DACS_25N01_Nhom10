@@ -42,7 +42,7 @@ export const purchaseSong = async (userId, song) => {
                 songId: song.id,
                 songName: song.name,
                 price: song.price,
-                type: 'buysheet', // Đánh dấu loại giao dịch là mua sheet nhạc
+                type: 'buysheet', 
                 timestamp: serverTimestamp(), //
                 status: 'success'
             });
