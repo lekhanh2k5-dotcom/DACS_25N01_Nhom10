@@ -1,0 +1,345 @@
+.ios-page {
+    padding: 18px;
+    display: grid;
+    gap: 12px;
+}
+
+.ios-header {
+    padding: 4px 2px 10px;
+}
+
+.ios-h1 {
+    font-size: 22px;
+    font-weight: 900;
+    margin: 0;
+}
+
+.ios-h2 {
+    margin-top: 6px;
+    font-size: 13px;
+    color: var(--text-sub);
+}
+
+.ios-section {
+    width: 100%;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 14px;
+}
+
+.ios-section-title {
+    font-size: 12px;
+    font-weight: 900;
+    color: var(--text-sub);
+    letter-spacing: 0.2px;
+    margin-bottom: 10px;
+}
+
+.ios-section-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.ios-mini {
+    font-size: 12px;
+    color: var(--text-sub);
+    margin-top: -4px;
+}
+
+.ios-seg {
+    display: flex;
+    gap: 6px;
+    padding: 6px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.02);
+    flex-wrap: wrap;
+}
+
+.ios-seg.small {
+    padding: 4px;
+    border-radius: 12px;
+}
+
+.ios-seg-btn {
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--text);
+    padding: 9px 12px;
+    border-radius: 12px;
+    font-weight: 900;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.14s ease, border-color 0.14s ease, transform 0.14s ease;
+}
+
+.ios-seg.small .ios-seg-btn {
+    padding: 8px 10px;
+    border-radius: 10px;
+}
+
+.ios-seg-btn:hover {
+    transform: translateY(-1px);
+    border-color: var(--primary);
+}
+
+.ios-seg-btn.active {
+    background: rgba(76, 175, 80, 0.14);
+    border-color: var(--primary);
+}
+
+.ios-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    align-items: center;
+}
+
+@media (min-width: 860px) {
+    .ios-row {
+        grid-template-columns: 1fr auto;
+    }
+}
+
+.ios-row-left {
+    display: grid;
+    gap: 3px;
+}
+
+.ios-row-label {
+    font-size: 12px;
+    color: var(--text-sub);
+}
+
+.ios-row-value {
+    font-size: 16px;
+    font-weight: 900;
+}
+
+.ios-row-right {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.ios-primary {
+    border: none;
+    border-radius: 14px;
+    padding: 10px 12px;
+    font-weight: 900;
+    background: var(--primary);
+    color: white;
+    cursor: pointer;
+}
+
+.ios-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.ios-ghost {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 9px 12px;
+    font-weight: 900;
+    background: rgba(255, 255, 255, 0.02);
+    color: var(--text);
+    cursor: pointer;
+}
+
+.ios-ghost:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.ios-muted {
+    color: var(--text-sub);
+    font-size: 13px;
+}
+
+/* Mapping list */
+.map-list {
+    margin-top: 12px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow-y: auto;
+    max-height: 320px;
+
+    /* Firefox */
+    scrollbar-width: none;
+}
+
+.map-list::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+}
+
+.map-list::after {
+    content: "";
+    display: block;
+    height: 8px;
+}
+
+.map-item {
+    display: grid;
+    grid-template-columns: 72px 30px 1fr 64px;
+    gap: 8px;
+    align-items: center;
+    padding: 10px 12px;
+    background: rgba(255, 255, 255, 0.02);
+    border-top: 1px solid var(--border);
+}
+
+.map-item:first-child {
+    border-top: none;
+}
+
+.map-note {
+    font-weight: 900;
+    font-size: 13px;
+}
+
+.map-mid {
+    text-align: center;
+    color: var(--text-sub);
+    font-weight: 900;
+}
+
+.map-key {
+    font-size: 13px;
+    font-weight: 900;
+    justify-self: start;
+    padding: 6px 10px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.02);
+    width: fit-content;
+}
+
+.map-change {
+    justify-self: end;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-sub);
+    border-radius: 10px;
+    padding: 6px 10px;
+    font-weight: 900;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.map-actions {
+    margin-top: 12px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* Collapse header (iOS-style row) */
+.ios-collapse-head {
+    width: 100%;
+    border: none;
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.ios-collapse-left {
+    text-align: left;
+}
+
+.ios-chev {
+    font-size: 26px;
+    line-height: 1;
+    color: var(--text-sub);
+    transform: rotate(0deg);
+    transition: transform 0.2s ease;
+    user-select: none;
+}
+
+.ios-chev.open {
+    transform: rotate(90deg);
+}
+
+/* Collapsible body with smooth transition */
+.ios-collapse-body {
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: max-height 0.28s ease, opacity 0.22s ease, transform 0.22s ease;
+}
+
+/* đủ lớn để chứa list 21 dòng */
+.ios-collapse-body.open {
+    max-height: 1400px;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Hotkeys */
+.hotkey-list {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.hotkey-item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: center;
+    padding: 12px 12px;
+    border-top: 1px solid var(--border);
+}
+
+.hotkey-item:first-child {
+    border-top: none;
+}
+
+.hotkey-left {
+    display: grid;
+    gap: 2px;
+}
+
+.hotkey-name {
+    font-size: 13px;
+    font-weight: 900;
+}
+
+.hotkey-desc {
+    font-size: 12px;
+    color: var(--text-sub);
+}
+
+.hotkey-keys {
+    display: inline-flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+/* keycap style */
+.keycap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 10px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.03);
+    font-size: 12px;
+    font-weight: 900;
+    color: var(--text);
+    min-width: 44px;
+}
