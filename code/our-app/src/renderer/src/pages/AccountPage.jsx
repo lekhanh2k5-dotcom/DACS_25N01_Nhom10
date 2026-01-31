@@ -1,16 +1,24 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import { showConfirm } from "../utils/alert";
+import { showConfirm, showError, showSuccess, mapFirebaseError } from "../utils/alert";
 import "./AccountPage.css";
 
 export default function AccountPage() {
-    const { user, userProfile, logout } = useAuth();
+    const {
+        user,
+        userProfile,
+        updateUsername,
+        updateAccountEmail,
+        updateAccountPassword,
+        sendVerification,
+        logout,
+        loading,
+    } = useAuth();
 
     const initial = useMemo(() => {
         const email = user?.email || "";
         return {
-            username:
-                userProfile?.displayName || (email ? email.split("@")[0] : "user"),
+            username: userProfile?.displayName || (email ? email.split("@")[0] : "user"),
             email,
             coins: userProfile?.coins ?? 0,
             emailVerified: Boolean(user?.emailVerified),
@@ -20,9 +28,67 @@ export default function AccountPage() {
     const [form, setForm] = useState({
         username: initial.username,
         email: initial.email,
+        currentPassword: "",
         newPassword: "",
         confirmPassword: "",
     });
+
+
+    useEffect(() => {
+        setForm((s) => ({
+            ...s,
+            username: initial.username,
+            email: initial.email,
+        }));
+    }, [initial.username, initial.email]);
+
+    const handleUpdateUsername = async () => {
+        if (!form.currentPassword) {
+            return showError("Vui lòng nhập mật khẩu hiện tại.");
+        }
+
+        try {
+            await updateUsername(form.currentPassword, form.username);
+            showSuccess("Đã cập nhật tên đăng nhập!");
+        } catch (error) {
+            showError(mapFirebaseError(error), error.code);
+        }
+    };
+
+
+    const handleUpdateEmail = async () => {
+        if (!form.currentPassword) {
+            return showError("Vui lòng nhập mật khẩu hiện tại.");
+        }
+
+        try {
+            await updateAccountEmail(form.currentPassword, form.email);
+            showSuccess("Đã cập nhật email!");
+        } catch (error) {
+            showError(mapFirebaseError(error), error.code);
+        }
+    };
+
+    const handleChangePassword = async () => {
+        if (!form.currentPassword) return showError("Vui lòng nhập mật khẩu hiện tại.");
+        if (form.newPassword !== form.confirmPassword) return showError("Mật khẩu xác nhận không khớp!");
+
+        try {
+            await updateAccountPassword(form.currentPassword, form.newPassword);
+            setForm(s => ({ ...s, currentPassword: "", newPassword: "", confirmPassword: "" }));
+            showSuccess("Mật khẩu đã được thay đổi!");
+        } catch (error) {
+            showError(mapFirebaseError(error), error.code);
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="acc-page">
+                <div className="acc-card">Đang tải...</div>
+            </div>
+        );
+    }
 
     return (
         <div className="acc-page">
@@ -32,9 +98,12 @@ export default function AccountPage() {
                     <p className="acc-subtitle">Quản lý thông tin và bảo mật</p>
                 </div>
 
-                <button className="acc-logout" onClick={async () => {
-                    if (await showConfirm("Bạn có chắc muốn đăng xuất?")) await logout();
-                }}>
+                <button
+                    className="acc-logout"
+                    onClick={async () => {
+                        if (await showConfirm("Bạn có chắc muốn đăng xuất?")) await logout();
+                    }}
+                >
                     Đăng xuất
                 </button>
             </div>
@@ -60,8 +129,6 @@ export default function AccountPage() {
                     </div>
                 </section>
 
-
-                {/* RIGHT: Profile + Security */}
                 <section className="acc-card">
                     <div className="acc-card-head">
                         <div>
@@ -80,7 +147,9 @@ export default function AccountPage() {
                                 onChange={(e) => setForm((s) => ({ ...s, username: e.target.value }))}
                                 placeholder="Nhập tên đăng nhập"
                             />
-                            <button className="acc-secondary">Lưu</button>
+                            <button className="acc-secondary" onClick={handleUpdateUsername}>
+                                Lưu
+                            </button>
                         </div>
                         <div className="acc-note">Tên hiển thị = tên đăng nhập.</div>
                     </div>
@@ -103,11 +172,15 @@ export default function AccountPage() {
                                 onChange={(e) => setForm((s) => ({ ...s, email: e.target.value }))}
                                 placeholder="name@example.com"
                             />
-                            <button className="acc-secondary">Cập nhật</button>
+                            <button className="acc-secondary" onClick={handleUpdateEmail}>
+                                Cập nhật
+                            </button>
                         </div>
 
                         {!initial.emailVerified && (
-                            <button className="acc-link">Gửi email xác nhận</button>
+                            <button className="acc-link" onClick={() => sendVerification()}>
+                                Gửi email xác nhận
+                            </button>
                         )}
                     </div>
 
@@ -120,7 +193,9 @@ export default function AccountPage() {
                         <input
                             type="password"
                             value={form.currentPassword}
-                            onChange={(e) => setForm((s) => ({ ...s, currentPassword: e.target.value }))}
+                            onChange={(e) =>
+                                setForm((s) => ({ ...s, currentPassword: e.target.value }))
+                            }
                             placeholder="Mật khẩu hiện tại"
                         />
 
@@ -134,12 +209,16 @@ export default function AccountPage() {
                             <input
                                 type="password"
                                 value={form.confirmPassword}
-                                onChange={(e) => setForm((s) => ({ ...s, confirmPassword: e.target.value }))}
+                                onChange={(e) =>
+                                    setForm((s) => ({ ...s, confirmPassword: e.target.value }))
+                                }
                                 placeholder="Xác nhận mật khẩu"
                             />
                         </div>
 
-                        <button className="acc-secondary full">Đổi mật khẩu</button>
+                        <button className="acc-secondary full" onClick={handleChangePassword}>
+                            Đổi mật khẩu
+                        </button>
                     </div>
                 </section>
             </div>
