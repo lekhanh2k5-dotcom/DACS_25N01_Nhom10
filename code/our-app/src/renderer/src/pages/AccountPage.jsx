@@ -125,7 +125,24 @@ export default function AccountPage() {
                             </div>
                         </div>
 
-                        <button className="acc-primary small">Nạp</button>
+                        <button
+                            className="acc-primary small"
+                            onClick={() => {
+                                showConfirm(
+                                    "Chức năng nạp tự động chưa được phát triển.\nLiên hệ trực tiếp với KChip nếu bạn muốn nạp xu.\n\nBạn có muốn mở Facebook của KChip không?"
+                                ).then((ok) => {
+                                    if (ok) {
+                                        window.open(
+                                            "https://www.facebook.com/profile.php?id=100083202309058",
+                                            "_blank",
+                                            "noopener,noreferrer"
+                                        );
+                                    }
+                                });
+                            }}
+                        >
+                            Nạp
+                        </button>
                     </div>
                 </section>
 
