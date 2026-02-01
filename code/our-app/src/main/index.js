@@ -4,7 +4,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { registerPlayerHandlers } from './ipc/player-handler'
 import { registerSheetHandlers } from './ipc/sheet-handler'
-
+import { registerAdminHandlers } from './ipc/admin-handler'
 function createWindow() {
   const mainWindow = new BrowserWindow({
     width: 900,
@@ -44,6 +44,7 @@ app.whenReady().then(() => {
   // Register IPC handlers
   registerPlayerHandlers()
   registerSheetHandlers()
+  registerAdminHandlers()
 
   ipcMain.on('ping', () => console.log('pong'))
 

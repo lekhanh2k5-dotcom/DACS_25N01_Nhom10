@@ -4,6 +4,7 @@ import { showConfirm, showError, showSuccess, mapFirebaseError } from "../utils/
 import "./AccountPage.css";
 
 export default function AccountPage() {
+    const [isAdmin, setIsAdmin] = useState(false);
     const {
         user,
         userProfile,
@@ -41,6 +42,28 @@ export default function AccountPage() {
             email: initial.email,
         }));
     }, [initial.username, initial.email]);
+    useEffect(() => {
+        const checkPermission = async () => {
+            if (user) {
+                try {
+                    // idTokenResult(true) ép buộc refresh token để lấy claim mới nhất
+                    const idTokenResult = await user.getIdTokenResult(true);
+                    setIsAdmin(!!idTokenResult.claims.admin);
+                } catch (error) {
+                    console.error("Lỗi kiểm tra quyền:", error);
+                }
+            } else {
+                setIsAdmin(false);
+            }
+        };
+        checkPermission();
+    }, [user]); // Chạy lại mỗi khi user thay đổi
+
+    const handleOpenAdminWindow = () => {
+        if (window.electron && window.electron.ipcRenderer) {
+            window.electron.ipcRenderer.send('open-admin-window');
+        }
+    };
 
     const handleUpdateUsername = async () => {
         if (!form.currentPassword) {
@@ -63,7 +86,7 @@ export default function AccountPage() {
 
         try {
             await updateAccountEmail(form.currentPassword, form.email);
-            showSuccess("Đã cập nhật email!");
+            showSuccess("Vui lòng kiểm tra tin nhắn xác nhận về " + form.email + "!");
         } catch (error) {
             showError(mapFirebaseError(error), error.code);
         }
@@ -97,15 +120,23 @@ export default function AccountPage() {
                     <h2 className="acc-title">Tài khoản</h2>
                     <p className="acc-subtitle">Quản lý thông tin và bảo mật</p>
                 </div>
+                <div className="acc-actions">
+                    {isAdmin && (
+                        <button className="acc-admin" onClick={handleOpenAdminWindow}>
+                            🛡️ Admin
+                        </button>
+                    )}
 
-                <button
-                    className="acc-logout"
-                    onClick={async () => {
-                        if (await showConfirm("Bạn có chắc muốn đăng xuất?")) await logout();
-                    }}
-                >
-                    Đăng xuất
-                </button>
+                    <button
+                        className="acc-logout"
+                        onClick={async () => {
+                            if (await showConfirm("Bạn có chắc muốn đăng xuất?")) await logout();
+                        }}
+                    >
+                        Đăng xuất
+                    </button>
+                </div>
+
             </div>
 
             <div className="acc-grid">
@@ -145,6 +176,8 @@ export default function AccountPage() {
                         </button>
                     </div>
                 </section>
+
+
 
                 <section className="acc-card">
                     <div className="acc-card-head">
@@ -238,6 +271,7 @@ export default function AccountPage() {
                         </button>
                     </div>
                 </section>
+
             </div>
         </div>
     );

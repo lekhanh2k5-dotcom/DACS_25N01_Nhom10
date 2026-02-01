@@ -126,7 +126,7 @@ export async function showSuccess(message, details) {
     customClass: smallPopupStyle,
     width: 260,
     padding: "0.8em",
-    timer: 1400,
+    timer: 3000,
   });
 }    
 

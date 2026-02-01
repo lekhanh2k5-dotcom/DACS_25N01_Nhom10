@@ -8,11 +8,16 @@ import Settings from './pages/Settings';
 import AccountPage from './pages/AccountPage';
 import LoginModal from './components/LoginModal';
 import { useState } from 'react';
+import AdminDashboard from './pages/admin/AdminDashboard';
 
 function AppContent() {
   const { activeTab, loading: appLoading } = useApp();
   const { loading: authLoading } = useAuth();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
+  if (window.location.hash === '#/admin') {
+    return <AdminDashboard />;
+  }
 
   if (authLoading || appLoading) {
     return (
