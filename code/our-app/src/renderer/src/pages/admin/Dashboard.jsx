@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import { db } from '../../firebase/firebase'
 import { collection, getDocs } from 'firebase/firestore'
+import { useAuth } from '../../contexts/AuthContext'
 
 export default function Dashboard() {
+    const { user } = useAuth()
     const [stats, setStats] = useState({
         totalUsers: 0,
         totalSongs: 0,
@@ -13,23 +15,36 @@ export default function Dashboard() {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        fetchStats()
-    }, [])
+        if (user) {
+            fetchStats()
+        }
+    }, [user])
 
     const fetchStats = async () => {
+        if (!user) {
+            console.log('❌ Chưa đăng nhập')
+            return
+        }
+
         try {
+            console.log('🔄 Đang load dữ liệu từ Firebase...')
+            console.log('👤 User:', user.email)
+
             const usersSnapshot = await getDocs(collection(db, 'users'))
             const songsSnapshot = await getDocs(collection(db, 'songs'))
             const transactionsSnapshot = await getDocs(collection(db, 'transactions'))
 
-            const transactions = transactionsSnapshot.docs.map(doc => doc.data())
+            console.log('📊 Users:', usersSnapshot.size)
+            console.log('🎵 Songs:', songsSnapshot.size)
+            console.log('💳 Transactions:', transactionsSnapshot.size)
 
-            // Get current month
+            const transactions = transactionsSnapshot.docs.map(doc => doc.data())
+            console.log('📦 Transaction data:', transactions)
+
             const now = new Date()
             const currentMonth = now.getMonth()
             const currentYear = now.getFullYear()
 
-            // Filter transactions for current month
             const monthlyTransactions = transactions.filter(t => {
                 if (!t.timestamp) return false
                 const transactionDate = new Date(t.timestamp.seconds * 1000)
@@ -37,12 +52,17 @@ export default function Dashboard() {
                     transactionDate.getFullYear() === currentYear
             })
 
+            console.log('📅 Monthly transactions:', monthlyTransactions.length)
+
             const monthlyRevenue = monthlyTransactions.reduce((sum, t) => {
-                if (t.type === 'purchase') return sum + Math.abs(t.amount || 0)
+                const amount = Math.abs(t.amount || t.price || 0)
+                console.log('💰 Transaction:', t.type, amount, t)
+                if (t.type === 'purchase' || t.type === 'buysheet') return sum + amount
                 return sum
             }, 0)
 
-            // Get last 7 days data for chart
+            console.log('💰 Monthly revenue:', monthlyRevenue)
+
             const last7Days = []
             for (let i = 6; i >= 0; i--) {
                 const date = new Date()
@@ -53,10 +73,13 @@ export default function Dashboard() {
                     if (!t.timestamp) return false
                     const tDate = new Date(t.timestamp.seconds * 1000)
                     tDate.setHours(0, 0, 0, 0)
-                    return tDate.getTime() === date.getTime() && t.type === 'purchase'
+                    return tDate.getTime() === date.getTime() && (t.type === 'purchase' || t.type === 'buysheet')
                 })
 
-                const dayRevenue = dayTransactions.reduce((sum, t) => sum + Math.abs(t.amount || 0), 0)
+                const dayRevenue = dayTransactions.reduce((sum, t) => {
+                    const amount = Math.abs(t.amount || t.price || 0)
+                    return sum + amount
+                }, 0)
 
                 last7Days.push({
                     day: date.toLocaleDateString('vi-VN', { weekday: 'short' }),
@@ -65,6 +88,7 @@ export default function Dashboard() {
                 })
             }
 
+            console.log('📊 Chart data:', last7Days)
             setChartData(last7Days)
 
             setStats({
@@ -73,8 +97,10 @@ export default function Dashboard() {
                 monthlyTransactions: monthlyTransactions.length,
                 monthlyRevenue
             })
+
+            console.log('✅ Dữ liệu đã load xong!')
         } catch (error) {
-            console.error('Error fetching stats:', error)
+            console.error('❌ Error fetching stats:', error)
         } finally {
             setLoading(false)
         }
@@ -150,7 +176,9 @@ export default function Dashboard() {
                 }}>
                     {chartData.map((data, index) => {
                         const maxRevenue = Math.max(...chartData.map(d => d.revenue), 1)
-                        const heightPercent = (data.revenue / maxRevenue) * 100
+                        const heightPixels = data.revenue > 0
+                            ? Math.max((data.revenue / maxRevenue) * 160, 25)
+                            : 3
 
                         return (
                             <div key={index} style={{
@@ -158,15 +186,16 @@ export default function Dashboard() {
                                 display: 'flex',
                                 flexDirection: 'column',
                                 alignItems: 'center',
+                                justifyContent: 'flex-end',
+                                height: '100%',
                                 gap: '8px'
                             }}>
                                 <div style={{
                                     width: '100%',
-                                    height: `${heightPercent}%`,
-                                    minHeight: data.revenue > 0 ? '20px' : '2px',
+                                    height: `${heightPixels}px`,
                                     background: data.revenue > 0
                                         ? 'linear-gradient(180deg, var(--primary) 0%, #17a34a 100%)'
-                                        : 'var(--border)',
+                                        : '#333',
                                     borderRadius: '8px 8px 0 0',
                                     transition: 'all 0.3s ease',
                                     position: 'relative',
