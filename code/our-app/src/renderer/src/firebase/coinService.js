@@ -54,3 +54,44 @@ export const purchaseSong = async (userId, song) => {
         throw error;
     }
 };
+
+export const adminUpdateCoins = async (userId, amount, adminInfo) => {
+    const userRef = doc(db, "users", userId);
+    const txnId = generatePrettyId(userId);
+
+    try {
+        return await runTransaction(db, async (transaction) => {
+            const userDoc = await transaction.get(userRef);
+            if (!userDoc.exists()) throw "Người dùng không tồn tại!";
+
+            const userData = userDoc.data();
+            const currentCoins = userData.coins || 0;
+            const newCoins = currentCoins + amount;
+
+            if (newCoins < 0) throw "Số xu không đủ để trừ!";
+
+            transaction.update(userRef, { 
+                coins: newCoins
+            });
+
+            const historyRef = doc(db, "transactions", txnId);
+            
+            transaction.set(historyRef, {
+                txnId: txnId,
+                userId: userId,
+                userEmail: userData.email,
+                amount: amount,
+                type: amount > 0 ? 'admin_add' : 'admin_subtract',
+                adminEmail: adminInfo.email,
+                adminId: adminInfo.uid,
+                timestamp: serverTimestamp(),
+                status: 'success'
+            });
+
+            return { success: true };
+        });
+    } catch (error) {
+        console.error("Lỗi cập nhật xu:", error);
+        throw error;
+    }
+};

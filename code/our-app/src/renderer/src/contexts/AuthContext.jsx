@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { auth, db } from "../firebase/firebase";
 import { resetPassword as fbResetPassword } from "../firebase/auth";
+import { showError } from "../utils/alert";
 import {
     onAuthStateChanged,
     signInWithEmailAndPassword,
@@ -63,11 +64,28 @@ export const AuthProvider = ({ children }) => {
                         ownedSongs: {},
                     };
                     await setDoc(ref, profile);
+                } else {
+                    const userData = snap.data();
+                    if (userData.isLocked) {
+                        await signOut(auth);
+                        setUser(null);
+                        setUserProfile(null);
+                        setLoading(false);
+                        showError('Tài khoản của bạn đã bị khóa bởi quản trị viên');
+                        return;
+                    }
                 }
 
                 unsubscribeProfile = onSnapshot(ref, (snapshot) => {
                     if (snapshot.exists()) {
-                        setUserProfile(snapshot.data());
+                        const data = snapshot.data();
+                        // Kiểm tra realtime nếu bị khóa trong khi đang dùng
+                        if (data.isLocked) {
+                            signOut(auth);
+                            showError('Tài khoản của bạn đã bị khóa');
+                        } else {
+                            setUserProfile(data);
+                        }
                     }
                     setLoading(false);
                 });

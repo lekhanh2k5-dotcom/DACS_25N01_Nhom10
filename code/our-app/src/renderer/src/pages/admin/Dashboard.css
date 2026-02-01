@@ -1,0 +1,90 @@
+/* Dashboard Loading State */
+.dashboard-loading {
+    text-align: center;
+    padding: 50px;
+    color: var(--text-sub);
+}
+
+/* Chart Container */
+.dashboard-chart-container {
+    background: var(--bg-card);
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+}
+
+.dashboard-chart-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.dashboard-chart-bars {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    height: 180px;
+    gap: 10px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border);
+}
+
+.dashboard-chart-bar-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    height: 100%;
+    gap: 8px;
+}
+
+.dashboard-chart-bar {
+    width: 100%;
+    border-radius: 8px 8px 0 0;
+    transition: all 0.3s ease;
+    position: relative;
+    cursor: pointer;
+}
+
+.dashboard-chart-bar.has-revenue {
+    background: linear-gradient(180deg, var(--primary) 0%, #17a34a 100%);
+    box-shadow: 0 4px 12px rgba(29, 185, 84, 0.3);
+}
+
+.dashboard-chart-bar.empty {
+    background: #333;
+}
+
+.dashboard-chart-bar-label {
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent-gold);
+    white-space: nowrap;
+}
+
+.dashboard-chart-day-label {
+    font-size: 12px;
+    color: var(--text-sub);
+    font-weight: 600;
+    text-align: center;
+}
+
+.dashboard-chart-summary {
+    margin-top: 15px;
+    font-size: 13px;
+    color: var(--text-sub);
+    text-align: center;
+}
+
+.dashboard-chart-summary strong.revenue {
+    color: var(--accent-gold);
+}
+
+.dashboard-chart-summary strong.transactions {
+    color: var(--primary);
+}

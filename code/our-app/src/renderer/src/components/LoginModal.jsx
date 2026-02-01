@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { showSuccess } from '../utils/alert';
 import './LoginModal.css';
 
 export default function LoginModal({ isOpen, onClose }) {
@@ -71,7 +72,7 @@ export default function LoginModal({ isOpen, onClose }) {
                     return;
                 }
                 await register(email, password, username);
-                alert('Đăng ký thành công! Bạn đã nhận 1000 xu');
+                showSuccess('Đăng ký thành công! Bạn đã nhận 1000 xu');
                 setEmail('');
                 setPassword('');
                 setConfirmPassword('');

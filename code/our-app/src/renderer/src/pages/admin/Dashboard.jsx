@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { db } from '../../firebase/firebase'
 import { collection, getDocs } from 'firebase/firestore'
 import { useAuth } from '../../contexts/AuthContext'
+import './Dashboard.css'
 
 export default function Dashboard() {
     const { user } = useAuth()
@@ -109,7 +110,7 @@ export default function Dashboard() {
     if (loading) {
         return (
             <div className="admin-page">
-                <div style={{ textAlign: 'center', padding: '50px', color: 'var(--text-sub)' }}>
+                <div className="dashboard-loading">
                     ⏳ Đang tải...
                 </div>
             </div>
@@ -156,24 +157,11 @@ export default function Dashboard() {
                 </div>
             </div>
 
-            <div style={{
-                background: 'var(--bg-card)',
-                padding: '20px',
-                borderRadius: '12px',
-                border: '1px solid var(--border)'
-            }}>
-                <h2 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '20px' }}>
+            <div className="dashboard-chart-container">
+                <h2 className="dashboard-chart-title">
                     📊 Doanh thu 7 ngày gần đây (xu)
                 </h2>
-                <div style={{
-                    display: 'flex',
-                    alignItems: 'flex-end',
-                    justifyContent: 'space-around',
-                    height: '180px',
-                    gap: '10px',
-                    paddingBottom: '10px',
-                    borderBottom: '2px solid var(--border)'
-                }}>
+                <div className="dashboard-chart-bars">
                     {chartData.map((data, index) => {
                         const maxRevenue = Math.max(...chartData.map(d => d.revenue), 1)
                         const heightPixels = data.revenue > 0
@@ -181,67 +169,31 @@ export default function Dashboard() {
                             : 3
 
                         return (
-                            <div key={index} style={{
-                                flex: 1,
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                                justifyContent: 'flex-end',
-                                height: '100%',
-                                gap: '8px'
-                            }}>
-                                <div style={{
-                                    width: '100%',
-                                    height: `${heightPixels}px`,
-                                    background: data.revenue > 0
-                                        ? 'linear-gradient(180deg, var(--primary) 0%, #17a34a 100%)'
-                                        : '#333',
-                                    borderRadius: '8px 8px 0 0',
-                                    transition: 'all 0.3s ease',
-                                    position: 'relative',
-                                    cursor: 'pointer',
-                                    boxShadow: data.revenue > 0 ? '0 4px 12px rgba(29, 185, 84, 0.3)' : 'none'
-                                }}
+                            <div key={index} className="dashboard-chart-bar-container">
+                                <div
+                                    className={`dashboard-chart-bar ${data.revenue > 0 ? 'has-revenue' : 'empty'}`}
+                                    style={{ height: `${heightPixels}px` }}
                                     title={`${data.revenue.toLocaleString()} xu - ${data.count} giao dịch`}
                                 >
                                     {data.revenue > 0 && (
-                                        <div style={{
-                                            position: 'absolute',
-                                            top: '-25px',
-                                            left: '50%',
-                                            transform: 'translateX(-50%)',
-                                            fontSize: '11px',
-                                            fontWeight: 700,
-                                            color: 'var(--accent-gold)',
-                                            whiteSpace: 'nowrap'
-                                        }}>
+                                        <div className="dashboard-chart-bar-label">
                                             {data.revenue > 1000 ? `${(data.revenue / 1000).toFixed(1)}k` : data.revenue}
                                         </div>
                                     )}
                                 </div>
-                                <div style={{
-                                    fontSize: '12px',
-                                    color: 'var(--text-sub)',
-                                    fontWeight: 600,
-                                    textAlign: 'center'
-                                }}>
+                                <div className="dashboard-chart-day-label">
                                     {data.day}
                                 </div>
                             </div>
                         )
                     })}
                 </div>
-                <div style={{
-                    marginTop: '15px',
-                    fontSize: '13px',
-                    color: 'var(--text-sub)',
-                    textAlign: 'center'
-                }}>
-                    Tổng 7 ngày: <strong style={{ color: 'var(--accent-gold)' }}>
+                <div className="dashboard-chart-summary">
+                    Tổng 7 ngày: <strong className="revenue">
                         {chartData.reduce((sum, d) => sum + d.revenue, 0).toLocaleString()} xu
                     </strong>
                     {' • '}
-                    <strong style={{ color: 'var(--primary)' }}>
+                    <strong className="transactions">
                         {chartData.reduce((sum, d) => sum + d.count, 0)} giao dịch
                     </strong>
                 </div>

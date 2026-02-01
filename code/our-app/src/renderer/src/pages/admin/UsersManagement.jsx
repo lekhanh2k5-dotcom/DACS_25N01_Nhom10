@@ -1,91 +1,294 @@
 import { useEffect, useState } from 'react'
-import { db } from "../../firebase/firebase"
-import { useAuth } from "../../contexts/AuthContext"
-import { collection, getDocs, doc, updateDoc, increment } from 'firebase/firestore'
+import { db } from '../../firebase/firebase'
+import { collection, getDocs, updateDoc, doc } from 'firebase/firestore'
+import { useAuth } from '../../contexts/AuthContext'
 import { showSuccess, showError, showConfirm } from '../../utils/alert'
+import { adminUpdateCoins } from '../../firebase/coinService'
+import './UsersManagement.css'
 
-export default function AdminDashboard() {
+export default function UsersManagement() {
     const { user } = useAuth()
     const [users, setUsers] = useState([])
     const [loading, setLoading] = useState(true)
+    const [searchQuery, setSearchQuery] = useState('')
+    const [openDropdown, setOpenDropdown] = useState(null)
+    const [coinModal, setCoinModal] = useState(null)
+    const [coinAmount, setCoinAmount] = useState('')
+
+    useEffect(() => {
+        if (user) {
+            fetchUsers()
+        }
+    }, [user])
 
     const fetchUsers = async () => {
         if (!user) return
+
         try {
-            // Lấy danh sách từ collection 'users'
-            const querySnapshot = await getDocs(collection(db, 'users'))
-            const list = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
-            setUsers(list)
+            setLoading(true)
+            const usersSnapshot = await getDocs(collection(db, 'users'))
+            const usersData = usersSnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }))
+            setUsers(usersData)
         } catch (error) {
-            showError('Bạn không có quyền truy cập dữ liệu quản trị!')
+            console.error('Lỗi khi tải người dùng:', error)
+            showError('Không thể tải danh sách người dùng')
         } finally {
             setLoading(false)
         }
     }
 
-    useEffect(() => {
-        fetchUsers()
-    }, [user])
+    const handleManageCoins = (user) => {
+        setCoinModal(user)
+        setCoinAmount('')
+        setOpenDropdown(null)
+    }
 
-    const addCoins = async (userId, amount) => {
-        if (!(await showConfirm(`Cộng ${amount} xu cho người dùng này?`))) return
+    const handleAddCoins = async (action) => {
+        const amount = parseInt(coinAmount) || 0
+        if (amount === 0) {
+            showError('Vui lòng nhập số xu hợp lệ')
+            return
+        }
+
+        if (amount < 0) {
+            showError('Số xu phải là số dương')
+            return
+        }
+
+        const finalAmount = action === 'subtract' ? -amount : amount
+        const actionText = action === 'subtract' ? 'trừ' : 'cộng'
+        const confirmed = await showConfirm(
+            `Xác nhận ${actionText} ${amount.toLocaleString()} xu cho ${coinModal.email}?`
+        )
+
+        if (!confirmed) return
+
         try {
-            const userRef = doc(db, 'users', userId)
-            // Sử dụng increment để tăng số dư xu
-            await updateDoc(userRef, { coins: increment(amount) })
-            showSuccess('Cập nhật xu thành công!')
+            await adminUpdateCoins(coinModal.id, finalAmount, {
+                email: user.email,
+                uid: user.uid
+            })
+            
+            showSuccess(`Đã ${actionText} ${amount.toLocaleString()} xu!`)
+            setCoinModal(null)
             fetchUsers()
-        } catch (e) {
-            showError('Lỗi cập nhật: ' + e.message)
+        } catch (error) {
+            console.error('Lỗi khi cập nhật xu:', error)
+            showError(error || 'Không thể cập nhật xu')
         }
     }
 
-    if (loading) return <div style={{ color: 'white', padding: '20px' }}>Đang xác thực quyền...</div>
+    const handleToggleLock = async (userId, currentStatus) => {
+        const targetUser = users.find(u => u.id === userId)
+        const action = currentStatus ? 'mở khóa' : 'khóa'
+
+        const confirmed = await showConfirm(
+            `Bạn có chắc muốn ${action} tài khoản ${targetUser.email}?`
+        )
+
+        if (!confirmed) return
+
+        try {
+            const userRef = doc(db, 'users', userId)
+            await updateDoc(userRef, {
+                isLocked: !currentStatus
+            })
+            showSuccess(`Đã ${action} tài khoản!`)
+            setOpenDropdown(null)
+            fetchUsers()
+        } catch (error) {
+            console.error('Lỗi khi cập nhật trạng thái:', error)
+            showError(`Không thể ${action} tài khoản`)
+        }
+    }
+
+    const filteredUsers = users.filter(u => {
+        const query = searchQuery.toLowerCase()
+        return u.email?.toLowerCase().includes(query) ||
+            u.displayName?.toLowerCase().includes(query) ||
+            u.username?.toLowerCase().includes(query)
+    })
+
+    const activeUsers = users.filter(u => !u.isLocked).length
+    const lockedUsers = users.filter(u => u.isLocked).length
+
+    if (loading) {
+        return (
+            <div className="admin-page">
+                <div className="admin-page-header">
+                    <h1>👥 Quản lý người dùng</h1>
+                </div>
+                <div className="users-loading">
+                    Đang tải...
+                </div>
+            </div>
+        )
+    }
 
     return (
-        <div className="admin-page" style={{ backgroundColor: '#121212', minHeight: '100vh', color: 'white', padding: '20px', fontFamily: 'sans-serif' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <h2>🛡️ Quản trị hệ thống SkyBard</h2>
-                <button onClick={fetchUsers} style={{ padding: '8px 16px', cursor: 'pointer', borderRadius: '4px', border: '1px solid #444', background: '#333', color: 'white' }}>
-                    Làm mới danh sách
-                </button>
+        <div className="admin-page">
+            <div className="admin-page-header">
+                <h1>👥 Quản lý người dùng</h1>
+                <input
+                    type="text"
+                    placeholder="🔍 Tìm kiếm..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="users-search-input"
+                />
             </div>
 
-            <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: '#1e1e1e', borderRadius: '8px', overflow: 'hidden' }}>
-                <thead>
-                    <tr style={{ backgroundColor: '#2d2d2d', textAlign: 'left' }}>
-                        <th style={{ padding: '12px' }}>Email / UID</th>
-                        <th style={{ padding: '12px' }}>Tên hiển thị</th>
-                        <th style={{ padding: '12px' }}>Số dư Xu</th>
-                        <th style={{ padding: '12px' }}>Thao tác cộng xu</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {users.length > 0 ? users.map((u) => (
-                        <tr key={u.id} style={{ borderBottom: '1px solid #333' }}>
-                            <td style={{ padding: '12px' }}>
-                                <div>{u.email}</div>
-                                <small style={{ color: '#888', fontSize: '10px' }}>{u.id}</small>
-                            </td>
-                            <td style={{ padding: '12px' }}>{u.displayName || u.username || 'N/A'}</td>
-                            <td style={{ padding: '12px', color: '#fbbf24', fontWeight: 'bold' }}>
-                                {u.coins?.toLocaleString() || 0} 💰
-                            </td>
-                            <td style={{ padding: '12px' }}>
-                                <div style={{ display: 'flex', gap: '8px' }}>
-                                    <button onClick={() => addCoins(u.id, 1000)} style={{ backgroundColor: '#059669', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer' }}>+1k</button>
-                                    <button onClick={() => addCoins(u.id, 5000)} style={{ backgroundColor: '#059669', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer' }}>+5k</button>
-                                    <button onClick={() => addCoins(u.id, -1000)} style={{ backgroundColor: '#dc2626', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer' }}>-1k</button>
-                                </div>
-                            </td>
-                        </tr>
-                    )) : (
+            <div className="users-table-container">
+                <table className="admin-table">
+                    <thead>
                         <tr>
-                            <td colSpan="4" style={{ padding: '20px', textAlign: 'center', color: '#888' }}>Không tìm thấy người dùng nào.</td>
+                            <th>Người dùng</th>
+                            <th>Số xu</th>
+                            <th>Trạng thái</th>
+                            <th style={{ width: '80px' }}></th>
                         </tr>
-                    )}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {filteredUsers.length === 0 ? (
+                            <tr>
+                                <td colSpan="4" className="users-table-empty">
+                                    {searchQuery ? 'Không tìm thấy người dùng' : 'Chưa có người dùng'}
+                                </td>
+                            </tr>
+                        ) : (
+                            filteredUsers.map((u, index) => {
+                                const isNearBottom = index >= filteredUsers.length - 3
+                                return (
+                                    <tr key={u.id}>
+                                        <td>
+                                            <div
+                                                onClick={() => {
+                                                    navigator.clipboard.writeText(u.id)
+                                                    showSuccess('Đã sao chép ID!')
+                                                }}
+                                                className="users-info-cell"
+                                                title="Click để sao chép ID"
+                                            >
+                                                <div className="users-email">
+                                                    {u.email}
+                                                </div>
+                                                <div className="users-displayname">
+                                                    {u.displayName || u.username || '-'}
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="users-coin-cell">
+                                            {(u.coins || 0).toLocaleString()}
+                                        </td>
+                                        <td>
+                                            {u.isLocked ? (
+                                                <span className="users-status-locked">🔒 Đã khóa</span>
+                                            ) : (
+                                                <span className="users-status-active">✅ Hoạt động</span>
+                                            )}
+                                        </td>
+                                        <td className="users-dropdown-cell">
+                                            <button
+                                                onClick={() => setOpenDropdown(openDropdown === u.id ? null : u.id)}
+                                                className="users-dropdown-button"
+                                            >
+                                                ⋮
+                                            </button>
+
+                                            {openDropdown === u.id && (
+                                                <div className={`users-dropdown-menu ${isNearBottom ? 'top' : 'bottom'}`}>
+                                                    <div
+                                                        onClick={() => handleManageCoins(u)}
+                                                        className="users-dropdown-item"
+                                                    >
+                                                        💰 Quản lý xu
+                                                    </div>
+                                                    <div
+                                                        onClick={() => handleToggleLock(u.id, u.isLocked)}
+                                                        className="users-dropdown-item"
+                                                    >
+                                                        {u.isLocked ? '🔓 Mở khóa' : '🔒 Khóa tài khoản'}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </td>
+                                    </tr>
+                                )
+                            })
+                        )}
+                    </tbody>
+                </table>
+            </div>
+
+            <div className="users-stats-footer">
+                <span>Tổng: <strong className="total">{users.length}</strong> người dùng</span>
+                <span>•</span>
+                <span>Hiển thị: <strong className="total">{filteredUsers.length}</strong></span>
+                <span>•</span>
+                <span>Hoạt động: <strong className="active">{activeUsers}</strong></span>
+                <span>•</span>
+                <span>Bị khóa: <strong className="locked">{lockedUsers}</strong></span>
+            </div>
+
+            {/* Modal Quản lý xu */}
+            {coinModal && (
+                <div className="coin-modal-overlay" onClick={() => setCoinModal(null)}>
+                    <div className="coin-modal-content" onClick={(e) => e.stopPropagation()}>
+                        <h2 className="coin-modal-header">💰 Quản lý xu</h2>
+                        <div className="coin-modal-user-info">
+                            <div className="coin-modal-email">
+                                {coinModal.email}
+                            </div>
+                            <div className="coin-modal-balance">
+                                Số dư: {(coinModal.coins || 0).toLocaleString()} xu
+                            </div>
+                        </div>
+
+                        <div className="coin-modal-input-group">
+                            <label className="coin-modal-label">
+                                Nhập số xu:
+                            </label>
+                            <input
+                                type="number"
+                                value={coinAmount}
+                                onChange={(e) => setCoinAmount(e.target.value)}
+                                placeholder="Nhập số xu..."
+                                className="coin-modal-input"
+                                min="0"
+                            />
+                        </div>
+
+                        <div className="coin-modal-actions">
+                            <button
+                                onClick={() => setCoinModal(null)}
+                                className="admin-btn admin-btn-secondary"
+                            >
+                                Hủy
+                            </button>
+                            <button
+                                onClick={() => handleAddCoins('add')}
+                                className="coin-modal-btn-add"
+                            >
+                                ➕ Cộng
+                            </button>
+                            <button
+                                onClick={() => handleAddCoins('subtract')}
+                                className="coin-modal-btn-subtract"
+                            >
+                                ➖ Trừ
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Click outside to close dropdown */}
+            {openDropdown && (
+                <div className="users-dropdown-backdrop" onClick={() => setOpenDropdown(null)} />
+            )}
         </div>
     )
 }

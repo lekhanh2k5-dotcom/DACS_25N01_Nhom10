@@ -1,0 +1,320 @@
+/* Users Management Styles */
+
+.users-loading {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-sub);
+}
+
+.users-search-input {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text-main);
+    fontSize: 14px;
+    width: 250px;
+}
+
+.users-table-container {
+    margin-bottom: 20px;
+}
+
+.users-table-empty {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-sub);
+}
+
+.users-info-cell {
+    cursor: pointer;
+}
+
+.users-email {
+    color: var(--text-main);
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.users-displayname {
+    font-size: 12px;
+    color: #999;
+}
+
+.users-coin-cell {
+    color: var(--text-main);
+    font-weight: 600;
+}
+
+.users-status-locked {
+    color: #ff4444;
+}
+
+.users-status-active {
+    color: #1db954;
+}
+
+.users-dropdown-cell {
+    position: relative;
+}
+
+.users-dropdown-button {
+    background: transparent;
+    border: none;
+    color: var(--text-main);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 4px 12px;
+    border-radius: 4px;
+}
+
+.users-dropdown-button:hover {
+    background: var(--bg-hover);
+}
+
+.users-dropdown-menu {
+    position: absolute;
+    right: 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 100;
+    min-width: 180px;
+}
+
+.users-dropdown-menu.bottom {
+    top: 35px;
+}
+
+.users-dropdown-menu.top {
+    bottom: 35px;
+}
+
+.users-dropdown-item {
+    padding: 10px 15px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-main);
+}
+
+.users-dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.users-dropdown-item:hover {
+    background: var(--bg-hover);
+}
+
+.users-stats-footer {
+    display: flex;
+    gap: 15px;
+    color: var(--text-sub);
+    font-size: 14px;
+    padding: 15px 0;
+}
+
+.users-stats-footer strong {
+    color: var(--text-main);
+}
+
+.users-stats-footer .active {
+    color: #1db954;
+}
+
+.users-stats-footer .locked {
+    color: #ff4444;
+}
+
+/* Coin Modal */
+.coin-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.coin-modal-content {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 25px;
+    width: 400px;
+    max-width: 90%;
+}
+
+.coin-modal-header {
+    margin: 0 0 10px 0;
+    color: var(--text-main);
+}
+
+.coin-modal-user-info {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.coin-modal-email {
+    color: var(--text-sub);
+    margin-bottom: 5px;
+}
+
+.coin-modal-balance {
+    color: var(--text-main);
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.coin-modal-input-group {
+    margin-bottom: 20px;
+}
+
+.coin-modal-label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text-sub);
+    font-size: 14px;
+}
+
+.coin-modal-input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg-dark);
+    color: var(--text-main);
+    font-size: 16px;
+}
+
+/* Hide number input spinner */
+.coin-modal-input::-webkit-inner-spin-button,
+.coin-modal-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.coin-modal-input[type=number] {
+    -moz-appearance: textfield;
+}
+
+.coin-modal-quick-actions {
+    margin-bottom: 20px;
+}
+
+.coin-modal-section-label {
+    font-size: 13px;
+    color: var(--text-sub);
+    margin-bottom: 8px;
+}
+
+.coin-modal-button-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.coin-modal-button-row:last-child {
+    margin-bottom: 0;
+}
+
+.coin-modal-btn-add,
+.coin-modal-btn-subtract {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.coin-modal-btn-add {
+    background: #1db954;
+    color: white;
+}
+
+.coin-modal-btn-add:hover {
+    background: #1ed760;
+}
+
+.coin-modal-btn-subtract {
+    background: #ff4444;
+    color: white;
+}
+
+.coin-modal-btn-subtract:hover {
+    background: #ff6666;
+}
+
+.coin-modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.coin-modal-actions .coin-modal-btn-add,
+.coin-modal-actions .coin-modal-btn-subtract {
+    flex: 0 0 auto;
+    padding: 10px 20px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s;
+    background: var(--bg-card);
+    color: var(--text-main);
+}
+
+.coin-modal-actions .coin-modal-btn-add:hover {
+    background: rgba(29, 185, 84, 0.15);
+    border-color: #1db954;
+    color: #1db954;
+}
+
+.coin-modal-actions .coin-modal-btn-subtract:hover {
+    background: rgba(255, 68, 68, 0.15);
+    border-color: #ff4444;
+    color: #ff4444;
+}
+
+.users-dropdown-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 50;
+}
+
+/* Stats footer */
+.users-stats-footer {
+    display: flex;
+    gap: 15px;
+    color: var(--text-sub);
+    font-size: 14px;
+    padding: 15px 0;
+}
+
+.users-stats-footer strong.total {
+    color: var(--text-main);
+}
+
+.users-stats-footer strong.active {
+    color: #1db954;
+}
+
+.users-stats-footer strong.locked {
+    color: #ff4444;
+}
