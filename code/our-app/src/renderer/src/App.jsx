@@ -8,7 +8,7 @@ import Settings from './pages/Settings';
 import AccountPage from './pages/AccountPage';
 import LoginModal from './components/LoginModal';
 import { useState } from 'react';
-import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminLayout from './pages/admin/AdminLayout';
 
 function AppContent() {
   const { activeTab, loading: appLoading } = useApp();
@@ -16,7 +16,7 @@ function AppContent() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   if (window.location.hash === '#/admin') {
-    return <AdminDashboard />;
+    return <AdminLayout />;
   }
 
   if (authLoading || appLoading) {
