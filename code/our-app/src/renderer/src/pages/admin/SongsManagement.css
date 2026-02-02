@@ -74,10 +74,24 @@
     gap: 6px;
 }
 
+.songs-info-cell.clickable {
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.songs-info-cell.clickable:hover {
+    opacity: 0.8;
+}
+
+.songs-info-cell.clickable:hover .songs-name {
+    color: var(--primary);
+}
+
 .songs-name {
     color: var(--text-main);
     font-weight: 600;
     font-size: 15px;
+    transition: color 0.2s;
 }
 
 .songs-meta {

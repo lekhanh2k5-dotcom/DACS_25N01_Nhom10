@@ -15,6 +15,14 @@ export default function SongsManagement() {
     const [currentPage, setCurrentPage] = useState(1)
     const itemsPerPage = 50
 
+    const regionMapping = {
+        cn: 'chinese',
+        kr: 'korean',
+        vn: 'vietnam',
+        us: 'world',
+        jp: 'japanese'
+    }
+
     useEffect(() => {
         if (user) {
             fetchSongs()
@@ -55,12 +63,19 @@ export default function SongsManagement() {
         setOpenDropdown(null)
     }
 
+    const handleCopyId = (id) => {
+        navigator.clipboard.writeText(id)
+        showSuccess('Đã sao chép ID!')
+    }
+
     const filteredSongs = songs.filter(s => {
         const query = searchQuery.toLowerCase()
         const matchesSearch = s.name?.toLowerCase().includes(query) ||
             s.author?.toLowerCase().includes(query) ||
-            s.composer?.toLowerCase().includes(query)
-        const matchesRegion = selectedRegion === 'all' || s.region === selectedRegion
+            s.composer?.toLowerCase().includes(query) ||
+            s.id?.toLowerCase().includes(query)
+        
+        const matchesRegion = selectedRegion === 'all' || s.region === regionMapping[selectedRegion]
         return matchesSearch && matchesRegion
     })
 
@@ -81,7 +96,7 @@ export default function SongsManagement() {
 
     const regions = [
         { value: 'all', label: '🌍 Tất cả' },
-        { value: 'cn', label: '🇨🇳 Hoa ngữ' },
+        { value: 'cn', label: '🇨🇳 Trung Quốc' },
         { value: 'kr', label: '🇰🇷 Hàn Quốc' },
         { value: 'vn', label: '🇻🇳 Việt Nam' },
         { value: 'us', label: '🇺🇸 Âu Mỹ' },
@@ -153,7 +168,11 @@ export default function SongsManagement() {
                                 return (
                                     <tr key={s.id}>
                                         <td>
-                                            <div className="songs-info-cell">
+                                            <div 
+                                                className="songs-info-cell clickable"
+                                                onClick={() => handleCopyId(s.id)}
+                                                title="Click để sao chép ID"
+                                            >
                                                 <div className="songs-name">
                                                     🎵 {s.name || 'Untitled'}
                                                 </div>
