@@ -1,0 +1,266 @@
+/* Songs Management Loading State */
+.songs-loading {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-sub);
+}
+
+/* Filter Section */
+.songs-filter-section {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: var(--bg-card);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+}
+
+.songs-region-select {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text-main);
+    font-size: 14px;
+    cursor: pointer;
+    min-width: 150px;
+}
+
+.songs-region-select:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.songs-search-input {
+    flex: 1;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text-main);
+    font-size: 14px;
+    max-width: 300px;
+}
+
+.songs-search-input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.songs-search-input::placeholder {
+    color: var(--text-sub);
+}
+
+/* Table Container */
+.songs-table-container {
+    background: var(--bg-card);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+}
+
+.songs-table-empty {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-sub);
+}
+
+/* Table Cells */
+.songs-info-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.songs-name {
+    color: var(--text-main);
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.songs-meta {
+    color: var(--text-sub);
+    font-size: 12px;
+}
+
+.songs-region-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 12px;
+    background: rgba(29, 185, 84, 0.1);
+    color: var(--primary);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.songs-price-cell {
+    color: var(--accent-gold);
+    font-weight: 600;
+}
+
+.songs-notes-cell {
+    color: var(--text-sub);
+    font-size: 13px;
+}
+
+/* Dropdown */
+.songs-dropdown-cell {
+    position: relative;
+}
+
+.songs-dropdown-button {
+    background: transparent;
+    border: none;
+    color: var(--text-main);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 4px 12px;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.songs-dropdown-button:hover {
+    background: var(--bg-hover);
+}
+
+.songs-dropdown-menu {
+    position: absolute;
+    right: 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 100;
+    min-width: 180px;
+}
+
+.songs-dropdown-menu.bottom {
+    top: 35px;
+}
+
+.songs-dropdown-menu.top {
+    bottom: 35px;
+}
+
+.songs-dropdown-item {
+    padding: 10px 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-main);
+    transition: background 0.2s;
+    border-bottom: 1px solid var(--border);
+}
+
+.songs-dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.songs-dropdown-item:hover {
+    background: var(--bg-hover);
+}
+
+.songs-dropdown-item.danger {
+    color: #ff4444;
+}
+
+.songs-dropdown-item.danger:hover {
+    background: rgba(255, 68, 68, 0.1);
+}
+
+.songs-dropdown-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 50;
+}
+
+/* Stats Footer */
+.songs-stats-footer {
+    display: flex;
+    gap: 15px;
+    color: var(--text-sub);
+    font-size: 14px;
+    padding: 15px 0;
+}
+
+.songs-stats-footer strong.total {
+    color: var(--text-main);
+}
+
+.songs-stats-footer strong.value {
+    color: var(--accent-gold);
+}
+
+/* Pagination */
+.songs-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    padding: 20px 0;
+}
+
+.pagination-btn {
+    padding: 8px 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-main);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.pagination-btn:hover:not(:disabled) {
+    background: var(--bg-hover);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.pagination-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.pagination-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-main);
+    font-size: 14px;
+}
+
+.pagination-input {
+    width: 50px;
+    padding: 6px;
+    text-align: center;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg-card);
+    color: var(--text-main);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.pagination-input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+/* Hide number input spinner */
+.pagination-input::-webkit-inner-spin-button,
+.pagination-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.pagination-input[type=number] {
+    -moz-appearance: textfield;
+}

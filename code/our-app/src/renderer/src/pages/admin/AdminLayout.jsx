@@ -3,6 +3,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import './AdminLayout.css'
 import Dashboard from './Dashboard'
 import UsersManagement from './UsersManagement'
+import SongsManagement from './SongsManagement'
 
 export default function AdminLayout() {
     const [activeTab, setActiveTab] = useState('dashboard')
@@ -49,14 +50,7 @@ export default function AdminLayout() {
             <main className="admin-main-content">
                 {activeTab === 'dashboard' && <Dashboard />}
                 {activeTab === 'users' && <UsersManagement />}
-                {activeTab === 'songs' && (
-                    <div className="admin-page">
-                        <div className="admin-page-header">
-                            <h1>🎵 Quản lý bài hát</h1>
-                        </div>
-                        <p>Đang phát triển...</p>
-                    </div>
-                )}
+                {activeTab === 'songs' && <SongsManagement />}
                 {activeTab === 'transactions' && (
                     <div className="admin-page">
                         <div className="admin-page-header">
