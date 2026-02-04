@@ -177,24 +177,6 @@ export default function UploadSheetModal({ onClose, onSuccess }) {
                                 </small>
                             </div>
 
-                            <div className="song-preview">
-                                <div className="preview-header">
-                                    <span className="preview-label">📊 Preview</span>
-                                    <span className="preview-count">{metadata.songNotes.length} notes</span>
-                                </div>
-                                <div className="preview-notes">
-                                    {metadata.songNotes.slice(0, 5).map((note, i) => (
-                                        <div key={i} className="preview-note">
-                                            <span className="note-time">{note.time}ms</span>
-                                            <span className="note-key">{note.key}</span>
-                                        </div>
-                                    ))}
-                                    {metadata.songNotes.length > 5 && (
-                                        <div className="preview-more">... và {metadata.songNotes.length - 5} notes khác</div>
-                                    )}
-                                </div>
-                            </div>
-
                             {uploading && (
                                 <div className="upload-progress">
                                     <div className="progress-bar">

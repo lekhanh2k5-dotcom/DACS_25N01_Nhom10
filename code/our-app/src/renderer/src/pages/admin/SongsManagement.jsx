@@ -5,6 +5,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import { showSuccess, showError } from '../../utils/alert'
 import { deleteSongFromFirebase } from '../../firebase/deleteService'
 import UploadSheetModal from '../../components/UploadSheetModal'
+import EditSheetModal from '../../components/EditSheetModal'
 import Swal from 'sweetalert2'
 import './SongsManagement.css'
 
@@ -17,6 +18,8 @@ export default function SongsManagement() {
     const [selectedRegion, setSelectedRegion] = useState('all')
     const [currentPage, setCurrentPage] = useState(1)
     const [showUploadModal, setShowUploadModal] = useState(false)
+    const [showEditModal, setShowEditModal] = useState(false)
+    const [editingSong, setEditingSong] = useState(null)
     const itemsPerPage = 50
 
     const regionMapping = {
@@ -53,8 +56,9 @@ export default function SongsManagement() {
     }
 
     const handleEdit = (song) => {
-        showSuccess('Chức năng chỉnh sửa đang phát triển')
         setOpenDropdown(null)
+        setEditingSong(song)
+        setShowEditModal(true)
     }
 
     const handleDelete = async (song) => {
@@ -79,16 +83,11 @@ export default function SongsManagement() {
         try {
             await deleteSongFromFirebase(song.id, song.txtFilePath)
             showSuccess('✅ Đã xóa bài hát!')
-            fetchSongs() // Refresh danh sách
+            fetchSongs()
         } catch (error) {
             console.error('Delete error:', error)
             showError('❌ Lỗi: ' + error.message)
         }
-    }
-
-    const handleViewDetails = (song) => {
-        showSuccess('Chức năng xem chi tiết đang phát triển')
-        setOpenDropdown(null)
     }
 
     const handleCopyId = (id) => {
@@ -226,12 +225,6 @@ export default function SongsManagement() {
                                             {openDropdown === s.id && (
                                                 <div className={`songs-dropdown-menu ${isNearBottom ? 'top' : 'bottom'}`}>
                                                     <div
-                                                        onClick={() => handleViewDetails(s)}
-                                                        className="songs-dropdown-item"
-                                                    >
-                                                        👁️ Xem chi tiết
-                                                    </div>
-                                                    <div
                                                         onClick={() => handleEdit(s)}
                                                         className="songs-dropdown-item"
                                                     >
@@ -313,6 +306,22 @@ export default function SongsManagement() {
                     onSuccess={() => {
                         fetchSongs()
                         setShowUploadModal(false)
+                    }}
+                />
+            )}
+
+            {/* Edit Modal */}
+            {showEditModal && editingSong && (
+                <EditSheetModal
+                    song={editingSong}
+                    onClose={() => {
+                        setShowEditModal(false)
+                        setEditingSong(null)
+                    }}
+                    onSuccess={() => {
+                        fetchSongs()
+                        setShowEditModal(false)
+                        setEditingSong(null)
                     }}
                 />
             )}
