@@ -49,7 +49,7 @@ export async function getNextSongId(region) {
 /**
  * Upload sheet file và metadata lên Firebase
  * @param {string} fileContent - Nội dung file JSON string
- * @param {Object} metadata - {name, author, composer, region, price, txtFilePath}
+ * @param {Object} metadata - {name, author, composer, region, price, fileName}
  * @param {string} userId - ID user đang upload
  * @param {Function} onProgress - Callback progress (0-1)
  * @returns {Promise<{success: boolean, songId: string}>}
@@ -62,9 +62,11 @@ export async function uploadSheetToFirebase(fileContent, metadata, userId, onPro
     
     if (onProgress) onProgress(0.3);
     
+    const txtFilePath = `songs/txt/${songId}.txt`;
+    
     const uploadResult = await window.electron.ipcRenderer.invoke('sheet:upload-to-storage', {
       fileContent,
-      txtFilePath: metadata.txtFilePath
+      txtFilePath: txtFilePath
     });
     
     if (!uploadResult.ok) {
@@ -80,14 +82,14 @@ export async function uploadSheetToFirebase(fileContent, metadata, userId, onPro
       composer: metadata.composer,
       region: metadata.region,
       price: metadata.price,
-      txtFilePath: metadata.txtFilePath,
+      txtFilePath: txtFilePath,
       createdAt: serverTimestamp(),
       uploadedBy: userId
     });
     
     if (onProgress) onProgress(1.0);
     
-    console.log(`✅ Uploaded song: ${songId}`);
+    console.log(`✅ Uploaded song: ${songId} → ${txtFilePath}`);
     return { success: true, songId };
     
   } catch (error) {

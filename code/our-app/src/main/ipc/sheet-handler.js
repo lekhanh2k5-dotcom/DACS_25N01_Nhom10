@@ -44,8 +44,6 @@ function extractMetadata(songData, filePath) {
   const combinedText = `${name} ${author}`;
   const region = detectRegion(combinedText);
   
-  // Tạo txtFilePath: songs/txt/{tên file}.txt
-  const txtFilePath = `songs/txt/${fileNameWithoutExt}.txt`;
   
   return {
     name: name.trim(),
@@ -53,7 +51,7 @@ function extractMetadata(songData, filePath) {
     composer: composer.trim(),
     region,
     price: 30000,
-    txtFilePath,
+    fileName: fileNameWithoutExt, 
     songNotes: songData.songNotes || []
   };
 } 
@@ -69,7 +67,8 @@ if (!admin.apps.length) {
         
         admin.initializeApp({
             credential: admin.credential.cert(serviceAccount),
-            storageBucket: "sky-piano-test-21615.firebasestorage.app" 
+            storageBucket: "sky-piano-test-21615.firebasestorage.app",
+            databaseURL: "https://sky-piano-test-21615-default-rtdb.firebaseio.com"
         });
         console.log("✅ Firebase Admin initialized successfully");
     } catch (err) {
@@ -151,7 +150,7 @@ export function registerSheetHandlers() {
     }
   });
 
-  // Handler upload sử dụng Admin SDK (không cần Storage Rules)
+  // Handler upload sử dụng Admin SDK 
   ipcMain.handle('sheet:upload-to-storage', async (event, { fileContent, txtFilePath }) => {
     console.log('📤 Upload handler called:', txtFilePath);
     try {
@@ -173,6 +172,32 @@ export function registerSheetHandlers() {
       return { ok: false, message: e.message };
     }
   });
+
+  //  xóa file trong Storage 
+  ipcMain.handle('sheet:delete-storage', async (event, { txtFilePath }) => {
+    console.log('🗑️ Delete storage handler called:', txtFilePath);
+    
+    if (!txtFilePath) {
+      return { ok: true }; 
+    }
+    
+    try {
+      const bucket = admin.storage().bucket();
+      const file = bucket.file(txtFilePath);
+      
+      try {
+        await file.delete();
+        console.log(`✅ Deleted Storage file: ${txtFilePath}`);
+      } catch (storageError) {
+        console.warn(`⚠️ Could not delete file (may not exist): ${txtFilePath}`);
+      }
+      
+      return { ok: true };
+    } catch (e) {
+      console.error('❌ Storage delete failed:', e);
+      return { ok: false, message: e.message };
+    }
+  });
   
-  console.log('✅ Sheet handlers registered: sheet:open, sheet:extract-metadata, sheet:secure-load, sheet:upload-to-storage');
+  console.log('✅ Sheet handlers registered: sheet:open, sheet:extract-metadata, sheet:secure-load, sheet:upload-to-storage, sheet:delete-storage');
 }

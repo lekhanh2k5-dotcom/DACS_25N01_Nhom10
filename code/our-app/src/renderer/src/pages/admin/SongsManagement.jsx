@@ -3,7 +3,9 @@ import { db } from '../../firebase/firebase'
 import { collection, getDocs } from 'firebase/firestore'
 import { useAuth } from '../../contexts/AuthContext'
 import { showSuccess, showError } from '../../utils/alert'
+import { deleteSongFromFirebase } from '../../firebase/deleteService'
 import UploadSheetModal from '../../components/UploadSheetModal'
+import Swal from 'sweetalert2'
 import './SongsManagement.css'
 
 export default function SongsManagement() {
@@ -55,9 +57,33 @@ export default function SongsManagement() {
         setOpenDropdown(null)
     }
 
-    const handleDelete = (song) => {
-        showSuccess('Chức năng xóa đang phát triển')
+    const handleDelete = async (song) => {
         setOpenDropdown(null)
+
+        // Confirm dialog
+        const result = await Swal.fire({
+            title: '🗑️ Xóa bài hát?',
+            html: `Bạn có chắc muốn xóa:<br><strong>${song.name}</strong>?<br><br>
+                   <span style="color: #ff4444">⚠️ Hành động này không thể hoàn tác!</span>`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Xóa',
+            cancelButtonText: 'Hủy',
+            confirmButtonColor: '#d33',
+            background: '#1e1e1e',
+            color: '#fff'
+        })
+
+        if (!result.isConfirmed) return
+
+        try {
+            await deleteSongFromFirebase(song.id, song.txtFilePath)
+            showSuccess('✅ Đã xóa bài hát!')
+            fetchSongs() // Refresh danh sách
+        } catch (error) {
+            console.error('Delete error:', error)
+            showError('❌ Lỗi: ' + error.message)
+        }
     }
 
     const handleViewDetails = (song) => {

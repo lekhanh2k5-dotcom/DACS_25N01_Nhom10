@@ -164,14 +164,17 @@ export default function UploadSheetModal({ onClose, onSuccess }) {
                             </div>
 
                             <div className="form-group">
-                                <label>Đường dẫn Storage</label>
+                                <label>Tên file gốc</label>
                                 <input
                                     type="text"
-                                    value={metadata.txtFilePath}
-                                    onChange={(e) => setMetadata({ ...metadata, txtFilePath: e.target.value })}
-                                    placeholder="songs/txt/filename.txt"
-                                    disabled={uploading}
+                                    value={metadata.fileName || ''}
+                                    disabled
+                                    style={{ opacity: 0.6, cursor: 'not-allowed' }}
+                                    placeholder="Sẽ được tạo tự động theo songId"
                                 />
+                                <small style={{ color: '#999', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+                                    💡 Path thực tế: songs/txt/song_XX_XXX.txt (tự động)
+                                </small>
                             </div>
 
                             <div className="song-preview">
