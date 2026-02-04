@@ -62,7 +62,7 @@ export async function uploadSheetToFirebase(fileContent, metadata, userId, onPro
     
     if (onProgress) onProgress(0.3);
     
-    const txtFilePath = `songs/txt/${songId}.txt`;
+    const txtFilePath = `songs/txt/${metadata.fileName}.txt`;
     
     const uploadResult = await window.electron.ipcRenderer.invoke('sheet:upload-to-storage', {
       fileContent,

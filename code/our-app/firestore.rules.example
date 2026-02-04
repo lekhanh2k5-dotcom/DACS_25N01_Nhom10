@@ -1,0 +1,48 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper function: Kiểm tra admin qua custom claims
+    function isAdmin() {
+      return request.auth != null && request.auth.token.admin == true;
+    }
+
+    // ✅ USERS: Chỉ đọc/sửa profile của chính mình, admin full access
+    match /users/{userId} {
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow read: if isAdmin() || (request.auth != null && request.auth.uid == userId);
+      
+      // Cho phép update coins CHỈ KHI GIẢM (mua hàng) hoặc admin
+      allow update: if request.auth != null && request.auth.uid == userId &&
+                       (request.resource.data.coins <= resource.data.coins || isAdmin());
+      
+      allow delete: if isAdmin();
+    }
+
+    // ✅ SONGS: Public read, chỉ admin write
+    match /songs/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    // ✅ TRANSACTIONS: Admin full access, user chỉ đọc của mình và tạo khi mua hàng
+    match /transactions/{transactionId} {
+      allow read: if isAdmin() || (request.auth != null && request.auth.uid == resource.data.userId);
+      
+      // Cho phép tạo transaction CHỈ KHI:
+      // 1. User authenticated
+      // 2. Transaction userId trùng với auth uid
+      // 3. Type là 'buysheet' (không cho tự cộng coin)
+      allow create: if request.auth != null 
+                    && request.resource.data.userId == request.auth.uid
+                    && request.resource.data.type == 'buysheet';
+      
+      allow update, delete: if isAdmin();
+    }
+    
+    // ✅ DEFAULT: Chặn tất cả
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

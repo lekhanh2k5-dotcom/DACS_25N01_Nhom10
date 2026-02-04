@@ -170,10 +170,10 @@ export default function UploadSheetModal({ onClose, onSuccess }) {
                                     value={metadata.fileName || ''}
                                     disabled
                                     style={{ opacity: 0.6, cursor: 'not-allowed' }}
-                                    placeholder="Sẽ được tạo tự động theo songId"
+                                    placeholder="Tên file gốc"
                                 />
                                 <small style={{ color: '#999', fontSize: '12px', marginTop: '4px', display: 'block' }}>
-                                    💡 Path thực tế: songs/txt/song_XX_XXX.txt (tự động)
+                                    💡 Path thực tế: songs/txt/{metadata.fileName ? `${metadata.fileName}.txt` : 'Tên file.txt'}
                                 </small>
                             </div>
 
