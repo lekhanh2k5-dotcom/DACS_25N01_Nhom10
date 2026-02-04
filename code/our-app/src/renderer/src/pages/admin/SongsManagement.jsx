@@ -3,6 +3,7 @@ import { db } from '../../firebase/firebase'
 import { collection, getDocs } from 'firebase/firestore'
 import { useAuth } from '../../contexts/AuthContext'
 import { showSuccess, showError } from '../../utils/alert'
+import UploadSheetModal from '../../components/UploadSheetModal'
 import './SongsManagement.css'
 
 export default function SongsManagement() {
@@ -13,6 +14,7 @@ export default function SongsManagement() {
     const [openDropdown, setOpenDropdown] = useState(null)
     const [selectedRegion, setSelectedRegion] = useState('all')
     const [currentPage, setCurrentPage] = useState(1)
+    const [showUploadModal, setShowUploadModal] = useState(false)
     const itemsPerPage = 50
 
     const regionMapping = {
@@ -74,7 +76,7 @@ export default function SongsManagement() {
             s.author?.toLowerCase().includes(query) ||
             s.composer?.toLowerCase().includes(query) ||
             s.id?.toLowerCase().includes(query)
-        
+
         const matchesRegion = selectedRegion === 'all' || s.region === regionMapping[selectedRegion]
         return matchesSearch && matchesRegion
     })
@@ -141,7 +143,10 @@ export default function SongsManagement() {
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="songs-search-input"
                 />
-                <button className="admin-btn admin-btn-primary">
+                <button
+                    className="admin-btn admin-btn-primary"
+                    onClick={() => setShowUploadModal(true)}
+                >
                     ➕ Thêm bài hát
                 </button>
             </div>
@@ -168,7 +173,7 @@ export default function SongsManagement() {
                                 return (
                                     <tr key={s.id}>
                                         <td>
-                                            <div 
+                                            <div
                                                 className="songs-info-cell clickable"
                                                 onClick={() => handleCopyId(s.id)}
                                                 title="Click để sao chép ID"
@@ -273,6 +278,17 @@ export default function SongsManagement() {
             {/* Click outside to close dropdown */}
             {openDropdown && (
                 <div className="songs-dropdown-backdrop" onClick={() => setOpenDropdown(null)} />
+            )}
+
+            {/* Upload Modal */}
+            {showUploadModal && (
+                <UploadSheetModal
+                    onClose={() => setShowUploadModal(false)}
+                    onSuccess={() => {
+                        fetchSongs()
+                        setShowUploadModal(false)
+                    }}
+                />
             )}
         </div>
     )

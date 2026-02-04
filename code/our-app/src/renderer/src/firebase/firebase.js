@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore, enableIndexedDbPersistence } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
 
 const firebaseConfig = {
@@ -17,6 +18,8 @@ const app = initializeApp(firebaseConfig);
 
 export const db = getFirestore(app, 'skysheet');
 export const auth = getAuth(app);
+export const storage = getStorage(app);
+
 enableIndexedDbPersistence(db)
   .then(() => {
     console.log('✅ Data được cache local');
