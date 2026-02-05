@@ -241,10 +241,9 @@
 
 .progress-bar {
     height: 100%;
-    background: var(--primary);
+    background: var(--primary) !important;
     border-radius: 3px;
-    width: 0%;
-    transition: width 0.1s linear;
+    transition: width 0.05s ease-out;
     position: relative;
 }
 
