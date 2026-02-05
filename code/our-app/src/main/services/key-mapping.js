@@ -45,6 +45,33 @@ export const KEY_MAPS = {
     '1Key18': Key.T,
     '1Key19': Key.Y,
     '1Key20': Key.U
+  },
+  
+  Roblox: {
+    '1Key0': Key.T,
+    '1Key1': Key.Y,
+    '1Key2': Key.U,
+    '1Key3': Key.I,
+    '1Key4': Key.O,
+    '1Key5': Key.P,
+    
+    '1Key6': Key.A,
+    '1Key7': Key.S,
+    '1Key8': Key.D,
+    '1Key9': Key.F,
+    '1Key10': Key.G,
+    '1Key11': Key.H,
+    '1Key12': Key.J,
+    '1Key13': Key.K,
+    '1Key14': Key.L,
+    
+    '1Key15': Key.Z,
+    '1Key16': Key.X,
+    '1Key17': Key.C,
+    '1Key18': Key.V,
+    '1Key19': Key.B,
+    '1Key20': Key.N,
+    '1Key21': Key.M
   }
 };
 
