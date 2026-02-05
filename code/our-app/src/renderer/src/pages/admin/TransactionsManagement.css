@@ -1,0 +1,338 @@
+/* Không cần padding riêng vì đã có từ .admin-page */
+
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    gap: 16px;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(100, 100, 255, 0.1);
+    border-top-color: #6464ff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Controls */
+.transactions-controls {
+    margin-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.search-box {
+    flex: 1;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+    background: var(--bg-card);
+    color: var(--text-main);
+}
+
+.search-box input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(100, 100, 255, 0.1);
+}
+
+.filter-tabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.filter-tab {
+    padding: 10px 20px;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text-sub);
+}
+
+.filter-tab:hover {
+    background: var(--bg-hover);
+    border-color: var(--border);
+    color: var(--text-main);
+}
+
+.filter-tab.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+/* Table */
+.transactions-table-container {
+    background: var(--bg-card);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border);
+}
+
+.transactions-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.transactions-table thead {
+    background: var(--bg-hover);
+    border-bottom: 1px solid var(--border);
+}
+
+.transactions-table th {
+    padding: 16px;
+    text-align: left;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-sub);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.transactions-table tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background-color 0.2s;
+}
+
+.transactions-table tbody tr:hover {
+    background-color: var(--bg-hover);
+}
+
+.transactions-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.transactions-table td {
+    padding: 16px;
+    font-size: 14px;
+    color: var(--text-main);
+}
+
+.user-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.user-name {
+    font-weight: 500;
+    color: var(--text-main);
+}
+
+.user-email {
+    font-size: 12px;
+    color: var(--text-sub);
+}
+
+.type-badge {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    color: var(--text-main);
+}
+
+.type-badge.type-buy {
+    color: var(--text-main);
+}
+
+.type-badge.type-add {
+    color: var(--text-main);
+}
+
+.type-badge.type-subtract {
+    color: var(--text-main);
+}
+
+.detail-cell {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+}
+
+.detail-icon {
+    font-size: 16px;
+}
+
+.note-simple {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.song-name {
+    color: var(--text-sub);
+    font-size: 13px;
+}
+
+.coin-amount {
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.coin-amount.positive {
+    color: #059669;
+}
+
+.coin-amount.negative {
+    color: #dc2626;
+}
+
+/* Empty State */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    color: var(--text-sub);
+}
+
+.empty-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.empty-state p {
+    font-size: 16px;
+    color: var(--text-sub);
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 20px;
+    border-top: 1px solid var(--border);
+}
+
+.page-numbers {
+    display: flex;
+    gap: 4px;
+}
+
+.page-btn {
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text-main);
+    min-width: 40px;
+}
+
+.page-btn:hover:not(:disabled) {
+    background: var(--bg-hover);
+    border-color: var(--border);
+}
+
+.page-btn.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.page-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.page-ellipsis {
+    padding: 8px 4px;
+    color: var(--text-sub);
+    font-size: 14px;
+}
+
+.transactions-footer {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--text-sub);
+    text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .transactions-table {
+        font-size: 13px;
+    }
+
+    .transactions-table th,
+    .transactions-table td {
+        padding: 12px 8px;
+    }
+}
+
+@media (max-width: 768px) {
+    .transactions-controls {
+        flex-direction: column;
+    }
+
+    .filter-tabs {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+    }
+
+    .transactions-table-container {
+        overflow-x: auto;
+    }
+
+    .transactions-table {
+        min-width: 800px;
+    }
+}
+
+.btn-refresh {
+    padding: 10px 20px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-refresh:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(100, 100, 255, 0.3);
+}
+
+.btn-refresh:active {
+    transform: translateY(0);
+}

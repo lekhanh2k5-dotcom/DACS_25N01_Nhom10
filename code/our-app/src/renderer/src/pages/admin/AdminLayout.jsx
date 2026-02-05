@@ -4,6 +4,7 @@ import './AdminLayout.css'
 import Dashboard from './Dashboard'
 import UsersManagement from './UsersManagement'
 import SongsManagement from './SongsManagement'
+import TransactionsManagement from './TransactionsManagement'
 
 export default function AdminLayout() {
     const [activeTab, setActiveTab] = useState('dashboard')
@@ -51,14 +52,7 @@ export default function AdminLayout() {
                 {activeTab === 'dashboard' && <Dashboard />}
                 {activeTab === 'users' && <UsersManagement />}
                 {activeTab === 'songs' && <SongsManagement />}
-                {activeTab === 'transactions' && (
-                    <div className="admin-page">
-                        <div className="admin-page-header">
-                            <h1>💰 Quản lý giao dịch</h1>
-                        </div>
-                        <p>Đang phát triển...</p>
-                    </div>
-                )}
+                {activeTab === 'transactions' && <TransactionsManagement />}
             </main>
         </div>
     )
