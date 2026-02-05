@@ -1,10 +1,11 @@
 import { keyboard } from "@nut-tree-fork/nut-js";
-import { KEY_MAP } from "./key-mapping";
+import { getKeyMap } from "./key-mapping";
 
 keyboard.config.autoDelayMs = 0;
 
 let isPlaying = false;
 let timeoutId = null;
+let currentGameType = 'Sky'; 
 
 const sleep = (ms) =>
   new Promise((resolve) => {
@@ -13,7 +14,8 @@ const sleep = (ms) =>
 
 export const playerService = {
   async playChord(keys) {
-    const nutKeys = keys.map((k) => KEY_MAP[k]).filter(Boolean);
+    const keyMap = getKeyMap(currentGameType);
+    const nutKeys = keys.map((k) => keyMap[k]).filter(Boolean);
 
     await Promise.all(nutKeys.map((key) => keyboard.pressKey(key)));
     await Promise.all(nutKeys.map((key) => keyboard.releaseKey(key)));
@@ -26,8 +28,13 @@ export const playerService = {
     console.log("--- Đã dừng Auto ---");
   },
 
-async start(songNotes, playbackSpeed = 1.0, offsetMs = 0) {
+async start(songNotes, playbackSpeed = 1.0, offsetMs = 0, gameType = 'Sky') {
   if (isPlaying) return;
+  isPlaying = true;
+
+  // Lưu game type để playChord sử dụng
+  currentGameType = gameType;
+  console.log(`🎮 Auto-play với game: ${gameType}`);
   isPlaying = true;
 
   const offset = Number.isFinite(Number(offsetMs)) ? Number(offsetMs) : 0;

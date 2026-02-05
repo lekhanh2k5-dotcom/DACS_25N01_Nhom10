@@ -151,8 +151,12 @@ export const AppProvider = ({ children }) => {
     const togglePlayback = () => {
         if (!currentSong) return;
         if (!isPlaying) {
+            // Lấy game type từ settings
+            const settings = JSON.parse(localStorage.getItem('appSettings') || '{}');
+            const gameType = settings.game || 'Sky';
+
             setIsPlaying(true);
-            window.api.autoPlay.start(currentSong.songNotes, currentTime, playbackSpeed);
+            window.api.autoPlay.start(currentSong.songNotes, currentTime, playbackSpeed, gameType);
         } else {
             setIsPlaying(false);
             window.api.autoPlay.stop();

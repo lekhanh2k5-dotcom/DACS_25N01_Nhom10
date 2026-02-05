@@ -1,50 +1,38 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import "./Settings.css";
-
-function buildNotesFromC3(count) {
-    const order = ["C", "D", "E", "F", "G", "A", "B"];
-    let octave = 3;
-    let idx = 0;
-    const res = [];
-
-    for (let i = 0; i < count; i++) {
-        res.push(`${order[idx]}${octave}`);
-        idx++;
-        if (idx === order.length) {
-            idx = 0;
-            octave++;
-        }
-    }
-    return res;
-}
 
 export default function Settings() {
     const [game, setGame] = useState("Sky");
     const [theme, setTheme] = useState("Tối");
     const [lang, setLang] = useState("Việt");
 
-    // mở/đóng khu mapping 
-    const [openMapping, setOpenMapping] = useState(true);
-    const [quickLayout, setQuickLayout] = useState("Sky"); // Sky | Genshin
+    // Load settings từ localStorage khi component mount
+    useEffect(() => {
+        try {
+            const savedSettings = localStorage.getItem('appSettings');
+            if (savedSettings) {
+                const { game: savedGame, theme: savedTheme, lang: savedLang } = JSON.parse(savedSettings);
+                if (savedGame) setGame(savedGame);
+                if (savedTheme) setTheme(savedTheme);
+                if (savedLang) setLang(savedLang);
+            }
+        } catch (e) {
+            console.error('Error loading settings:', e);
+        }
+    }, []);
 
-    const skyKeys = useMemo(
-        () => ["Y", "u", "i", "o", "p", "h", "j", "k", "l", ";", "n", "m", ",", ".", "/"],
-        []
-    );
+    // Lưu settings vào localStorage khi thay đổi
+    useEffect(() => {
+        try {
+            localStorage.setItem('appSettings', JSON.stringify({ game, theme, lang }));
+        } catch (e) {
+            console.error('Error saving settings:', e);
+        }
+    }, [game, theme, lang]);
 
-    const genshinKeys = useMemo(
-        () => ["z", "x", "c", "v", "b", "n", "m", "a", "s", "d", "f", "g", "h", "j", "q", "w", "e", "r", "t", "y", "u"],
-        []
-    );
 
-    const mappingRows = useMemo(() => {
-        const keys = quickLayout === "Sky" ? skyKeys : genshinKeys;
-        const notes = buildNotesFromC3(keys.length);
-        return notes.map((note, i) => ({ note, key: keys[i] || "—" }));
-    }, [quickLayout, skyKeys, genshinKeys]);
 
-    const gameTabs = useMemo(() => ["Sky", "Genshin", "Roblox", "Tùy chỉnh"], []);
-    const layoutTabs = useMemo(() => ["Sky", "Genshin"], []);
+    const gameTabs = useMemo(() => ["Sky", "Genshin", "Roblox"], []);
 
     return (
         <div className="ios-page">
@@ -120,70 +108,6 @@ export default function Settings() {
                 </div>
             </section>
 
-            {/* TÙY CHỈNH PHÍM ↔ NỐT */}
-            <section className="ios-section">
-                <button
-                    type="button"
-                    className="ios-collapse-head"
-                    onClick={() => setOpenMapping((v) => !v)}
-                >
-                    <div className="ios-collapse-left">
-                        <div className="ios-section-title" style={{ marginBottom: 0 }}>
-                            Tùy chỉnh phím ↔ nốt
-                        </div>
-                        <div className="ios-mini">
-                            Bắt đầu từ <b>C3</b>
-                        </div>
-                    </div>
-
-                    <div className={`ios-chev ${openMapping ? "open" : ""}`}>›</div>
-                </button>
-
-                <div className={`ios-collapse-body ${openMapping ? "open" : ""}`}>
-                    <div className="ios-row" style={{ marginTop: 10 }}>
-                        <div className="ios-row-left">
-                            <div className="ios-row-label">Layout nhanh</div>
-                            <div className="ios-row-value">{quickLayout}</div>
-                        </div>
-                        <div className="ios-row-right">
-                            <div className="ios-seg small">
-                                {layoutTabs.map((x) => (
-                                    <button
-                                        key={x}
-                                        type="button"
-                                        className={`ios-seg-btn ${quickLayout === x ? "active" : ""}`}
-                                        onClick={() => setQuickLayout(x)}
-                                    >
-                                        {x}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="map-list">
-                        {mappingRows.map((row) => (
-                            <div className="map-item" key={row.note}>
-                                <div className="map-note">{row.note}</div>
-                                <div className="map-mid">→</div>
-                                <div className="map-key">{row.key}</div>
-                                <button className="map-change" disabled>
-                                    Đổi
-                                </button>
-                            </div>
-                        ))}
-                    </div>
-
-                    <div className="map-actions">
-                        <button className="ios-ghost" disabled>
-                            + Thêm dòng
-                        </button>
-                        <button className="ios-primary" disabled>
-                            Lưu (sắp có)
-                        </button>
-                    </div>
-                </div>
-            </section>
             <section className="ios-section">
                 <div className="ios-section-title">Phím tắt</div>
 

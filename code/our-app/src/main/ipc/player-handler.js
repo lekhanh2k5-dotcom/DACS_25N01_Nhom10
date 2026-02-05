@@ -5,7 +5,7 @@ export function registerPlayerHandlers() {
   ipcMain.on('auto-play:start', async (event, payload) => {
     console.log('Nhận tín hiệu Play')
 
-    const { songNotes, offsetMs = 0, playbackSpeed = 1.0 } = payload || {}
+    const { songNotes, offsetMs = 0, playbackSpeed = 1.0, gameType = 'Sky' } = payload || {}
     const offset = Number.isFinite(Number(offsetMs)) ? Number(offsetMs) : 0
     const speed = Number.isFinite(Number(playbackSpeed)) ? Number(playbackSpeed) : 1.0
 
@@ -16,7 +16,7 @@ export function registerPlayerHandlers() {
 
     await new Promise((resolve) => setTimeout(resolve, 120))
     
-    playerService.start(songNotes, speed, offset)
+    playerService.start(songNotes, speed, offset, gameType)
     
   })
 
