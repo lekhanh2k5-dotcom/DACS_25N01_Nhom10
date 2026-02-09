@@ -12,9 +12,12 @@ service cloud.firestore {
       allow create: if request.auth != null && request.auth.uid == userId;
       allow read: if isAdmin() || (request.auth != null && request.auth.uid == userId);
       
-      // Cho phép update coins CHỈ KHI GIẢM (mua hàng) hoặc admin
-      allow update: if request.auth != null && request.auth.uid == userId &&
-                       (request.resource.data.coins <= resource.data.coins || isAdmin());
+      // Cho phép update:
+      // 1. Admin có thể update bất kỳ field nào
+      // 2. User chỉ có thể update coins khi GIẢM (mua hàng)
+      allow update: if isAdmin() 
+                    || (request.auth != null && request.auth.uid == userId 
+                        && request.resource.data.coins <= resource.data.coins);
       
       allow delete: if isAdmin();
     }
@@ -29,13 +32,13 @@ service cloud.firestore {
     match /transactions/{transactionId} {
       allow read: if isAdmin() || (request.auth != null && request.auth.uid == resource.data.userId);
       
-      // Cho phép tạo transaction CHỈ KHI:
-      // 1. User authenticated
-      // 2. Transaction userId trùng với auth uid
-      // 3. Type là 'buysheet' (không cho tự cộng coin)
-      allow create: if request.auth != null 
-                    && request.resource.data.userId == request.auth.uid
-                    && request.resource.data.type == 'buysheet';
+      // Cho phép tạo transaction:
+      // 1. Admin có thể tạo bất kỳ loại transaction nào
+      // 2. User chỉ được tạo transaction type 'buysheet' của chính mình
+      allow create: if isAdmin() 
+                    || (request.auth != null 
+                        && request.resource.data.userId == request.auth.uid
+                        && request.resource.data.type == 'buysheet');
       
       allow update, delete: if isAdmin();
     }

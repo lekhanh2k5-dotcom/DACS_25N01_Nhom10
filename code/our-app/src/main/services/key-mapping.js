@@ -79,9 +79,15 @@ export const KEY_MAP = KEY_MAPS.Sky;
 
 /**
  * Lấy key mapping theo game
- * @param {string} gameType - 'Sky', 'Genshin', 'Roblox', etc.
+ * @param {string} gameType - 'Sky', 'Genshin', 'Roblox', 'WhereWindMeet', 'Heartopia/15', etc.
  * @returns {Object} Key mapping object
  */
 export function getKeyMap(gameType = 'Sky') {
+  if (gameType === 'WhereWindMeet') {
+    return KEY_MAPS.Genshin;
+  }
+  if (gameType === 'Heartopia/15') {
+    return KEY_MAPS.Sky;
+  }
   return KEY_MAPS[gameType] || KEY_MAPS.Sky;
 }

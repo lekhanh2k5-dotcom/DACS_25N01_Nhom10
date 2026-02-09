@@ -32,7 +32,7 @@ export default function Settings() {
 
 
 
-    const gameTabs = useMemo(() => ["Sky", "Genshin", "Roblox"], []);
+    const gameTabs = useMemo(() => ["Sky", "Genshin", "Where Wind Meet", "Roblox", "Heartopia/15"], []);
 
     return (
         <div className="ios-page">
