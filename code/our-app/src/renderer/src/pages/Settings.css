@@ -87,7 +87,7 @@
 }
 
 .ios-seg-btn.active {
-    background: rgba(76, 175, 80, 0.14);
+    background: rgba(102, 187, 106, 0.14);
     border-color: var(--primary);
 }
 

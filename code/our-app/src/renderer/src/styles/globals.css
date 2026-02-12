@@ -1,20 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 
-:root {
-    --bg-dark: #121212;
-    --bg-sidebar: #000000;
-    --bg-card: #181818;
-    --bg-hover: #282828;
-    --primary: #1db954;
-    /* Xanh Spotify */
-    --text-main: #ffffff;
-    --text-sub: #b3b3b3;
-    --accent-red: #e74c3c;
-    --accent-gold: #f1c40f;
-    --border: #333333;
-    --card-bg: #181818;
-}
-
 * {
     box-sizing: border-box;
     user-select: none;
@@ -24,7 +9,7 @@ body {
     margin: 0;
     padding: 0;
     font-family: 'Inter', sans-serif;
-    background: var(--bg-dark);
+    background: var(--bg-primary);
     color: var(--text-main);
     height: 100vh;
     overflow: hidden;
@@ -46,7 +31,7 @@ body {
 /* MAIN CONTENT */
 .main-content {
     flex: 1;
-    background: linear-gradient(180deg, #202020 0%, var(--bg-dark) 100%);
+    background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
     padding: 20px 30px;
     overflow-y: auto;
 }
@@ -65,11 +50,11 @@ body {
 }
 
 .search-input {
-    background: #333;
-    border: none;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
     padding: 10px 15px;
     border-radius: 20px;
-    color: white;
+    color: var(--text-main);
     width: 250px;
     outline: none;
 }
@@ -83,7 +68,7 @@ body {
 
 .library-tab {
     background: transparent;
-    border: 2px solid #333;
+    border: 2px solid var(--border);
     color: var(--text-sub);
     padding: 8px 20px;
     border-radius: 20px;
@@ -148,7 +133,7 @@ body {
 
 /* SETTINGS FORM */
 .settings-group {
-    background: #2d3436;
+    background: var(--card-bg);
     padding: 20px;
     border-radius: 8px;
     margin-bottom: 20px;

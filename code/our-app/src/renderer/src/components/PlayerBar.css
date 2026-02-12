@@ -1,15 +1,15 @@
 /* PLAYER BAR */
 .player-bar {
     height: 100px;
-    background: linear-gradient(to top, #0a0a0a, #181818);
-    border-top: 1px solid #333;
+    background: linear-gradient(to top, var(--bg-primary), var(--bg-secondary));
+    border-top: 1px solid var(--border);
     display: grid;
     grid-template-columns: 1fr 2fr 1fr;
     align-items: center;
     padding: 0 24px;
     gap: 20px;
     z-index: 100;
-    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.5);
+    box-shadow: var(--shadow-lg);
 }
 
 /* LEFT SECTION */
@@ -106,7 +106,7 @@
 
 .btn-mode[data-mode="sequence"]:hover {
     background: rgba(29, 185, 84, 0.15);
-    color: #1ed760;
+    color: var(--primary-hover);
 }
 
 /* Shuffle mode - green */
@@ -116,7 +116,7 @@
 
 .btn-mode[data-mode="shuffle"]:hover {
     background: rgba(29, 185, 84, 0.15);
-    color: #1ed760;
+    color: var(--primary-hover);
 }
 
 /* Repeat-one mode - green */
@@ -126,14 +126,14 @@
 
 .btn-mode[data-mode="repeat-one"]:hover {
     background: rgba(29, 185, 84, 0.15);
-    color: #1ed760;
+    color: var(--primary-hover);
 }
 
 /* Main Controls */
 .btn-control {
     background: transparent;
     border: none;
-    color: #b3b3b3;
+    color: var(--text-sub);
     cursor: pointer;
     width: 32px;
     height: 32px;
@@ -151,15 +151,15 @@
 }
 
 .btn-control.btn-play {
-    background: white;
-    color: black;
+    background: var(--text-main);
+    color: #000;
     width: 40px;
     height: 40px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .btn-control.btn-play:hover {
-    background: white;
+    background: var(--text-main);
     transform: scale(1.08);
     box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
 }
@@ -184,7 +184,7 @@
     width: 45px;
     background: transparent;
     border: none;
-    color: white;
+    color: var(--text-main);
     padding: 2px 4px;
     font-size: 13px;
     font-weight: 600;

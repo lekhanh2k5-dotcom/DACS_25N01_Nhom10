@@ -103,8 +103,8 @@
     display: inline-block;
     padding: 4px 10px;
     border-radius: 12px;
-    background: rgba(29, 185, 84, 0.1);
-    color: var(--primary);
+    background: rgba(102, 187, 106, 0.1);
+    color: var(--success);
     font-size: 12px;
     font-weight: 600;
 }
@@ -178,11 +178,11 @@
 }
 
 .songs-dropdown-item.danger {
-    color: #ff4444;
+    color: var(--danger);
 }
 
 .songs-dropdown-item.danger:hover {
-    background: rgba(255, 68, 68, 0.1);
+    background: rgba(239, 83, 80, 0.1);
 }
 
 .songs-dropdown-backdrop {

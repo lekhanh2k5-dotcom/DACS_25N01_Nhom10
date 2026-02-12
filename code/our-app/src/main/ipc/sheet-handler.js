@@ -1,8 +1,38 @@
 import { ipcMain, dialog, BrowserWindow, app } from 'electron' 
 import { readJsonFile, decodeText } from '../utils/file-reader'
 import path from 'path'
-import admin from 'firebase-admin'
 import { readFileSync } from 'fs'
+
+let admin = null;
+
+// Initialize Firebase Admin SDK at runtime
+function getAdmin() {
+  if (admin) return admin;
+  
+  try {
+    admin = require('firebase-admin');
+    
+    if (!admin.apps.length) {
+      const isDev = !app.isPackaged;
+      const keyPath = isDev 
+        ? path.join(app.getAppPath(), 'serviceAccountKey.json') 
+        : path.join(process.resourcesPath, 'serviceAccountKey.json');
+      
+      const serviceAccount = JSON.parse(readFileSync(keyPath, 'utf8'));
+      
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+        storageBucket: "sky-piano-test-21615.firebasestorage.app"
+      });
+      console.log("✅ Firebase Admin initialized successfully");
+    }
+  } catch (err) {
+    console.error("❌ Firebase Admin Init Error:", err.message);
+    throw err;
+  }
+  
+  return admin;
+}
 
 
 /**
@@ -55,26 +85,6 @@ function extractMetadata(songData, filePath) {
     songNotes: songData.songNotes || []
   };
 } 
-
-const isDev = !app.isPackaged;
-const keyPath = isDev 
-  ? path.join(app.getAppPath(), 'serviceAccountKey.json') 
-  : path.join(process.resourcesPath, 'serviceAccountKey.json');
-
-if (!admin.apps.length) {
-    try {
-        const serviceAccount = JSON.parse(readFileSync(keyPath, 'utf8'));
-        
-        admin.initializeApp({
-            credential: admin.credential.cert(serviceAccount),
-            storageBucket: "sky-piano-test-21615.firebasestorage.app",
-            databaseURL: "https://sky-piano-test-21615-default-rtdb.firebaseio.com"
-        });
-        console.log("✅ Firebase Admin initialized successfully");
-    } catch (err) {
-        console.error("❌ Firebase Admin Init Error:", err.message);
-    }
-}
 
 export function registerSheetHandlers() {
   console.log('🔧 Registering sheet handlers...');
@@ -133,7 +143,8 @@ export function registerSheetHandlers() {
 
   ipcMain.handle('sheet:secure-load', async (event, txtFilePath) => {
     try {
-      const bucket = admin.storage().bucket();
+      const adminSDK = getAdmin();
+      const bucket = adminSDK.storage().bucket();
       const file = bucket.file(txtFilePath); 
       
       const [buffer] = await file.download();
@@ -154,7 +165,8 @@ export function registerSheetHandlers() {
   ipcMain.handle('sheet:upload-to-storage', async (event, { fileContent, txtFilePath }) => {
     console.log('📤 Upload handler called:', txtFilePath);
     try {
-      const bucket = admin.storage().bucket();
+      const adminSDK = getAdmin();
+      const bucket = adminSDK.storage().bucket();
       const file = bucket.file(txtFilePath);
       
       // Upload file
@@ -182,7 +194,8 @@ export function registerSheetHandlers() {
     }
     
     try {
-      const bucket = admin.storage().bucket();
+      const adminSDK = getAdmin();
+      const bucket = adminSDK.storage().bucket();
       const file = bucket.file(txtFilePath);
       
       try {

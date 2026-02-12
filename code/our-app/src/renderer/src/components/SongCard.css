@@ -13,14 +13,14 @@
 
 .song-card:hover {
     background: var(--bg-hover);
-    border-color: #333;
+    border-color: var(--border);
     transform: translateX(5px);
 }
 
 .card-img {
     width: 45px;
     height: 45px;
-    background: #333;
+    background: var(--bg-tertiary);
     border-radius: 4px;
     display: flex;
     justify-content: center;
@@ -40,7 +40,7 @@
 .card-title {
     font-weight: 700;
     font-size: 15px;
-    color: white;
+    color: var(--text-main);
 }
 
 .card-meta {
@@ -76,7 +76,7 @@
 .btn-delete-song {
     padding: 6px 12px;
     background: rgba(255, 68, 68, 0.1);
-    color: #ff4444;
+    color: var(--danger);
     border: 1px solid rgba(255, 68, 68, 0.3);
     border-radius: 6px;
     cursor: pointer;
@@ -89,7 +89,7 @@
 
 .btn-delete-song:hover {
     background: rgba(255, 68, 68, 0.2);
-    border-color: #ff4444;
+    border-color: var(--danger);
     transform: scale(1.05);
 }
 

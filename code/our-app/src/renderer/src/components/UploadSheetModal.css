@@ -13,7 +13,7 @@
 }
 
 .modal-content.upload-modal {
-    background: #1e1e1e;
+    background: var(--card-bg);
     border-radius: 12px;
     width: 90%;
     max-width: 600px;
@@ -40,19 +40,19 @@
     justify-content: space-between;
     align-items: center;
     padding: 20px 24px;
-    border-bottom: 1px solid #333;
+    border-bottom: 1px solid var(--border);
 }
 
 .modal-header h2 {
     margin: 0;
     font-size: 20px;
-    color: #fff;
+    color: var(--text-main);
 }
 
 .modal-close-btn {
     background: none;
     border: none;
-    color: #999;
+    color: var(--text-muted);
     font-size: 24px;
     cursor: pointer;
     padding: 0;
@@ -66,8 +66,8 @@
 }
 
 .modal-close-btn:hover {
-    background: #333;
-    color: #fff;
+    background: var(--bg-tertiary);
+    color: var(--text-main);
 }
 
 .modal-body {
@@ -88,7 +88,7 @@
 }
 
 .upload-select-file p {
-    color: #999;
+    color: var(--text-muted);
     margin-bottom: 24px;
     font-size: 16px;
 }
@@ -107,18 +107,18 @@
 }
 
 .form-group label {
-    color: #ccc;
+    color: var(--text-sub);
     font-size: 14px;
     font-weight: 500;
 }
 
 .form-group input,
 .form-group select {
-    background: #2a2a2a;
-    border: 1px solid #444;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
     border-radius: 6px;
     padding: 10px 12px;
-    color: #fff;
+    color: var(--text-main);
     font-size: 14px;
     transition: all 0.2s;
 }
@@ -126,8 +126,8 @@
 .form-group input:focus,
 .form-group select:focus {
     outline: none;
-    border-color: #1db954;
-    background: #333;
+    border-color: var(--primary);
+    background: var(--bg-tertiary);
 }
 
 .form-group input:disabled,
@@ -144,8 +144,8 @@
 
 /* Song Preview */
 .song-preview {
-    background: #2a2a2a;
-    border: 1px solid #444;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
     border-radius: 8px;
     padding: 16px;
 }
@@ -158,13 +158,13 @@
 }
 
 .preview-label {
-    color: #ccc;
+    color: var(--text-sub);
     font-size: 14px;
     font-weight: 500;
 }
 
 .preview-count {
-    color: #1db954;
+    color: var(--primary);
     font-size: 14px;
     font-weight: 600;
 }
@@ -181,23 +181,23 @@
     display: flex;
     justify-content: space-between;
     padding: 8px 12px;
-    background: #1e1e1e;
+    background: var(--card-bg);
     border-radius: 4px;
     font-size: 13px;
 }
 
 .note-time {
-    color: #999;
+    color: var(--text-muted);
 }
 
 .note-key {
-    color: #fff;
+    color: var(--text-main);
     font-weight: 600;
     font-family: monospace;
 }
 
 .preview-more {
-    color: #666;
+    color: var(--text-sub);
     font-size: 12px;
     text-align: center;
     padding: 8px;
@@ -213,20 +213,20 @@
 .progress-bar {
     width: 100%;
     height: 8px;
-    background: #2a2a2a;
+    background: var(--input-bg);
     border-radius: 4px;
     overflow: hidden;
 }
 
 .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, #1db954, #1ed760);
+    background: linear-gradient(90deg, var(--primary), var(--primary-hover));
     transition: width 0.3s ease;
 }
 
 .progress-text {
     text-align: center;
-    color: #1db954;
+    color: var(--primary);
     font-size: 14px;
     font-weight: 600;
 }
@@ -251,25 +251,25 @@
 }
 
 .upload-btn-primary {
-    background: #1db954;
-    color: #fff;
+    background: var(--primary);
+    color: var(--text-main);
 }
 
 .upload-btn-primary:hover:not(:disabled) {
-    background: #1ed760;
+    background: var(--primary-hover);
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(29, 185, 84, 0.4);
 }
 
 .upload-btn-secondary {
-    background: #2a2a2a;
-    color: #fff;
-    border: 1px solid #444;
+    background: var(--input-bg);
+    color: var(--text-main);
+    border: 1px solid var(--border);
 }
 
 .upload-btn-secondary:hover:not(:disabled) {
-    background: #333;
-    border-color: #555;
+    background: var(--bg-tertiary);
+    border-color: var(--bg-hover);
 }
 
 .upload-btn-primary:disabled,
@@ -287,16 +287,16 @@
 
 .modal-body::-webkit-scrollbar-track,
 .preview-notes::-webkit-scrollbar-track {
-    background: #1e1e1e;
+    background: var(--card-bg);
 }
 
 .modal-body::-webkit-scrollbar-thumb,
 .preview-notes::-webkit-scrollbar-thumb {
-    background: #444;
+    background: var(--border);
     border-radius: 4px;
 }
 
 .modal-body::-webkit-scrollbar-thumb:hover,
 .preview-notes::-webkit-scrollbar-thumb:hover {
-    background: #555;
+    background: var(--bg-hover);
 }

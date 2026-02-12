@@ -1,19 +1,19 @@
 import { useMemo, useState, useEffect } from "react";
+import { useTheme } from "../contexts/ThemeContext";
 import "./Settings.css";
 
 export default function Settings() {
     const [game, setGame] = useState("Sky");
-    const [theme, setTheme] = useState("Tối");
     const [lang, setLang] = useState("Việt");
+    const { theme, toggleTheme } = useTheme();  // Lấy theme từ ThemeContext
 
     // Load settings từ localStorage khi component mount
     useEffect(() => {
         try {
             const savedSettings = localStorage.getItem('appSettings');
             if (savedSettings) {
-                const { game: savedGame, theme: savedTheme, lang: savedLang } = JSON.parse(savedSettings);
+                const { game: savedGame, lang: savedLang } = JSON.parse(savedSettings);
                 if (savedGame) setGame(savedGame);
-                if (savedTheme) setTheme(savedTheme);
                 if (savedLang) setLang(savedLang);
             }
         } catch (e) {
@@ -24,11 +24,11 @@ export default function Settings() {
     // Lưu settings vào localStorage khi thay đổi
     useEffect(() => {
         try {
-            localStorage.setItem('appSettings', JSON.stringify({ game, theme, lang }));
+            localStorage.setItem('appSettings', JSON.stringify({ game, lang }));
         } catch (e) {
             console.error('Error saving settings:', e);
         }
-    }, [game, theme, lang]);
+    }, [game, lang]);
 
 
 
@@ -64,20 +64,24 @@ export default function Settings() {
                 <div className="ios-row">
                     <div className="ios-row-left">
                         <div className="ios-row-label">Chế độ</div>
-                        <div className="ios-row-value">{theme}</div>
+                        <div className="ios-row-value">{theme === 'light' ? 'Sáng' : 'Tối'}</div>
                     </div>
                     <div className="ios-row-right">
                         <div className="ios-seg small">
-                            {["Tối", "Sáng"].map((t) => (
-                                <button
-                                    key={t}
-                                    type="button"
-                                    className={`ios-seg-btn ${theme === t ? "active" : ""}`}
-                                    onClick={() => setTheme(t)}
-                                >
-                                    {t}
-                                </button>
-                            ))}
+                            <button
+                                type="button"
+                                className={`ios-seg-btn ${theme === 'dark' ? "active" : ""}`}
+                                onClick={() => theme === 'light' && toggleTheme()}
+                            >
+                                Tối
+                            </button>
+                            <button
+                                type="button"
+                                className={`ios-seg-btn ${theme === 'light' ? "active" : ""}`}
+                                onClick={() => theme === 'dark' && toggleTheme()}
+                            >
+                                Sáng
+                            </button>
                         </div>
                     </div>
                 </div>

@@ -12,8 +12,8 @@
 .loading-spinner {
     width: 40px;
     height: 40px;
-    border: 4px solid rgba(100, 100, 255, 0.1);
-    border-top-color: #6464ff;
+    border: 4px solid rgba(102, 126, 234, 0.1);
+    border-top-color: var(--primary);
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -50,7 +50,7 @@
 .search-box input:focus {
     outline: none;
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(100, 100, 255, 0.1);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .filter-tabs {
@@ -195,11 +195,11 @@
 }
 
 .coin-amount.positive {
-    color: #059669;
+    color: var(--success);
 }
 
 .coin-amount.negative {
-    color: #dc2626;
+    color: var(--danger);
 }
 
 /* Empty State */
@@ -330,7 +330,7 @@
 .btn-refresh:hover {
     background: var(--primary-hover);
     transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(100, 100, 255, 0.3);
+    box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
 }
 
 .btn-refresh:active {
