@@ -86,7 +86,7 @@
 }
 
 .btn-mode:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--bg-hover);
     color: var(--text-main);
 }
 
@@ -145,23 +145,23 @@
 }
 
 .btn-control:hover {
-    color: white;
-    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-main);
+    background: var(--bg-hover);
     transform: scale(1.05);
 }
 
 .btn-control.btn-play {
     background: var(--text-main);
-    color: #000;
+    color: var(--bg-primary);
     width: 40px;
     height: 40px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: var(--shadow-md);
 }
 
 .btn-control.btn-play:hover {
     background: var(--text-main);
     transform: scale(1.08);
-    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 12px var(--primary-glow);
 }
 
 /* Speed Control */
@@ -170,9 +170,9 @@
     align-items: center;
     gap: 6px;
     padding: 4px 10px;
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--card-bg);
     border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--border);
 }
 
 .speed-control label {
@@ -228,7 +228,7 @@
 .progress-container {
     flex: 1;
     height: 5px;
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--overlay);
     border-radius: 3px;
     cursor: pointer;
     position: relative;
@@ -273,7 +273,7 @@
 }
 
 .btn-add {
-    background: rgba(29, 185, 84, 0.15);
+    background: var(--button-hover-light);
     border: 2px solid var(--primary);
     color: var(--primary);
     width: 42px;
@@ -290,5 +290,5 @@
     background: var(--primary);
     color: white;
     transform: scale(1.1) rotate(90deg);
-    box-shadow: 0 4px 16px rgba(29, 185, 84, 0.4);
+    box-shadow: var(--primary-glow);
 }
