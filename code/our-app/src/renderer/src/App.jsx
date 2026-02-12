@@ -1,5 +1,6 @@
 import { AppProvider, useApp } from './contexts/AppContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import Sidebar from './components/Sidebar';
 import PlayerBar from './components/PlayerBar';
 import Store from './pages/Store';
@@ -9,6 +10,7 @@ import AccountPage from './pages/AccountPage';
 import LoginModal from './components/LoginModal';
 import { useState } from 'react';
 import AdminLayout from './pages/admin/AdminLayout';
+import './assets/theme.css';
 
 function AppContent() {
   const { activeTab, loading: appLoading } = useApp();
@@ -62,10 +64,12 @@ function AppContent() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <AppProvider>
-        <AppContent />
-      </AppProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <AppProvider>
+          <AppContent />
+        </AppProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

@@ -172,7 +172,7 @@ export default function UploadSheetModal({ onClose, onSuccess }) {
                                     style={{ opacity: 0.6, cursor: 'not-allowed' }}
                                     placeholder="Tên file gốc"
                                 />
-                                <small style={{ color: '#999', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+                                <small style={{ color: 'var(--text-muted)', fontSize: '12px', marginTop: '4px', display: 'block' }}>
                                     💡 Path thực tế: songs/txt/{metadata.fileName ? `${metadata.fileName}.txt` : 'Tên file.txt'}
                                 </small>
                             </div>

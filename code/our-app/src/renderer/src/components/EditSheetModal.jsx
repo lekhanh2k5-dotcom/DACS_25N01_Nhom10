@@ -150,7 +150,7 @@ export default function EditSheetModal({ song, onClose, onSuccess }) {
                                 disabled
                                 style={{ opacity: 0.6, cursor: 'not-allowed' }}
                             />
-                            <small style={{ color: '#999', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+                            <small style={{ color: 'var(--text-muted)', fontSize: '12px', marginTop: '4px', display: 'block' }}>
                                 💡 Đường dẫn file không thể thay đổi
                             </small>
                         </div>

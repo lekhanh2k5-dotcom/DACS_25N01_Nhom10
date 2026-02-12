@@ -48,12 +48,12 @@
 }
 
 .dashboard-chart-bar.has-revenue {
-    background: linear-gradient(180deg, var(--primary) 0%, #17a34a 100%);
-    box-shadow: 0 4px 12px rgba(29, 185, 84, 0.3);
+    background: linear-gradient(180deg, var(--primary) 0%, var(--success) 100%);
+    box-shadow: 0 4px 12px rgba(102, 187, 106, 0.3);
 }
 
 .dashboard-chart-bar.empty {
-    background: #333;
+    background: var(--bg-tertiary);
 }
 
 .dashboard-chart-bar-label {

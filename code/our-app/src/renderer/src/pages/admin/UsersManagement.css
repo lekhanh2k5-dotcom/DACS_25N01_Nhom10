@@ -38,7 +38,7 @@
 
 .users-displayname {
     font-size: 12px;
-    color: #999;
+    color: var(--text-muted);
 }
 
 .users-coin-cell {
@@ -47,11 +47,11 @@
 }
 
 .users-status-locked {
-    color: #ff4444;
+    color: var(--danger);
 }
 
 .users-status-active {
-    color: #1db954;
+    color: var(--success);
 }
 
 .users-dropdown-cell {
@@ -122,11 +122,11 @@
 }
 
 .users-stats-footer .active {
-    color: #1db954;
+    color: var(--success);
 }
 
 .users-stats-footer .locked {
-    color: #ff4444;
+    color: var(--danger);
 }
 
 /* Coin Modal */
@@ -239,21 +239,22 @@
 }
 
 .coin-modal-btn-add {
-    background: #1db954;
+    background: var(--success);
     color: white;
 }
 
 .coin-modal-btn-add:hover {
-    background: #1ed760;
+    background: var(--primary-hover);
 }
 
 .coin-modal-btn-subtract {
-    background: #ff4444;
+    background: var(--danger);
     color: white;
 }
 
 .coin-modal-btn-subtract:hover {
-    background: #ff6666;
+    background: var(--danger);
+    opacity: 0.9;
 }
 
 .coin-modal-actions {
@@ -278,15 +279,15 @@
 }
 
 .coin-modal-actions .coin-modal-btn-add:hover {
-    background: rgba(29, 185, 84, 0.15);
-    border-color: #1db954;
-    color: #1db954;
+    background: rgba(102, 187, 106, 0.15);
+    border-color: var(--success);
+    color: var(--success);
 }
 
 .coin-modal-actions .coin-modal-btn-subtract:hover {
-    background: rgba(255, 68, 68, 0.15);
-    border-color: #ff4444;
-    color: #ff4444;
+    background: rgba(239, 83, 80, 0.15);
+    border-color: var(--danger);
+    color: var(--danger);
 }
 
 .users-dropdown-backdrop {
@@ -312,9 +313,9 @@
 }
 
 .users-stats-footer strong.active {
-    color: #1db954;
+    color: var(--success);
 }
 
 .users-stats-footer strong.locked {
-    color: #ff4444;
+    color: var(--danger);
 }

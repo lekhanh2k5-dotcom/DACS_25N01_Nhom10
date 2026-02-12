@@ -197,15 +197,15 @@
 }
 
 .acc-badge.ok {
-    color: #6ee7b7;
-    background: rgba(110, 231, 183, 0.10);
-    border-color: rgba(110, 231, 183, 0.25);
+    color: var(--success);
+    background: rgba(102, 187, 106, 0.10);
+    border-color: rgba(102, 187, 106, 0.25);
 }
 
 .acc-badge.warn {
-    color: #fbbf24;
-    background: rgba(251, 191, 36, 0.10);
-    border-color: rgba(251, 191, 36, 0.25);
+    color: var(--accent-gold);
+    background: rgba(255, 215, 0, 0.10);
+    border-color: rgba(255, 215, 0, 0.25);
 }
 
 /* Divider */
@@ -273,9 +273,9 @@
 .acc-logout {
     padding: 10px 12px;
     border-radius: 14px;
-    border: 1px solid rgba(255, 77, 77, 0.35);
-    background: rgba(255, 77, 77, 0.10);
-    color: #ff6b6b;
+    border: 1px solid rgba(239, 83, 80, 0.35);
+    background: rgba(239, 83, 80, 0.10);
+    color: var(--danger);
     font-weight: 950;
     cursor: pointer;
     transition: transform .15s ease, background .15s ease;
@@ -284,7 +284,7 @@
 
 .acc-logout:hover {
     transform: translateY(-1px);
-    background: rgba(255, 77, 77, 0.16);
+    background: rgba(239, 83, 80, 0.16);
 }
 
 /* Responsive */

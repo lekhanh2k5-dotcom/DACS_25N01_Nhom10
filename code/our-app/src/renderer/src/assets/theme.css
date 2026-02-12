@@ -1,0 +1,147 @@
+/* ========== CSS VARIABLES - LIGHT THEME ========== */
+:root.light {
+    /* Background colors */
+    --bg-primary: #ffffff;           /* Main background */
+    --bg-secondary: #f5f5f5;         /* Secondary background */
+    --bg-tertiary: #eeeeee;          /* Tertiary background */
+    
+    /* Card & components */
+    --card-bg: #ffffff;              /* Card background */
+    --bg-card: #ffffff;              /* Card background (alias) */
+    --card-border: #e0e0e0;          /* Card border */
+    --input-bg: #f5f5f5;             /* Input field background */
+    --bg-sidebar: #f9f9f9;           /* Sidebar background */
+    --bg-hover: #f0f0f0;             /* Hover background */
+    
+    /* Text colors */
+    --text-main: #1a1a1a;            /* Main text (heading, body) */
+    --text-sub: #666666;             /* Secondary text (subtitle, hint) */
+    --text-muted: #999999;           /* Muted text (disabled, placeholder) */
+    
+    /* Accent colors */
+    --primary: #667eea;              /* Primary color (buttons, links) */
+    --primary-hover: #5568d3;        /* Primary hover */
+    --secondary: #764ba2;            /* Secondary color */
+    --success: #4caf50;              /* Success (purchase, etc) */
+    --danger: #f44336;               /* Danger (delete, error) */
+    --warning: #ff9800;              /* Warning */
+    --accent-gold: #ffd700;          /* Gold accent (coins) */
+    
+    /* Border & dividers */
+    --border: #e0e0e0;               /* Border color */
+    --divider: #f0f0f0;              /* Divider color */
+    
+    /* Shadow */
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.15);
+    --shadow-lg: 0 10px 25px rgba(0,0,0,0.2);
+    
+    /* Effects & overlays */
+    --overlay: rgba(0, 0, 0, 0.45);
+    --primary-glow: rgba(102, 126, 234, 0.3);
+    --danger-light: rgba(231, 76, 60, 0.15);
+    --button-hover-light: rgba(0, 0, 0, 0.05);
+}
+
+/* ========== CSS VARIABLES - DARK THEME ========== */
+:root.dark {
+    /* Background colors */
+    --bg-primary: #1a1a1a;           /* Main background */
+    --bg-secondary: #2a2a2a;         /* Secondary background */
+    --bg-tertiary: #333333;          /* Tertiary background */
+    
+    /* Card & components */
+    --card-bg: #242424;              /* Card background */
+    --bg-card: #242424;              /* Card background (alias) */
+    --card-border: #3a3a3a;          /* Card border */
+    --input-bg: #2a2a2a;             /* Input field background */
+    --bg-sidebar: #1a1a1a;           /* Sidebar background */
+    --bg-hover: #2d2d2d;             /* Hover background */
+    
+    /* Text colors */
+    --text-main: #ffffff;            /* Main text (heading, body) */
+    --text-sub: #b0b0b0;             /* Secondary text (subtitle, hint) */
+    --text-muted: #808080;           /* Muted text (disabled, placeholder) */
+    
+    /* Accent colors */
+    --primary: #667eea;              /* Primary color (buttons, links) */
+    --primary-hover: #7a8eee;        /* Primary hover */
+    --secondary: #764ba2;            /* Secondary color */
+    --success: #66bb6a;              /* Success (purchase, etc) */
+    --danger: #ef5350;               /* Danger (delete, error) */
+    --warning: #ffa726;              /* Warning */
+    --accent-gold: #ffd700;          /* Gold accent (coins) */
+    
+    /* Border & dividers */
+    --border: #3a3a3a;               /* Border color */
+    --divider: #2a2a2a;              /* Divider color */
+    
+    /* Shadow */
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.4);
+    --shadow-lg: 0 10px 25px rgba(0,0,0,0.5);
+    
+    /* Effects & overlays */
+    --overlay: rgba(0, 0, 0, 0.65);
+    --primary-glow: rgba(102, 126, 234, 0.4);
+    --danger-light: rgba(239, 83, 80, 0.15);
+    --button-hover-light: rgba(255, 255, 255, 0.1);
+}
+
+/* ========== UNIVERSAL STYLES ========== */
+* {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+html, body {
+    background-color: var(--bg-primary);
+    color: var(--text-main);
+}
+
+/* Apply theme to common elements */
+input, textarea, select {
+    background-color: var(--input-bg);
+    color: var(--text-main);
+    border-color: var(--border);
+}
+
+input::placeholder, textarea::placeholder {
+    color: var(--text-muted);
+}
+
+button {
+    background-color: var(--primary);
+}
+
+button:hover {
+    background-color: var(--primary-hover);
+}
+
+/* Card styles */
+.card {
+    background-color: var(--card-bg);
+    border-color: var(--card-border);
+}
+
+/* Modal/Dialog */
+.modal, .modal-content {
+    background-color: var(--bg-secondary);
+}
+
+/* Scrollbar (optional - make it theme-aware) */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-sub);
+}
