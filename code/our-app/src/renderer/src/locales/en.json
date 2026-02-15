@@ -1,0 +1,167 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "owned": "Owned"
+  },
+  "settings": {
+    "title": "Settings",
+    "quickSettings": "Quick Options",
+    "game": "Game",
+    "interface": "Interface",
+    "mode": "Mode",
+    "dark": "Dark",
+    "light": "Light",
+    "language": "Language",
+    "display": "Display",
+    "vietnam": "Vietnamese",
+    "english": "English",
+    "shortcuts": "Shortcuts",
+    "prevSong": "Previous Song",
+    "prevDesc": "Prev",
+    "playpause": "Play / Pause",
+    "playDesc": "Play / Stop",
+    "nextSong": "Next Song",
+    "nextDesc": "Next",
+    "shortcutNote": "These shortcuts are fixed and cannot be edited."
+  },
+  "sidebar": {
+    "store": "Store",
+    "library": "Library",
+    "settings": "Settings",
+    "account": "Account"
+  },
+  "store": {
+    "title": "Store",
+    "search": "🔍 Search...",
+    "allRegions": "🌏 All",
+    "vietnam": "🇻🇳 Vietnam",
+    "japan": "🇯🇵 Japan",
+    "korea": "🇰🇷 Korea",
+    "china": "🇨🇳 China",
+    "world": "🌍 World",
+    "notFound": "No songs found",
+    "purchased": "✓ Purchased"
+  },
+  "library": {
+    "title": "Library",
+    "allSongs": "All Songs",
+    "favorite": "Favorite",
+    "empty": "You don't have any songs yet",
+    "search": "🔍 Search songs..."
+  },
+  "account": {
+    "title": "Account",
+    "coins": "Coins",
+    "profile": "Profile",
+    "logout": "Logout",
+    "editProfile": "Edit Profile"
+  },
+  "player": {
+    "speed": "Speed",
+    "times": "times",
+    "noSongSelected": "No song selected",
+    "selectToStart": "Select a song to begin",
+    "songCount": "songs"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "signup": "Create Account",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "username": "Username",
+    "loading": "Processing...",
+    "forgotPassword": "Forgot Password?",
+    "sendReset": "Send Reset Email",
+    "backToLogin": "← Back to Login",
+    "sendingEmail": "Sending...",
+    "retryIn": "Retry in",
+    "hints": {
+      "password": "Minimum 6 characters",
+      "username": "Only letters, numbers, _ and - (minimum 3 characters)",
+      "email": "We will send a recovery link to this email"
+    }
+  },
+  "songCard": {
+    "buy": "Buy",
+    "play": "Play",
+    "delete": "Delete"
+  },
+  "modal": {
+    "uploadSheet": "📤 Upload Sheet",
+    "editSong": "✏️ Edit Song",
+    "selectFile": "Select .txt or .json file to upload",
+    "chooseFile": "Choose File",
+    "songName": "Song Name",
+    "author": "Author",
+    "composer": "Transcribed by",
+    "region": "Region",
+    "price": "Price (coins)",
+    "fileName": "Original File Name",
+    "songId": "Song ID",
+    "storagePath": "Storage Path",
+    "cantChangePath": "💡 File path cannot be changed",
+    "saving": "⏳ Saving...",
+    "saved": "💾 Save Changes",
+    "upload": "📤 Upload"
+  },
+  "validation": {
+    "nameRequired": "Song name cannot be empty!",
+    "priceInvalid": "Price must be >= 0!",
+    "updateSuccess": "✅ Song updated!",
+    "updateFailed": "❌ Update failed: ",
+    "noDataFromCloud": "Cannot load song data from cloud: ",
+    "loginToBuy": "Please login to buy songs!",
+    "buySuccess": "Purchase successful! Song is now in your library."
+  },
+  "admin": {
+    "dashboard": "📊 Dashboard",
+    "songsManagement": "🎵 Songs Management",
+    "usersManagement": "👥 Users Management",
+    "transactionsManagement": "💰 Transactions",
+    "addSong": "➕ Add Song",
+    "revenue": "Monthly Revenue",
+    "revenue7Days": "📊 Revenue Last 7 Days (coins)",
+    "loading": "Loading...",
+    "search": "🔍 Search...",
+    "songs": "Songs",
+    "total": "Total",
+    "noSongs": "No songs yet",
+    "songNotFound": "No songs found",
+    "deleteConfirm": "🗑️ Delete song?",
+    "deleteSuccess": "✅ Song deleted!",
+    "loadError": "Error loading songs",
+    "cantLoadList": "Cannot load songs list",
+    "searchPlaceholder": "🔍 Search by user, song, transaction ID...",
+    "noUsers": "No users yet",
+    "userNotFound": "No users found",
+    "page": "Page",
+    "prev": "Previous",
+    "next": "Next",
+    "showing": "Showing",
+    "totalValue": "Total Value",
+    "regions": {
+      "all": "🌍 All",
+      "china": "🇨🇳 China",
+      "korea": "🇰🇷 Korea",
+      "vietnam": "🇻🇳 Vietnam",
+      "world": "🇺🇸 World",
+      "japan": "🇯🇵 Japan"
+    }
+  },
+  "aboutApp": {
+    "title": "About",
+    "version": "Version"
+  }
+}

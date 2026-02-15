@@ -1,8 +1,10 @@
 import { useApp } from '../contexts/AppContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import './SongCard.css';
 
 export default function SongCard({ song, songKey, onPlay }) {
     const { buySong, deleteSong } = useApp();
+    const { t } = useLanguage();
 
     const handleClick = () => {
         if (song.isOwned) {
@@ -34,18 +36,18 @@ export default function SongCard({ song, songKey, onPlay }) {
             <div className="card-action">
                 {song.isFromFirebase ? (
                     song.isOwned ? (
-                        <span className="card-owned">✅ Đã sở hữu</span>
+                        <span className="card-owned">✅ {t('common.owned')}</span>
                     ) : (
-                        <span className="card-price">💰 {song.price} xu</span>
+                        <span className="card-price">💰 {song.price} {t('account.coins')}</span>
                     )
                 ) : (
                     <button
                         className="btn-delete-song"
                         onClick={handleDelete}
-                        title="Xóa bài hát"
+                        title={t('common.delete')}
                     >
                         <span>🗑️</span>
-                        <span>Xóa</span>
+                        <span>{t('common.delete')}</span>
                     </button>
                 )}
             </div>

@@ -1,8 +1,10 @@
 import { useApp } from '../contexts/AppContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { useState } from 'react';
 import './PlayerBar.css';
 
 export default function PlayerBar() {
+    const { t } = useLanguage();
     const {
         currentSong,
         isPlaying,
@@ -97,10 +99,10 @@ export default function PlayerBar() {
                 <div className="song-thumbnail">🎵</div>
                 <div className="song-details">
                     <div className="song-title" id="statusTitle">
-                        {currentSong ? currentSong.name : 'Chưa chọn bài'}
+                        {currentSong ? currentSong.name : t('player.noSongSelected')}
                     </div>
                     <div className="song-artist" id="statusSub">
-                        {currentSong ? currentSong.author : 'Chọn bài hát để bắt đầu'}
+                        {currentSong ? currentSong.author : t('player.selectToStart')}
                     </div>
                 </div>
             </div>
@@ -143,7 +145,7 @@ export default function PlayerBar() {
                     </button>
 
                     <div className="speed-control">
-                        <label htmlFor="speedInput">Tốc độ:</label>
+                        <label htmlFor="speedInput">{t('player.speed')}:</label>
                         <input
                             type="number"
                             id="speedInput"

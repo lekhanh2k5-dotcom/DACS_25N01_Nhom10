@@ -1,6 +1,7 @@
 import { AppProvider, useApp } from './contexts/AppContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
 import Sidebar from './components/Sidebar';
 import PlayerBar from './components/PlayerBar';
 import Store from './pages/Store';
@@ -15,6 +16,7 @@ import './assets/theme.css';
 function AppContent() {
   const { activeTab, loading: appLoading } = useApp();
   const { loading: authLoading } = useAuth();
+  const { t } = useLanguage();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   if (window.location.hash === '#/admin') {
@@ -64,12 +66,14 @@ function AppContent() {
 
 export default function App() {
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <AppProvider>
-          <AppContent />
-        </AppProvider>
-      </AuthProvider>
-    </ThemeProvider>
+    <LanguageProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <AppProvider>
+            <AppContent />
+          </AppProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </LanguageProvider>
   );
 }

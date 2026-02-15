@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
+import { useLanguage } from '../../contexts/LanguageContext'
 import './AdminLayout.css'
 import Dashboard from './Dashboard'
 import UsersManagement from './UsersManagement'
@@ -9,12 +10,13 @@ import TransactionsManagement from './TransactionsManagement'
 export default function AdminLayout() {
     const [activeTab, setActiveTab] = useState('dashboard')
     const { user, userProfile } = useAuth()
+    const { t } = useLanguage()
 
     const navItems = [
-        { id: 'dashboard', label: 'Tổng quan', icon: '📊' },
-        { id: 'users', label: 'Người dùng', icon: '👥' },
-        { id: 'songs', label: 'Bài hát', icon: '🎵' },
-        { id: 'transactions', label: 'Giao dịch', icon: '💰' },
+        { id: 'dashboard', label: t('admin.dashboard'), icon: '📊' },
+        { id: 'users', label: t('admin.usersManagement'), icon: '👥' },
+        { id: 'songs', label: t('admin.songsManagement'), icon: '🎵' },
+        { id: 'transactions', label: t('admin.transactionsManagement'), icon: '💰' },
     ]
 
     return (
