@@ -96,7 +96,9 @@
   "songCard": {
     "buy": "Mua",
     "play": "Chơi",
-    "delete": "Xóa bài"
+    "delete": "Xóa bài",
+    "addToFavorite": "Thêm vào yêu thích",
+    "removeFromFavorite": "Bỏ yêu thích"
   },
   "modal": {
     "uploadSheet": "📤 Upload Sheet",

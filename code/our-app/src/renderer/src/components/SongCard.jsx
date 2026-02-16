@@ -3,7 +3,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import './SongCard.css';
 
 export default function SongCard({ song, songKey, onPlay }) {
-    const { buySong, deleteSong } = useApp();
+    const { buySong, deleteSong, toggleFavorite } = useApp();
     const { t } = useLanguage();
 
     const handleClick = () => {
@@ -11,7 +11,7 @@ export default function SongCard({ song, songKey, onPlay }) {
             if (onPlay) {
                 onPlay();
             }
-        } else {
+        } else if (song.isFromFirebase) {
             buySong(songKey, song.price);
         }
     };
@@ -19,6 +19,11 @@ export default function SongCard({ song, songKey, onPlay }) {
     const handleDelete = (e) => {
         e.stopPropagation();
         deleteSong(songKey);
+    };
+
+    const handleFavorite = (e) => {
+        e.stopPropagation();
+        toggleFavorite(songKey);
     };
 
     return (
@@ -35,11 +40,30 @@ export default function SongCard({ song, songKey, onPlay }) {
 
             <div className="card-action">
                 {song.isFromFirebase ? (
-                    song.isOwned ? (
-                        <span className="card-owned">✅ {t('common.owned')}</span>
-                    ) : (
-                        <span className="card-price">💰 {song.price} {t('account.coins')}</span>
-                    )
+                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                        {song.isOwned && (
+                            <button
+                                className="btn-favorite"
+                                onClick={handleFavorite}
+                                title={song.isFavorite ? t('songCard.removeFromFavorite') : t('songCard.addToFavorite')}
+                                style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    fontSize: '20px',
+                                    cursor: 'pointer',
+                                    padding: '5px',
+                                    opacity: song.isFavorite ? 1 : 0.4,
+                                    color: song.isFavorite ? '#e91e63' : 'var(--text-sub)',
+                                    transition: 'all 0.3s ease'
+                                }}
+                            >
+                                ❤️
+                            </button>
+                        )}
+                        {!song.isOwned && (
+                            <span className="card-price">💰 {song.price} {t('account.coins')}</span>
+                        )}
+                    </div>
                 ) : (
                     <button
                         className="btn-delete-song"

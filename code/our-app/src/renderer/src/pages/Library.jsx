@@ -28,9 +28,14 @@ export default function Library() {
 
     const favoriteSongs = useMemo(() => {
         return Object.keys(songs)
-            .filter(key => songs[key].isOwned && songs[key].isFavorite)
-            .reduce((obj, key) => ({ ...obj, [key]: songs[key] }), {});
-    }, [songs]);
+            .filter(key => {
+                const song = songs[key];
+                if (!song.isFromFirebase) return false;
+                const isBought = userData?.ownedSongs?.[key] === true;
+                return isBought && song.isFavorite;
+            })
+            .reduce((obj, key) => ({ ...obj, [key]: { ...songs[key], isOwned: true } }), {});
+    }, [songs, userData]);
 
     const baseSongs = activeLibraryTab === 'all' ? ownedSongs : favoriteSongs;
 
