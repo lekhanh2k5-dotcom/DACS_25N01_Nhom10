@@ -9,15 +9,43 @@ import Library from './pages/Library';
 import Settings from './pages/Settings';
 import AccountPage from './pages/AccountPage';
 import LoginModal from './components/LoginModal';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AdminLayout from './pages/admin/AdminLayout';
 import './assets/theme.css';
 
 function AppContent() {
-  const { activeTab, loading: appLoading } = useApp();
+  const { activeTab, loading: appLoading, togglePlayback, playNext, playPrev } = useApp();
   const { loading: authLoading } = useAuth();
   const { t } = useLanguage();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      // Only trigger if Ctrl + Shift are pressed
+      if (!event.ctrlKey || !event.shiftKey) return;
+
+      switch (event.code) {
+        case 'KeyC': // Ctrl + Shift + C = Previous
+          event.preventDefault();
+          playPrev();
+          break;
+        case 'KeyV': // Ctrl + Shift + V = Play/Pause
+          event.preventDefault();
+          togglePlayback();
+          break;
+        case 'KeyB': // Ctrl + Shift + B = Next
+          event.preventDefault();
+          playNext();
+          break;
+        default:
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [togglePlayback, playNext, playPrev]);
 
   if (window.location.hash === '#/admin') {
     return <AdminLayout />;
