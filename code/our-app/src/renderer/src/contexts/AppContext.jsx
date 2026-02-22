@@ -251,6 +251,9 @@ export const AppProvider = ({ children }) => {
 
             if (result.success) {
                 await showAlert('Mua hàng thành công! Bài hát đã có trong thư viện của bạn.');
+                // Redirect to Library and show All Songs tab
+                setActiveTab('library');
+                setActiveLibraryTab('all');
                 return true;
             } else {
                 await showAlert(result.message || 'Giao dịch thất bại.');

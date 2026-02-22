@@ -11,17 +11,37 @@ export default function Library() {
     const { t } = useLanguage();
 
     const ownedSongs = useMemo(() => {
-        return Object.keys(songs)
-            .filter(key => {
-                const song = songs[key];
-                if (!song.isFromFirebase) return true;
-                const isBought = userData?.ownedSongs?.[key] === true;
-                return isBought;
+        const owned = {};
+        Object.keys(songs).forEach(key => {
+            const song = songs[key];
+            if (!song.isFromFirebase) {
+                owned[key] = { ...song, isOwned: true };
+            } else {
+                const ownedItem = userData?.ownedSongs?.[key];
+                // Check if purchased (can be true or Timestamp object)
+                if (ownedItem) {
+                    owned[key] = { 
+                        ...song, 
+                        isOwned: true,
+                        purchasedAt: ownedItem?.toDate?.() || ownedItem
+                    };
+                }
+            }
+        });
+
+        // Sort by purchasedAt (newest first)
+        const sorted = Object.entries(owned)
+            .sort(([, a], [, b]) => {
+                const aTime = a.purchasedAt?.getTime?.() || 0;
+                const bTime = b.purchasedAt?.getTime?.() || 0;
+                return bTime - aTime; // Newest first
             })
-            .reduce((obj, key) => {
-                obj[key] = { ...songs[key], isOwned: true };
+            .reduce((obj, [key, value]) => {
+                obj[key] = value;
                 return obj;
             }, {});
+
+        return sorted;
     }, [songs, userData]);
 
 
