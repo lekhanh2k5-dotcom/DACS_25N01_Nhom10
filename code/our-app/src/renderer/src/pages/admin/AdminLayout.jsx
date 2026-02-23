@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { useLanguage } from '../../contexts/LanguageContext'
+import { useTheme } from '../../contexts/ThemeContext'
 import './AdminLayout.css'
 import Dashboard from './Dashboard'
 import UsersManagement from './UsersManagement'
@@ -11,6 +12,7 @@ export default function AdminLayout() {
     const [activeTab, setActiveTab] = useState('dashboard')
     const { user, userProfile } = useAuth()
     const { t } = useLanguage()
+    const { theme } = useTheme()
 
     const navItems = [
         { id: 'dashboard', label: t('admin.dashboard'), icon: '📊' },

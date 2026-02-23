@@ -128,11 +128,11 @@
     "buySuccess": "Mua hàng thành công! Bài hát đã có trong thư viện của bạn."
   },
   "admin": {
-    "dashboard": "📊 Tổng quan",
-    "songsManagement": "🎵 Quản lý bài hát",
-    "usersManagement": "👥 Quản lý người dùng",
-    "transactionsManagement": "💰 Quản lý giao dịch",
-    "addSong": "➕ Thêm bài hát",
+    "dashboard": "Tổng quan",
+    "songsManagement": "Quản lý bài hát",
+    "usersManagement": "Quản lý người dùng",
+    "transactionsManagement": "Quản lý giao dịch",
+    "addSong": "Thêm bài hát",
     "revenue": "Doanh thu/tháng",
     "revenue7Days": "📊 Doanh thu 7 ngày gần đây (xu)",
     "loading": "Đang tải...",

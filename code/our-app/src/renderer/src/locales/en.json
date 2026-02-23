@@ -128,11 +128,11 @@
     "buySuccess": "Purchase successful! Song is now in your library."
   },
   "admin": {
-    "dashboard": "📊 Dashboard",
-    "songsManagement": "🎵 Songs Management",
-    "usersManagement": "👥 Users Management",
-    "transactionsManagement": "💰 Transactions",
-    "addSong": "➕ Add Song",
+    "dashboard": "Dashboard",
+    "songsManagement": "Songs Management",
+    "usersManagement": "Users Management",
+    "transactionsManagement": "Transactions",
+    "addSong": "Add Song",
     "revenue": "Monthly Revenue",
     "revenue7Days": "📊 Revenue Last 7 Days (coins)",
     "loading": "Loading...",
