@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { showSuccess, showError } from '../utils/alert';
 import { updateSongMetadata } from '../firebase/updateService';
+import { useLanguage } from '../contexts/LanguageContext';
 import './EditSheetModal.css';
 
 export default function EditSheetModal({ song, onClose, onSuccess }) {
+    const { t } = useLanguage();
     const [formData, setFormData] = useState({
         name: song.name || '',
         author: song.author || '',
@@ -25,12 +27,12 @@ export default function EditSheetModal({ song, onClose, onSuccess }) {
         e.preventDefault();
 
         if (!formData.name.trim()) {
-            showError('Tên bài hát không được rỗng!');
+            showError(t('validation.nameRequired'));
             return;
         }
 
         if (formData.price < 0) {
-            showError('Giá phải >= 0!');
+            showError(t('validation.priceInvalid'));
             return;
         }
 
@@ -45,7 +47,7 @@ export default function EditSheetModal({ song, onClose, onSuccess }) {
                 price: Number(formData.price)
             });
 
-            showSuccess('✅ Đã cập nhật bài hát!');
+            showSuccess(t('validation.updateSuccess'));
             onSuccess();
             onClose();
         } catch (error) {

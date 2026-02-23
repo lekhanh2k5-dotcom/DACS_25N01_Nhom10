@@ -1,21 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useApp } from '../contexts/AppContext';
 import SongCard from '../components/SongCard';
 import { useAuth } from '../contexts/AuthContext';
-const REGIONS = {
-    all: { label: '🌏 Tất cả', icon: '🌏' },
-    vietnam: { label: '🇻🇳 Việt Nam', icon: '🇻🇳' },
-    japanese: { label: '🇯🇵 Nhật Bản', icon: '🇯🇵' },
-    korean: { label: '🇰🇷 Hàn Quốc', icon: '🇰🇷' },
-    chinese: { label: '🇨🇳 Trung Quốc', icon: '🇨🇳' },
-    world: { label: '🌍 Thế giới', icon: '🌍' }
-};
+import { useLanguage } from '../contexts/LanguageContext';
 
 export default function Store() {
     const { songs, selectSong } = useApp();
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedRegion, setSelectedRegion] = useState('all');
     const { userData } = useAuth();
+    const { t } = useLanguage();
+    
+    const REGIONS = useMemo(() => ({
+        all: { label: `🌏 ${t('store.allRegions')}`, icon: '🌏' },
+        vietnam: { label: `🇻🇳 ${t('store.vietnam')}`, icon: '🇻🇳' },
+        japanese: { label: `🇯🇵 ${t('store.japan')}`, icon: '🇯🇵' },
+        korean: { label: `🇰🇷 ${t('store.korea')}`, icon: '🇰🇷' },
+        chinese: { label: `🇨🇳 ${t('store.china')}`, icon: '🇨🇳' },
+        world: { label: `🌍 ${t('store.world')}`, icon: '🌍' }
+    }), [t]);
     React.useEffect(() => {
         const style = document.createElement('style');
         style.textContent = `
@@ -48,10 +51,10 @@ export default function Store() {
     return (
         <div id="view-store" className="content-view active">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <h2 className="view-title" style={{ margin: 0 }}>🏪 Cửa hàng</h2>
+                <h2 className="view-title" style={{ margin: 0 }}>🏪 {t('store.title')}</h2>
                 <input
                     type="text"
-                    placeholder="🔍 Tìm kiếm bài hát..."
+                    placeholder={t('store.search')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     style={{
@@ -72,7 +75,7 @@ export default function Store() {
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                 <p style={{ fontSize: '14px', color: 'var(--text-sub)', margin: 0 }}>
-                    {filteredSongs.length} bài hát
+                    {filteredSongs.length} {t('player.songCount')}
                 </p>
                 <select
                     id="store-region-select"
@@ -114,7 +117,7 @@ export default function Store() {
                     ))
                 ) : (
                     <p style={{ color: 'var(--text-sub)', padding: '20px' }}>
-                        Không tìm thấy bài hát nào
+                        {t('store.notFound')}
                     </p>
                 )}
             </div>

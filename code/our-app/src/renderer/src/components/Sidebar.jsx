@@ -1,10 +1,12 @@
 import { useApp } from '../contexts/AppContext';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import './Sidebar.css';
 
 export default function Sidebar({ onLoginClick }) {
     const { activeTab, setActiveTab } = useApp();
     const { user, userProfile } = useAuth();
+    const { t } = useLanguage();
 
     const handleLoginClick = () => {
         if (!user) {
@@ -15,9 +17,9 @@ export default function Sidebar({ onLoginClick }) {
     };
 
     const navItems = [
-        { id: 'store', label: '🏪 Cửa hàng', icon: '🏪' },
-        { id: 'library', label: '📚 Thư viện', icon: '📚' },
-        { id: 'settings', label: '⚙️ Cài đặt', icon: '⚙️' },
+        { id: 'store', label: `🏪 ${t('sidebar.store')}`, icon: '🏪' },
+        { id: 'library', label: `📚 ${t('sidebar.library')}`, icon: '📚' },
+        { id: 'settings', label: `⚙️ ${t('sidebar.settings')}`, icon: '⚙️' },
     ];
 
     return (
@@ -53,11 +55,11 @@ export default function Sidebar({ onLoginClick }) {
                     <div className="user-name">
                         {user
                             ? (userProfile?.displayName || user.email.split('@')[0])
-                            : 'Chưa đăng nhập'
+                            : t('account.logout')
                         }
                     </div>
                     <div className="user-balance">
-                        💰 {userProfile ? `${userProfile.coins.toLocaleString()} xu` : '-- xu'}
+                        💰 {userProfile ? `${userProfile.coins.toLocaleString()} ${t('account.coins')}` : `-- ${t('account.coins')}`}
                     </div>
                 </div>
             </div>

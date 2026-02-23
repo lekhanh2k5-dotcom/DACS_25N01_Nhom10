@@ -2,33 +2,60 @@ import React, { useState, useMemo } from 'react';
 import { useApp } from '../contexts/AppContext';
 import SongCard from '../components/SongCard';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 
 export default function Library() {
     const { songs, activeLibraryTab, setActiveLibraryTab, selectSong, importSongFile } = useApp();
     const [searchQuery, setSearchQuery] = useState('');
     const { userData } = useAuth();
+    const { t } = useLanguage();
 
     const ownedSongs = useMemo(() => {
-        return Object.keys(songs)
-            .filter(key => {
-                const song = songs[key];
-                if (!song.isFromFirebase) return true;
-                const isBought = userData?.ownedSongs?.[key] === true;
-                return isBought;
+        const owned = {};
+        Object.keys(songs).forEach(key => {
+            const song = songs[key];
+            if (!song.isFromFirebase) {
+                owned[key] = { ...song, isOwned: true };
+            } else {
+                const ownedItem = userData?.ownedSongs?.[key];
+                // Check if purchased (can be true or Timestamp object)
+                if (ownedItem) {
+                    owned[key] = { 
+                        ...song, 
+                        isOwned: true,
+                        purchasedAt: ownedItem?.toDate?.() || ownedItem
+                    };
+                }
+            }
+        });
+
+        // Sort by purchasedAt (newest first)
+        const sorted = Object.entries(owned)
+            .sort(([, a], [, b]) => {
+                const aTime = a.purchasedAt?.getTime?.() || 0;
+                const bTime = b.purchasedAt?.getTime?.() || 0;
+                return bTime - aTime; // Newest first
             })
-            .reduce((obj, key) => {
-                obj[key] = { ...songs[key], isOwned: true };
+            .reduce((obj, [key, value]) => {
+                obj[key] = value;
                 return obj;
             }, {});
+
+        return sorted;
     }, [songs, userData]);
 
 
 
     const favoriteSongs = useMemo(() => {
         return Object.keys(songs)
-            .filter(key => songs[key].isOwned && songs[key].isFavorite)
-            .reduce((obj, key) => ({ ...obj, [key]: songs[key] }), {});
-    }, [songs]);
+            .filter(key => {
+                const song = songs[key];
+                if (!song.isFromFirebase) return false;
+                const isBought = userData?.ownedSongs?.[key] === true;
+                return isBought && song.isFavorite;
+            })
+            .reduce((obj, key) => ({ ...obj, [key]: { ...songs[key], isOwned: true } }), {});
+    }, [songs, userData]);
 
     const baseSongs = activeLibraryTab === 'all' ? ownedSongs : favoriteSongs;
 
@@ -44,10 +71,10 @@ export default function Library() {
     return (
         <div id="view-library" className="content-view active">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <h2 className="view-title" style={{ margin: 0 }}>📚 Thư viện</h2>
+                <h2 className="view-title" style={{ margin: 0 }}>📚 {t('library.title')}</h2>
                 <input
                     type="text"
-                    placeholder="🔍 Tìm kiếm bài hát..."
+                    placeholder={t('library.search')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     style={{
@@ -72,14 +99,14 @@ export default function Library() {
                     className={`library-tab ${activeLibraryTab === 'all' ? 'active' : ''}`}
                     onClick={() => setActiveLibraryTab('all')}
                 >
-                    📁 Tất cả
+                    📁 {t('library.allSongs')}
                 </button>
                 <button
                     id="tab-favorites"
                     className={`library-tab ${activeLibraryTab === 'favorites' ? 'active' : ''}`}
                     onClick={() => setActiveLibraryTab('favorites')}
                 >
-                    ❤️ Yêu thích
+                    ❤️ {t('library.favorite')}
                 </button>
             </div>
 
@@ -95,9 +122,7 @@ export default function Library() {
                     ))
                 ) : (
                     <p style={{ color: 'var(--text-sub)', padding: '20px' }}>
-                        {activeLibraryTab === 'favorites'
-                            ? 'Chưa có bài hát yêu thích'
-                            : 'Chưa có bài hát nào'}
+                        {t('library.empty')}
                     </p>
                 )}
             </div>

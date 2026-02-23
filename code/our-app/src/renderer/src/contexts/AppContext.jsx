@@ -57,6 +57,21 @@ export const AppProvider = ({ children }) => {
                 console.error('Không load được Firebase songs:', e);
             }
 
+            // Load favorites from localStorage
+            try {
+                const savedFavorites = localStorage.getItem('favoriteSongs');
+                if (savedFavorites) {
+                    const favorites = JSON.parse(savedFavorites);
+                    Object.keys(favorites).forEach(key => {
+                        if (loadedSongs[key]) {
+                            loadedSongs[key].isFavorite = true;
+                        }
+                    });
+                }
+            } catch (e) {
+                console.error('Không load được favorites:', e);
+            }
+
             setSongs(loadedSongs);
             setLoading(false);
         };
@@ -68,16 +83,21 @@ export const AppProvider = ({ children }) => {
         if (loading) return;
 
         const importedSongs = {};
+        const favorites = {};
         Object.entries(songs).forEach(([key, song]) => {
             if (song.isImported) {
                 importedSongs[key] = song;
+            }
+            if (song.isFavorite) {
+                favorites[key] = true;
             }
         });
 
         try {
             localStorage.setItem('importedSongs', JSON.stringify(importedSongs));
+            localStorage.setItem('favoriteSongs', JSON.stringify(favorites));
         } catch (e) {
-            console.error('Không lưu được imported songs:', e);
+            console.error('Không lưu được imported songs hoặc favorites:', e);
         }
     }, [songs, loading]);
 
@@ -231,6 +251,9 @@ export const AppProvider = ({ children }) => {
 
             if (result.success) {
                 await showAlert('Mua hàng thành công! Bài hát đã có trong thư viện của bạn.');
+                // Redirect to Library and show All Songs tab
+                setActiveTab('library');
+                setActiveLibraryTab('all');
                 return true;
             } else {
                 await showAlert(result.message || 'Giao dịch thất bại.');

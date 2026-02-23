@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { db } from '../../firebase/firebase'
 import { collection, getDocs } from 'firebase/firestore'
 import { useAuth } from '../../contexts/AuthContext'
+import { useLanguage } from '../../contexts/LanguageContext'
 import { showSuccess, showError } from '../../utils/alert'
 import { deleteSongFromFirebase } from '../../firebase/deleteService'
 import UploadSheetModal from '../../components/UploadSheetModal'
@@ -11,6 +12,7 @@ import './SongsManagement.css'
 
 export default function SongsManagement() {
     const { user } = useAuth()
+    const { t } = useLanguage()
     const [songs, setSongs] = useState([])
     const [loading, setLoading] = useState(true)
     const [searchQuery, setSearchQuery] = useState('')
@@ -48,8 +50,8 @@ export default function SongsManagement() {
             }))
             setSongs(songsData)
         } catch (error) {
-            console.error('Lỗi khi tải bài hát:', error)
-            showError('Không thể tải danh sách bài hát')
+            console.error(t('admin.loadError'), error)
+            showError(t('admin.cantLoadList'))
         } finally {
             setLoading(false)
         }
@@ -66,7 +68,7 @@ export default function SongsManagement() {
 
         // Confirm dialog
         const result = await Swal.fire({
-            title: '🗑️ Xóa bài hát?',
+            title: t('admin.deleteConfirm'),
             html: `Bạn có chắc muốn xóa:<br><strong>${song.name}</strong>?<br><br>
                    <span style="color: #ff4444">⚠️ Hành động này không thể hoàn tác!</span>`,
             icon: 'warning',
@@ -82,7 +84,7 @@ export default function SongsManagement() {
 
         try {
             await deleteSongFromFirebase(song.id, song.txtFilePath)
-            showSuccess('✅ Đã xóa bài hát!')
+            showSuccess(t('admin.deleteSuccess'))
             fetchSongs()
         } catch (error) {
             console.error('Delete error:', error)
@@ -122,22 +124,22 @@ export default function SongsManagement() {
     }
 
     const regions = [
-        { value: 'all', label: '🌍 Tất cả' },
-        { value: 'cn', label: '🇨🇳 Trung Quốc' },
-        { value: 'kr', label: '🇰🇷 Hàn Quốc' },
-        { value: 'vn', label: '🇻🇳 Việt Nam' },
-        { value: 'us', label: '🇺🇸 Âu Mỹ' },
-        { value: 'jp', label: '🇯🇵 Nhật Bản' },
+        { value: 'all', label: t('admin.regions.all') },
+        { value: 'cn', label: t('admin.regions.china') },
+        { value: 'kr', label: t('admin.regions.korea') },
+        { value: 'vn', label: t('admin.regions.vietnam') },
+        { value: 'us', label: t('admin.regions.world') },
+        { value: 'jp', label: t('admin.regions.japan') },
     ]
 
     if (loading) {
         return (
             <div className="admin-page">
                 <div className="admin-page-header">
-                    <h1>🎵 Quản lý bài hát</h1>
+                    <h1>{t('admin.songsManagement')}</h1>
                 </div>
                 <div className="songs-loading">
-                    Đang tải...
+                    {t('admin.loading')}
                 </div>
             </div>
         )
@@ -146,7 +148,7 @@ export default function SongsManagement() {
     return (
         <div className="admin-page">
             <div className="admin-page-header">
-                <h1>🎵 Quản lý bài hát</h1>
+                <h1>{t('admin.songsManagement')}</h1>
             </div>
 
             <div className="songs-filter-section">
@@ -163,7 +165,7 @@ export default function SongsManagement() {
                 </select>
                 <input
                     type="text"
-                    placeholder="🔍 Tìm kiếm..."
+                    placeholder={t('admin.search')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="songs-search-input"
@@ -172,7 +174,7 @@ export default function SongsManagement() {
                     className="admin-btn admin-btn-primary"
                     onClick={() => setShowUploadModal(true)}
                 >
-                    ➕ Thêm bài hát
+                    {t('admin.addSong')}
                 </button>
             </div>
 
@@ -180,7 +182,7 @@ export default function SongsManagement() {
                 <table className="admin-table">
                     <thead>
                         <tr>
-                            <th>Bài hát</th>
+                            <th>{t('admin.songs')}</th>
                             <th>Giá</th>
                             <th style={{ width: '80px' }}></th>
                         </tr>
@@ -189,7 +191,7 @@ export default function SongsManagement() {
                         {paginatedSongs.length === 0 ? (
                             <tr>
                                 <td colSpan="3" className="songs-table-empty">
-                                    {searchQuery || selectedRegion !== 'all' ? 'Không tìm thấy bài hát' : 'Chưa có bài hát'}
+                                    {searchQuery || selectedRegion !== 'all' ? t('admin.songNotFound') : t('admin.noSongs')}
                                 </td>
                             </tr>
                         ) : (
@@ -255,11 +257,11 @@ export default function SongsManagement() {
                         disabled={currentPage === 1}
                         className="pagination-btn"
                     >
-                        Trước
+                        {t('admin.prev')}
                     </button>
 
                     <div className="pagination-info">
-                        <span>Trang </span>
+                        <span>{t('admin.page')} </span>
                         <input
                             type="number"
                             value={currentPage}
@@ -281,17 +283,17 @@ export default function SongsManagement() {
                         disabled={currentPage === totalPages}
                         className="pagination-btn"
                     >
-                        Tiếp
+                        {t('admin.next')}
                     </button>
                 </div>
             )}
 
             <div className="songs-stats-footer">
-                <span>Tổng: <strong className="total">{songs.length}</strong> bài hát</span>
+                <span>{t('admin.total')}: <strong className="total">{songs.length}</strong> {t('player.songCount')}</span>
                 <span>•</span>
-                <span>Hiển thị: <strong className="total">{filteredSongs.length}</strong></span>
+                <span>{t('admin.showing')}: <strong className="total">{filteredSongs.length}</strong></span>
                 <span>•</span>
-                <span>Tổng giá trị: <strong className="value">{songs.reduce((sum, s) => sum + (s.price || 0), 0).toLocaleString()}</strong> xu</span>
+                <span>{t('admin.totalValue')}: <strong className="value">{songs.reduce((sum, s) => sum + (s.price || 0), 0).toLocaleString()}</strong> xu</span>
             </div>
 
             {/* Click outside to close dropdown */}
