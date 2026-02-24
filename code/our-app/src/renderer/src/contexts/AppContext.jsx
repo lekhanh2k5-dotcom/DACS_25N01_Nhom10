@@ -129,7 +129,7 @@ export const AppProvider = ({ children }) => {
         const song = songs[songKey];
         if (!song) return false;
         if (song.isImported || !song.price || song.price === 0) return true;
-        return userData?.ownedSongs?.[songKey] === true;
+        return !!userData?.ownedSongs?.[songKey];
     };
 
     const selectSong = async (songKey) => {
@@ -137,7 +137,7 @@ export const AppProvider = ({ children }) => {
         if (!song) return;
         const isImported = song.isImported;
         const isFromFirebase = song.isFromFirebase;
-        const isBought = userData?.ownedSongs?.[songKey] === true;
+        const isBought = !!userData?.ownedSongs?.[songKey];
         if (isFromFirebase && !isBought && !isImported) {
             await showAlert(`Bạn cần mua bài "${song.name}" để phát.`);
             return;

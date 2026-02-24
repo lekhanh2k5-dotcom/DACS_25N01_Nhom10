@@ -30,7 +30,7 @@ export const purchaseSong = async (userId, song) => {
 
             transaction.update(userRef, { 
                 coins: currentCoins - song.price,
-                [`ownedSongs.${song.id}`]: serverTimestamp()
+                [`ownedSongs.${song.id}`]: true
             });
 
            const historyRef = doc(db, "transactions", txnId);
