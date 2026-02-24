@@ -136,7 +136,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
+    background: var(--overlay);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -279,13 +279,13 @@
 }
 
 .coin-modal-actions .coin-modal-btn-add:hover {
-    background: rgba(102, 187, 106, 0.15);
+    background: var(--success-light);
     border-color: var(--success);
     color: var(--success);
 }
 
 .coin-modal-actions .coin-modal-btn-subtract:hover {
-    background: rgba(239, 83, 80, 0.15);
+    background: var(--danger-light);
     border-color: var(--danger);
     color: var(--danger);
 }
