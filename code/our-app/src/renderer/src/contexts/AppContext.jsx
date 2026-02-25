@@ -175,9 +175,7 @@ export const AppProvider = ({ children }) => {
         const id = setInterval(() => {
             const now = performance.now();
             const realElapsed = now - playRef.current.realStartTime;
-
             const nextTime = playRef.current.initialSongTime + (realElapsed * playbackSpeed);
-
             const clamped = Math.min(nextTime, duration);
             setCurrentTime(clamped);
         }, 16);
@@ -198,7 +196,7 @@ export const AppProvider = ({ children }) => {
         return !!userData?.ownedSongs?.[songKey];
     };
 
-    const selectSong = async (songKey) => {
+    const selectSong = async (songKey, { autoStart = false } = {}) => {
         const song = songs[songKey];
         if (!song) return;
         const isImported = song.isImported;
@@ -209,10 +207,17 @@ export const AppProvider = ({ children }) => {
             return;
         }
 
-        setCurrentSong({ ...song, key: songKey });
+        // Dừng bài hiện tại nếu đang phát
+        window.api.autoPlay.stop();
         setIsPlaying(false);
         setCurrentTime(0);
+        setCurrentSong({ ...song, key: songKey });
+
+        let finalNotes = song.songNotes || [];
+        let finalDuration = 0;
+
         if (song.txtFilePath) {
+<<<<<<< HEAD
             try {
                 const result = await window.api?.sheet?.secureLoad(song.txtFilePath);
                 if (result && result.ok) {
@@ -237,9 +242,35 @@ export const AppProvider = ({ children }) => {
                 const dur = lastNote ? lastNote.time + 1000 : 0;
                 setDuration(dur);
                 console.log(`📊 selectSong - Duration set: ${dur}ms (${(dur/1000).toFixed(2)}s), Last note: ${lastNote?.time}ms`);
+=======
+            const result = await window.api.sheet.secureLoad(song.txtFilePath);
+            if (result.ok) {
+                finalNotes = result.songNotes;
+                setCurrentSong(prev => ({ ...prev, songNotes: finalNotes }));
+            } else {
+                await showAlert('Không tải được dữ liệu bài hát từ cloud: ' + result.message);
+                return;
+>>>>>>> 97ca362855acd0ad1590a038d31d3aa1504f3b03
             }
         }
+
+        if (finalNotes.length > 0) {
+            const lastNote = finalNotes[finalNotes.length - 1];
+            finalDuration = lastNote ? lastNote.time + 1000 : 0;
+            setDuration(finalDuration);
+        }
+
+        // Tự động phát nếu được yêu cầu (từ next/prev khi đang chơi)
+        if (autoStart && finalNotes.length > 0) {
+            const settings = JSON.parse(localStorage.getItem('appSettings') || '{}');
+            const gameType = settings.game || 'Sky';
+            setIsPlaying(true);
+            window.api.autoPlay.start(finalNotes, 0, playbackSpeed, gameType);
+        }
     };
+
+    // Giữ selectSongRef luôn trỏ tới phiên bản mới nhất
+    useEffect(() => { selectSongRef.current = selectSong; });
 
     const togglePlayback = () => {
         if (!currentSong) return;
@@ -251,43 +282,33 @@ export const AppProvider = ({ children }) => {
             setIsPlaying(true);
             safeAutoPlay.start(currentSong.songNotes, currentTime, playbackSpeed, gameType);
         } else {
-            setIsPlaying(false);
-            safeAutoPlay.stop();
-        }
-    };
-
-
-    const seekTo = (timeMs) => {
-        setCurrentTime(timeMs);
-    };
-
-    const playNext = () => {
-        const songKeys = Object.keys(songs);
-        if (songKeys.length === 0 || !currentSong) return;
-
-        const currentIndex = songKeys.findIndex(key => key === currentSong.key);
-        for (let i = 1; i <= songKeys.length; i++) {
-            const nextIndex = (currentIndex + i) % songKeys.length;
-            const nextKey = songKeys[nextIndex];
-
-            if (hasPermission(nextKey)) {
-                selectSong(nextKey);
-                return;
+            try {
+                const result = await window.api?.sheet?.secureLoad(song.txtFilePath);
+                if (result && result.ok) {
+                    setCurrentSong(prev => ({
+                        ...prev,
+                        songNotes: result.songNotes
+                    }));
+                    if (result.songNotes.length > 0) {
+                        const lastNote = result.songNotes[result.songNotes.length - 1];
+                        setDuration(lastNote ? lastNote.time + 1000 : 0);
+                    }
+                } else {
+                    await showAlert('Không tải được dữ liệu bài hát từ cloud: ' + result?.message);
+                }
+            } catch (e) {
+                console.error('Error loading song notes:', e);
+                await showAlert('Lỗi tải bài hát: ' + e.message);
             }
-        }
-    };
-
-    const playPrev = () => {
-        const songKeys = Object.keys(songs);
-        if (songKeys.length === 0 || !currentSong) return;
-
-        const currentIndex = songKeys.findIndex(key => key === currentSong.key);
-        for (let i = 1; i <= songKeys.length; i++) {
-            const prevIndex = (currentIndex - i + songKeys.length) % songKeys.length;
-            const prevKey = songKeys[prevIndex];
+        } else {
+            if (song.songNotes && song.songNotes.length > 0) {
+                const lastNote = song.songNotes[song.songNotes.length - 1];
+                const dur = lastNote ? lastNote.time + 1000 : 0;
+                setDuration(dur);
+                console.log(`📊 selectSong - Duration set: ${dur}ms (${(dur/1000).toFixed(2)}s), Last note: ${lastNote?.time}ms`);
 
             if (hasPermission(prevKey)) {
-                selectSong(prevKey);
+                selectSong(prevKey, { autoStart: isPlaying });
                 return;
             }
         }

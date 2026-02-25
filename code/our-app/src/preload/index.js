@@ -36,6 +36,16 @@ const api = {
     open: () => ipcRenderer.invoke('sheet:open'),
     readPath: (path) => ipcRenderer.invoke('sheet:read-path', path),
     secureLoad: (txtFilePath) => ipcRenderer.invoke('sheet:secure-load', txtFilePath) 
+  },
+  shortcuts: {
+    // Đăng ký callback nhận lệnh global shortcut từ Main Process
+    onAction: (callback) => {
+      ipcRenderer.on('global-shortcut', (_event, action) => callback(action))
+    },
+    offAction: () => {
+      ipcRenderer.removeAllListeners('global-shortcut')
+    }
+  }
   }
 }
 

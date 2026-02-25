@@ -19,32 +19,16 @@ function AppContent() {
   const { t } = useLanguage();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
-  // Keyboard shortcuts
+  // Keyboard shortcuts - nhận từ Main Process (hoạt động kể cả khi minimize)
   useEffect(() => {
-    const handleKeyDown = (event) => {
-      // Only trigger if Ctrl + Shift are pressed
-      if (!event.ctrlKey || !event.shiftKey) return;
-
-      switch (event.code) {
-        case 'KeyC': // Ctrl + Shift + C = Previous
-          event.preventDefault();
-          playPrev();
-          break;
-        case 'KeyV': // Ctrl + Shift + V = Play/Pause
-          event.preventDefault();
-          togglePlayback();
-          break;
-        case 'KeyB': // Ctrl + Shift + B = Next
-          event.preventDefault();
-          playNext();
-          break;
-        default:
-          break;
+    window.api.shortcuts.onAction((action) => {
+      switch (action) {
+        case 'play-pause': togglePlayback(); break;
+        case 'next': playNext(); break;
+        case 'prev': playPrev(); break;
       }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    });
+    return () => window.api.shortcuts.offAction();
   }, [togglePlayback, playNext, playPrev]);
 
   if (window.location.hash === '#/admin') {
