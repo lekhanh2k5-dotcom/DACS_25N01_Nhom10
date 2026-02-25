@@ -172,6 +172,8 @@
     "coins": "Coins",
     "joinDate": "Join Date",
     "activity": "Activity",
+    "active": "Active",
+    "locked": "Locked",
     "notes": "Notes",
     "time": "Time",
     "all": "All",

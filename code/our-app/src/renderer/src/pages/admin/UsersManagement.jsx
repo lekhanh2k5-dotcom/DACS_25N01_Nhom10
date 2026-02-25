@@ -188,9 +188,9 @@ export default function UsersManagement() {
                                         </td>
                                         <td>
                                             {u.isLocked ? (
-                                                <span className="users-status-locked">🔒 Đã khóa</span>
+                                                <span className="users-status-locked">🔒 {t('admin.locked')}</span>
                                             ) : (
-                                                <span className="users-status-active">✅ Hoạt động</span>
+                                                <span className="users-status-active">✅ {t('admin.active')}</span>
                                             )}
                                         </td>
                                         <td className="users-dropdown-cell">

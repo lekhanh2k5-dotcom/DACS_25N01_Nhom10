@@ -153,6 +153,8 @@
     "next": "Tiếp",
     "showing": "Hiển thị",
     "totalValue": "Tổng giá trị",
+    "active": "Hoạt động",
+    "locked": "Đã khóa",
     "regions": {
       "all": "🌍 Tất cả",
       "china": "🇨🇳 Trung Quốc",
