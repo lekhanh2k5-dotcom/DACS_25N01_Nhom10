@@ -132,7 +132,7 @@ export const AppProvider = ({ children }) => {
         return !!userData?.ownedSongs?.[songKey];
     };
 
-    const selectSong = async (songKey) => {
+    const selectSong = async (songKey, { autoStart = false } = {}) => {
         const song = songs[songKey];
         if (!song) return;
         const isImported = song.isImported;
@@ -143,28 +143,38 @@ export const AppProvider = ({ children }) => {
             return;
         }
 
-        setCurrentSong({ ...song, key: songKey });
+        // Dừng bài hiện tại nếu đang phát
+        window.api.autoPlay.stop();
         setIsPlaying(false);
         setCurrentTime(0);
+        setCurrentSong({ ...song, key: songKey });
+
+        let finalNotes = song.songNotes || [];
+        let finalDuration = 0;
+
         if (song.txtFilePath) {
             const result = await window.api.sheet.secureLoad(song.txtFilePath);
             if (result.ok) {
-                setCurrentSong(prev => ({
-                    ...prev,
-                    songNotes: result.songNotes
-                }));
-                if (result.songNotes.length > 0) {
-                    const lastNote = result.songNotes[result.songNotes.length - 1];
-                    setDuration(lastNote ? lastNote.time + 1000 : 0);
-                }
+                finalNotes = result.songNotes;
+                setCurrentSong(prev => ({ ...prev, songNotes: finalNotes }));
             } else {
                 await showAlert('Không tải được dữ liệu bài hát từ cloud: ' + result.message);
+                return;
             }
-        } else {
-            if (song.songNotes && song.songNotes.length > 0) {
-                const lastNote = song.songNotes[song.songNotes.length - 1];
-                setDuration(lastNote ? lastNote.time + 1000 : 0);
-            }
+        }
+
+        if (finalNotes.length > 0) {
+            const lastNote = finalNotes[finalNotes.length - 1];
+            finalDuration = lastNote ? lastNote.time + 1000 : 0;
+            setDuration(finalDuration);
+        }
+
+        // Tự động phát nếu được yêu cầu (từ next/prev khi đang chơi)
+        if (autoStart && finalNotes.length > 0) {
+            const settings = JSON.parse(localStorage.getItem('appSettings') || '{}');
+            const gameType = settings.game || 'Sky';
+            setIsPlaying(true);
+            window.api.autoPlay.start(finalNotes, 0, playbackSpeed, gameType);
         }
     };
 
@@ -198,7 +208,7 @@ export const AppProvider = ({ children }) => {
             const nextKey = songKeys[nextIndex];
 
             if (hasPermission(nextKey)) {
-                selectSong(nextKey);
+                selectSong(nextKey, { autoStart: isPlaying });
                 return;
             }
         }
@@ -214,7 +224,7 @@ export const AppProvider = ({ children }) => {
             const prevKey = songKeys[prevIndex];
 
             if (hasPermission(prevKey)) {
-                selectSong(prevKey);
+                selectSong(prevKey, { autoStart: isPlaying });
                 return;
             }
         }

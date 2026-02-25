@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, globalShortcut } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
@@ -52,6 +52,16 @@ app.whenReady().then(() => {
 
   createWindow()
 
+  // Global shortcuts - hoạt động kể cả khi app bị minimize
+  const sendToRenderer = (channel) => {
+    const wins = BrowserWindow.getAllWindows()
+    wins.forEach(win => win.webContents.send('global-shortcut', channel))
+  }
+
+  globalShortcut.register('Ctrl+Shift+V', () => sendToRenderer('play-pause'))
+  globalShortcut.register('Ctrl+Shift+B', () => sendToRenderer('next'))
+  globalShortcut.register('Ctrl+Shift+C', () => sendToRenderer('prev'))
+
   app.on('activate', function () {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
@@ -61,4 +71,8 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
   }
+})
+
+app.on('will-quit', () => {
+  globalShortcut.unregisterAll()
 })

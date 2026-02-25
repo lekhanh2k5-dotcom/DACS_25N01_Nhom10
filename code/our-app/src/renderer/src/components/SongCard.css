@@ -58,7 +58,14 @@
 
 .card-action {
     text-align: right;
-    min-width: 100px;
+    min-width: 80px;
+}
+
+.card-action-group {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    justify-content: flex-end;
 }
 
 .card-price {
@@ -73,26 +80,60 @@
     font-size: 13px;
 }
 
-.btn-delete-song {
-    padding: 6px 12px;
-    background: rgba(255, 68, 68, 0.1);
-    color: var(--danger);
-    border: 1px solid rgba(255, 68, 68, 0.3);
-    border-radius: 6px;
+/* Icon-only action buttons */
+.btn-icon {
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 50%;
     cursor: pointer;
-    font-size: 14px;
-    transition: all 0.2s;
-    display: inline-flex;
+    font-size: 15px;
+    display: flex;
     align-items: center;
-    gap: 5px;
+    justify-content: center;
+    padding: 0;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
 }
 
-.btn-delete-song:hover {
-    background: rgba(255, 68, 68, 0.2);
+.btn-favorite {
+    background: transparent;
+    color: var(--text-sub);
+    border: 1px solid var(--border);
+}
+
+.btn-favorite:hover {
+    background: rgba(29, 185, 84, 0.15);
+    color: #1DB954;
+    border-color: #1DB954;
+    transform: scale(1.1);
+}
+
+.btn-favorite.active {
+    background: #1DB954;
+    color: #fff;
+    border-color: #1DB954;
+}
+
+.btn-favorite.active:hover {
+    background: #17a349;
+    transform: scale(1.1);
+}
+
+.btn-delete {
+    background: transparent;
+    color: var(--text-sub);
+    border: 1px solid var(--border);
+    font-size: 13px;
+}
+
+.btn-delete:hover {
+    background: rgba(255, 68, 68, 0.15);
+    color: var(--danger);
     border-color: var(--danger);
-    transform: scale(1.05);
+    transform: scale(1.1);
 }
 
-.btn-delete-song:active {
+.btn-delete:active {
     transform: scale(0.95);
 }

@@ -10,14 +10,14 @@ export default function Store() {
     const [selectedRegion, setSelectedRegion] = useState('all');
     const { userData } = useAuth();
     const { t } = useLanguage();
-    
+
     const REGIONS = useMemo(() => ({
-        all: { label: `🌏 ${t('store.allRegions')}`, icon: '🌏' },
-        vietnam: { label: `🇻🇳 ${t('store.vietnam')}`, icon: '🇻🇳' },
-        japanese: { label: `🇯🇵 ${t('store.japan')}`, icon: '🇯🇵' },
-        korean: { label: `🇰🇷 ${t('store.korea')}`, icon: '🇰🇷' },
-        chinese: { label: `🇨🇳 ${t('store.china')}`, icon: '🇨🇳' },
-        world: { label: `🌍 ${t('store.world')}`, icon: '🌍' }
+        all: { label: t('store.allRegions') },
+        vietnam: { label: t('store.vietnam') },
+        japanese: { label: t('store.japan') },
+        korean: { label: t('store.korea') },
+        chinese: { label: t('store.china') },
+        world: { label: t('store.world') }
     }), [t]);
     React.useEffect(() => {
         const style = document.createElement('style');
