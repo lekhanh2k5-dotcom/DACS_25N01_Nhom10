@@ -46,7 +46,6 @@ const api = {
       ipcRenderer.removeAllListeners('global-shortcut')
     }
   }
-  }
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

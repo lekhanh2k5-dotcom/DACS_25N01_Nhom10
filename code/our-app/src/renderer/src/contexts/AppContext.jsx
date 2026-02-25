@@ -212,12 +212,10 @@ export const AppProvider = ({ children }) => {
         setIsPlaying(false);
         setCurrentTime(0);
         setCurrentSong({ ...song, key: songKey });
-
         let finalNotes = song.songNotes || [];
         let finalDuration = 0;
 
         if (song.txtFilePath) {
-<<<<<<< HEAD
             try {
                 const result = await window.api?.sheet?.secureLoad(song.txtFilePath);
                 if (result && result.ok) {
@@ -242,15 +240,6 @@ export const AppProvider = ({ children }) => {
                 const dur = lastNote ? lastNote.time + 1000 : 0;
                 setDuration(dur);
                 console.log(`📊 selectSong - Duration set: ${dur}ms (${(dur/1000).toFixed(2)}s), Last note: ${lastNote?.time}ms`);
-=======
-            const result = await window.api.sheet.secureLoad(song.txtFilePath);
-            if (result.ok) {
-                finalNotes = result.songNotes;
-                setCurrentSong(prev => ({ ...prev, songNotes: finalNotes }));
-            } else {
-                await showAlert('Không tải được dữ liệu bài hát từ cloud: ' + result.message);
-                return;
->>>>>>> 97ca362855acd0ad1590a038d31d3aa1504f3b03
             }
         }
 
@@ -282,35 +271,8 @@ export const AppProvider = ({ children }) => {
             setIsPlaying(true);
             safeAutoPlay.start(currentSong.songNotes, currentTime, playbackSpeed, gameType);
         } else {
-            try {
-                const result = await window.api?.sheet?.secureLoad(song.txtFilePath);
-                if (result && result.ok) {
-                    setCurrentSong(prev => ({
-                        ...prev,
-                        songNotes: result.songNotes
-                    }));
-                    if (result.songNotes.length > 0) {
-                        const lastNote = result.songNotes[result.songNotes.length - 1];
-                        setDuration(lastNote ? lastNote.time + 1000 : 0);
-                    }
-                } else {
-                    await showAlert('Không tải được dữ liệu bài hát từ cloud: ' + result?.message);
-                }
-            } catch (e) {
-                console.error('Error loading song notes:', e);
-                await showAlert('Lỗi tải bài hát: ' + e.message);
-            }
-        } else {
-            if (song.songNotes && song.songNotes.length > 0) {
-                const lastNote = song.songNotes[song.songNotes.length - 1];
-                const dur = lastNote ? lastNote.time + 1000 : 0;
-                setDuration(dur);
-                console.log(`📊 selectSong - Duration set: ${dur}ms (${(dur/1000).toFixed(2)}s), Last note: ${lastNote?.time}ms`);
-
-            if (hasPermission(prevKey)) {
-                selectSong(prevKey, { autoStart: isPlaying });
-                return;
-            }
+            setIsPlaying(false);
+            safeAutoPlay.stop();
         }
     };
 
