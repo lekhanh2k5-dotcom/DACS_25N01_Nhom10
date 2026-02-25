@@ -32,6 +32,17 @@ export const AppProvider = ({ children }) => {
         realStartTime: 0,
         initialSongTime: 0
     });
+    const playbackModeRef = useRef(playbackMode);
+    const currentSongRef = useRef(currentSong);
+    const songsRef = useRef(songs);
+    const isPlayingRef = useRef(isPlaying);
+
+    useEffect(() => { playbackModeRef.current = playbackMode; }, [playbackMode]);
+    useEffect(() => { currentSongRef.current = currentSong; }, [currentSong]);
+    useEffect(() => { songsRef.current = songs; }, [songs]);
+    useEffect(() => { isPlayingRef.current = isPlaying; }, [isPlaying]);
+
+    const selectSongRef = useRef(null);
     useEffect(() => {
         if (!isPlaying) return
         playRef.current.startedAt = performance.now()
@@ -109,21 +120,72 @@ export const AppProvider = ({ children }) => {
         const id = setInterval(() => {
             const now = performance.now();
             const realElapsed = now - playRef.current.realStartTime;
-
             const nextTime = playRef.current.initialSongTime + (realElapsed * playbackSpeed);
-
             const clamped = Math.min(nextTime, duration);
             setCurrentTime(clamped);
 
             if (nextTime >= duration) {
-                setIsPlaying(false);
-                window.api.autoPlay.stop();
                 clearInterval(id);
+                window.api.autoPlay.stop();
+                setIsPlaying(false);
+                setCurrentTime(0);
+
+                const mode = playbackModeRef.current;
+                const song = currentSongRef.current;
+                const allSongs = songsRef.current;
+
+                if (mode === 'once') {
+                    // Dừng, không làm gì thêm
+                    return;
+                }
+
+                if (mode === 'repeat-one') {
+                    // Phát lại chính bài này
+                    if (song && selectSongRef.current) {
+                        selectSongRef.current(song.key, { autoStart: true });
+                    }
+                    return;
+                }
+
+                if (mode === 'sequence') {
+                    // Phát bài kế tiếp theo thứ tự
+                    if (!song) return;
+                    const songKeys = Object.keys(allSongs);
+                    const currentIndex = songKeys.findIndex(k => k === song.key);
+                    for (let i = 1; i <= songKeys.length; i++) {
+                        const nextIndex = (currentIndex + i) % songKeys.length;
+                        const nextKey = songKeys[nextIndex];
+                        const s = allSongs[nextKey];
+                        if (!s) continue;
+                        const permitted = s.isImported || !s.price || s.price === 0
+                            || !!(s.isFromFirebase);
+                        if (permitted && selectSongRef.current) {
+                            selectSongRef.current(nextKey, { autoStart: true });
+                            return;
+                        }
+                    }
+                    return;
+                }
+
+                if (mode === 'shuffle') {
+                    // Phát ngẫu nhiên
+                    const songKeys = Object.keys(allSongs);
+                    const available = songKeys.filter(k => {
+                        if (k === song?.key) return false;
+                        const s = allSongs[k];
+                        return s.isImported || !s.price || s.price === 0 || s.isFromFirebase;
+                    });
+                    if (available.length > 0 && selectSongRef.current) {
+                        const randomKey = available[Math.floor(Math.random() * available.length)];
+                        selectSongRef.current(randomKey, { autoStart: true });
+                    }
+                    return;
+                }
             }
         }, 16);
 
         return () => clearInterval(id);
-    }, [isPlaying, playbackSpeed, duration]); //
+    }, [isPlaying, playbackSpeed, duration]);
 
     const hasPermission = (songKey) => {
         const song = songs[songKey];
@@ -177,6 +239,9 @@ export const AppProvider = ({ children }) => {
             window.api.autoPlay.start(finalNotes, 0, playbackSpeed, gameType);
         }
     };
+
+    // Giữ selectSongRef luôn trỏ tới phiên bản mới nhất
+    useEffect(() => { selectSongRef.current = selectSong; });
 
     const togglePlayback = () => {
         if (!currentSong) return;
