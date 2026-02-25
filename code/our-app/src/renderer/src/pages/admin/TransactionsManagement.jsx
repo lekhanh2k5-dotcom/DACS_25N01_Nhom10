@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
+import { useLanguage } from '../../contexts/LanguageContext'
 import { getTransactions } from '../../firebase/transactionService'
 import { showError } from '../../utils/alert'
 import './TransactionsManagement.css'
 
 export default function TransactionsManagement() {
     const { user } = useAuth()
+    const { t } = useLanguage()
     const [transactions, setTransactions] = useState([])
     const [loading, setLoading] = useState(true)
     const [searchQuery, setSearchQuery] = useState('')
@@ -38,9 +40,9 @@ export default function TransactionsManagement() {
 
     const getTypeLabel = (type) => {
         const types = {
-            'buysheet': 'Mua sheet',
-            'admin_add': 'Nạp xu',
-            'admin_subtract': 'Trừ xu'
+            'buysheet': t('admin.buySheet'),
+            'admin_add': t('admin.addCoins'),
+            'admin_subtract': t('admin.subtractCoins')
         }
         return types[type] || type
     }
@@ -107,11 +109,11 @@ export default function TransactionsManagement() {
         return (
             <div className="admin-page">
                 <div className="admin-page-header">
-                    <h1>💰 Quản lý giao dịch</h1>
+                    <h1>💰 {t('admin.transactionsTitle')}</h1>
                 </div>
                 <div className="loading-container">
                     <div className="loading-spinner"></div>
-                    <p>Đang tải dữ liệu...</p>
+                    <p>{t('admin.loadingData')}</p>
                 </div>
             </div>
         )
@@ -120,14 +122,14 @@ export default function TransactionsManagement() {
     return (
         <div className="admin-page transactions-page">
             <div className="admin-page-header">
-                <h1>💰 Quản lý giao dịch</h1>
+                <h1>💰 {t('admin.transactionsTitle')}</h1>
             </div>
 
             <div className="transactions-controls">
                 <div className="search-box">
                     <input
                         type="text"
-                        placeholder="🔍 Tìm theo người dùng, bài hát, ID giao dịch..."
+                        placeholder={t('admin.searchPlaceholder')}
                         value={searchQuery}
                         onChange={(e) => {
                             setSearchQuery(e.target.value)
@@ -146,7 +148,7 @@ export default function TransactionsManagement() {
                             }
                         }}
                     >
-                        Tất cả
+                        {t('admin.all')}
                     </button>
                     <button
                         className={`filter-tab ${filterType === 'buysheet' ? 'active' : ''}`}
@@ -157,7 +159,7 @@ export default function TransactionsManagement() {
                             }
                         }}
                     >
-                        Mua sheet
+                        {t('admin.buySheet')}
                     </button>
                     <button
                         className={`filter-tab ${filterType === 'admin_add' ? 'active' : ''}`}
@@ -168,7 +170,7 @@ export default function TransactionsManagement() {
                             }
                         }}
                     >
-                        Nạp xu
+                        {t('admin.addCoins')}
                     </button>
                     <button
                         className={`filter-tab ${filterType === 'admin_subtract' ? 'active' : ''}`}
@@ -179,27 +181,27 @@ export default function TransactionsManagement() {
                             }
                         }}
                     >
-                        Trừ xu
+                        {t('admin.subtractCoins')}
                     </button>
                 </div>
             </div>
 
-            {/* Bảng giao dịch */}
+            {/* Transactions table */}
             <div className="transactions-table-container">
                 {currentTransactions.length === 0 ? (
                     <div className="empty-state">
                         <div className="empty-icon">📭</div>
-                        <p>Không có giao dịch nào</p>
+                        <p>{t('admin.noTransactions')}</p>
                     </div>
                 ) : (
                     <>
                         <table className="transactions-table">
                             <thead>
                                 <tr>
-                                    <th>Thời gian</th>
-                                    <th>Người dùng</th>
-                                    <th>Hoạt động</th>
-                                    <th>Ghi chú</th>
+                                    <th>{t('admin.time')}</th>
+                                    <th>{t('admin.user')}</th>
+                                    <th>{t('admin.activity')}</th>
+                                    <th>{t('admin.notes')}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -248,7 +250,7 @@ export default function TransactionsManagement() {
                                     disabled={currentPage === 1}
                                     onClick={() => handlePageChange(currentPage - 1)}
                                 >
-                                    ‹ Trước
+                                    ‹ {t('admin.prev')}
                                 </button>
 
                                 <div className="page-numbers">
@@ -280,13 +282,13 @@ export default function TransactionsManagement() {
                                     disabled={currentPage === totalPages}
                                     onClick={() => handlePageChange(currentPage + 1)}
                                 >
-                                    Sau ›
+                                    {t('admin.next')} ›
                                 </button>
                             </div>
                         )}
 
                         <div className="transactions-footer">
-                            Hiển thị {startIndex + 1}-{Math.min(endIndex, filteredTransactions.length)} trong tổng số {filteredTransactions.length} giao dịch
+                            {t('admin.showing')} {startIndex + 1}-{Math.min(endIndex, filteredTransactions.length)} {t('admin.totalValue')} {filteredTransactions.length} {t('admin.transactionsManagement')}
                         </div>
                     </>
                 )}

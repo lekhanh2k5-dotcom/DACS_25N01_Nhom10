@@ -69,12 +69,12 @@ export default function SongsManagement() {
         // Confirm dialog
         const result = await Swal.fire({
             title: t('admin.deleteConfirm'),
-            html: `Bạn có chắc muốn xóa:<br><strong>${song.name}</strong>?<br><br>
-                   <span style="color: #ff4444">⚠️ Hành động này không thể hoàn tác!</span>`,
+            html: `${t('admin.confirmDeleteMsg')}:<br><strong>${song.name}</strong>?<br><br>
+                   <span style="color: #ff4444">⚠️ ${t('admin.warning')}</span>`,
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonText: 'Xóa',
-            cancelButtonText: 'Hủy',
+            confirmButtonText: t('admin.deleteAction'),
+            cancelButtonText: t('admin.cancel'),
             confirmButtonColor: '#d33',
             background: '#1e1e1e',
             color: '#fff'
@@ -88,13 +88,13 @@ export default function SongsManagement() {
             fetchSongs()
         } catch (error) {
             console.error('Delete error:', error)
-            showError('❌ Lỗi: ' + error.message)
+            showError('❌ Error: ' + error.message)
         }
     }
 
     const handleCopyId = (id) => {
         navigator.clipboard.writeText(id)
-        showSuccess('Đã sao chép ID!')
+        showSuccess('ID copied!')
     }
 
     const filteredSongs = songs.filter(s => {
@@ -183,7 +183,7 @@ export default function SongsManagement() {
                     <thead>
                         <tr>
                             <th>{t('admin.songs')}</th>
-                            <th>Giá</th>
+                            <th>{t('admin.price')}</th>
                             <th style={{ width: '80px' }}></th>
                         </tr>
                     </thead>
@@ -203,7 +203,7 @@ export default function SongsManagement() {
                                             <div
                                                 className="songs-info-cell clickable"
                                                 onClick={() => handleCopyId(s.id)}
-                                                title="Click để sao chép ID"
+                                                title="Click to copy ID"
                                             >
                                                 <div className="songs-name">
                                                     🎵 {s.name || 'Untitled'}
@@ -214,7 +214,7 @@ export default function SongsManagement() {
                                             </div>
                                         </td>
                                         <td className="songs-price-cell">
-                                            {(s.price || 0).toLocaleString()} xu
+                                            {(s.price || 0).toLocaleString()} {t('common.owned').split(' ')[0]}
                                         </td>
                                         <td className="songs-dropdown-cell">
                                             <button
@@ -230,13 +230,13 @@ export default function SongsManagement() {
                                                         onClick={() => handleEdit(s)}
                                                         className="songs-dropdown-item"
                                                     >
-                                                        ✏️ Chỉnh sửa
+                                                        ✏️ {t('admin.edit')}
                                                     </div>
                                                     <div
                                                         onClick={() => handleDelete(s)}
                                                         className="songs-dropdown-item danger"
                                                     >
-                                                        🗑️ Xóa
+                                                        🗑️ {t('admin.deleteAction')}
                                                     </div>
                                                 </div>
                                             )}

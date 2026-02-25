@@ -50,9 +50,14 @@ export default function Library() {
         return Object.keys(songs)
             .filter(key => {
                 const song = songs[key];
-                if (!song.isFromFirebase) return false;
-                const isBought = userData?.ownedSongs?.[key] === true;
-                return isBought && song.isFavorite;
+                // Include both Firebase purchased songs and all local songs that are marked favorite
+                if (song.isFromFirebase) {
+                    const isBought = userData?.ownedSongs?.[key] === true;
+                    return isBought && song.isFavorite;
+                } else {
+                    // Local songs just need isFavorite flag
+                    return song.isFavorite;
+                }
             })
             .reduce((obj, key) => ({ ...obj, [key]: { ...songs[key], isOwned: true } }), {});
     }, [songs, userData]);
@@ -67,6 +72,8 @@ export default function Library() {
                 (song.artist && song.artist.toLowerCase().includes(query));
         }).reduce((obj, key) => ({ ...obj, [key]: baseSongs[key] }), {});
     }, [baseSongs, searchQuery]);
+
+
 
     return (
         <div id="view-library" className="content-view active">
@@ -92,6 +99,8 @@ export default function Library() {
                     onBlur={(e) => e.target.style.border = '1px solid var(--border)'}
                 />
             </div>
+            
+
 
             <div className="library-tabs">
                 <button

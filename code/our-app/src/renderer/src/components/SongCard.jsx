@@ -47,17 +47,23 @@ export default function SongCard({ song, songKey, onPlay }) {
                                 onClick={handleFavorite}
                                 title={song.isFavorite ? t('songCard.removeFromFavorite') : t('songCard.addToFavorite')}
                                 style={{
-                                    background: 'none',
+                                    background: song.isFavorite ? '#1DB954' : 'rgba(255, 255, 255, 0.2)',
                                     border: 'none',
-                                    fontSize: '20px',
+                                    borderRadius: '50%',
+                                    width: '32px',
+                                    height: '32px',
+                                    fontSize: '16px',
                                     cursor: 'pointer',
-                                    padding: '5px',
-                                    opacity: song.isFavorite ? 1 : 0.4,
-                                    color: song.isFavorite ? '#e91e63' : 'var(--text-sub)',
-                                    transition: 'all 0.3s ease'
+                                    padding: '0',
+                                    color: song.isFavorite ? '#fff' : 'var(--text-sub)',
+                                    transition: 'all 0.3s ease',
+                                    fontWeight: 'bold',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
                                 }}
                             >
-                                ❤️
+                                {song.isFavorite ? '✓' : '+'}
                             </button>
                         )}
                         {!song.isOwned && (
@@ -65,14 +71,39 @@ export default function SongCard({ song, songKey, onPlay }) {
                         )}
                     </div>
                 ) : (
-                    <button
-                        className="btn-delete-song"
-                        onClick={handleDelete}
-                        title={t('common.delete')}
-                    >
-                        <span>🗑️</span>
-                        <span>{t('common.delete')}</span>
-                    </button>
+                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                        <button
+                            className="btn-favorite"
+                            onClick={handleFavorite}
+                            title={song.isFavorite ? t('songCard.removeFromFavorite') : t('songCard.addToFavorite')}
+                            style={{
+                                background: song.isFavorite ? '#1DB954' : 'rgba(255, 255, 255, 0.2)',
+                                border: 'none',
+                                borderRadius: '50%',
+                                width: '32px',
+                                height: '32px',
+                                fontSize: '16px',
+                                cursor: 'pointer',
+                                padding: '0',
+                                color: song.isFavorite ? '#fff' : 'var(--text-sub)',
+                                transition: 'all 0.3s ease',
+                                fontWeight: 'bold',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                            }}
+                        >
+                            {song.isFavorite ? '✓' : '+'}
+                        </button>
+                        <button
+                            className="btn-delete-song"
+                            onClick={handleDelete}
+                            title={t('common.delete')}
+                        >
+                            <span>🗑️</span>
+                            <span>{t('common.delete')}</span>
+                        </button>
+                    </div>
                 )}
             </div>
         </div>

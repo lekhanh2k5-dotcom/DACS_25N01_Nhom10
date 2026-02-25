@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react'
 import { db } from '../../firebase/firebase'
 import { collection, getDocs } from 'firebase/firestore'
 import { useAuth } from '../../contexts/AuthContext'
+import { useLanguage } from '../../contexts/LanguageContext'
 import './Dashboard.css'
 
 export default function Dashboard() {
     const { user } = useAuth()
+    const { t } = useLanguage()
     const [stats, setStats] = useState({
         totalUsers: 0,
         totalSongs: 0,
@@ -111,7 +113,7 @@ export default function Dashboard() {
         return (
             <div className="admin-page">
                 <div className="dashboard-loading">
-                    ⏳ Đang tải...
+                    ⏳ {t('admin.loadingData')}
                 </div>
             </div>
         )
@@ -120,12 +122,12 @@ export default function Dashboard() {
     return (
         <div className="admin-page">
             <div className="admin-page-header">
-                <h1>📊 Tổng quan hệ thống</h1>
+                <h1>📊 {t('admin.dashboard')}</h1>
             </div>
 
             <div className="admin-stats">
                 <div className="admin-stat-card">
-                    <div className="admin-stat-label">Người dùng</div>
+                    <div className="admin-stat-label">{t('admin.user')}s</div>
                     <div className="admin-stat-value">
                         <span>👥</span>
                         {stats.totalUsers}
@@ -133,7 +135,7 @@ export default function Dashboard() {
                 </div>
 
                 <div className="admin-stat-card">
-                    <div className="admin-stat-label">Bài hát</div>
+                    <div className="admin-stat-label">{t('admin.songs')}</div>
                     <div className="admin-stat-value">
                         <span>🎵</span>
                         {stats.totalSongs}
@@ -141,7 +143,7 @@ export default function Dashboard() {
                 </div>
 
                 <div className="admin-stat-card">
-                    <div className="admin-stat-label">Giao dịch/tháng</div>
+                    <div className="admin-stat-label">Transactions/Month</div>
                     <div className="admin-stat-value">
                         <span>💳</span>
                         {stats.monthlyTransactions}
@@ -149,7 +151,7 @@ export default function Dashboard() {
                 </div>
 
                 <div className="admin-stat-card">
-                    <div className="admin-stat-label">Doanh thu/tháng</div>
+                    <div className="admin-stat-label">Revenue/Month</div>
                     <div className="admin-stat-value">
                         <span>💰</span>
                         {stats.monthlyRevenue.toLocaleString()}
@@ -159,7 +161,7 @@ export default function Dashboard() {
 
             <div className="dashboard-chart-container">
                 <h2 className="dashboard-chart-title">
-                    📊 Doanh thu 7 ngày gần đây (xu)
+                    {t('admin.revenue7Days')}
                 </h2>
                 <div className="dashboard-chart-bars">
                     {chartData.map((data, index) => {
@@ -173,7 +175,7 @@ export default function Dashboard() {
                                 <div
                                     className={`dashboard-chart-bar ${data.revenue > 0 ? 'has-revenue' : 'empty'}`}
                                     style={{ height: `${heightPixels}px` }}
-                                    title={`${data.revenue.toLocaleString()} xu - ${data.count} giao dịch`}
+                                    title={`${data.revenue.toLocaleString()} coins - ${data.count} transactions`}
                                 >
                                     {data.revenue > 0 && (
                                         <div className="dashboard-chart-bar-label">
@@ -189,12 +191,12 @@ export default function Dashboard() {
                     })}
                 </div>
                 <div className="dashboard-chart-summary">
-                    Tổng 7 ngày: <strong className="revenue">
-                        {chartData.reduce((sum, d) => sum + d.revenue, 0).toLocaleString()} xu
+                    Last 7 days: <strong className="revenue">
+                        {chartData.reduce((sum, d) => sum + d.revenue, 0).toLocaleString()} coins
                     </strong>
                     {' • '}
                     <strong className="transactions">
-                        {chartData.reduce((sum, d) => sum + d.count, 0)} giao dịch
+                        {chartData.reduce((sum, d) => sum + d.count, 0)} transactions
                     </strong>
                 </div>
             </div>

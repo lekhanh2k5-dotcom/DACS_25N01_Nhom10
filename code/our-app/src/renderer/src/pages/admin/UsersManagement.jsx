@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react'
 import { db } from '../../firebase/firebase'
 import { collection, getDocs, updateDoc, doc } from 'firebase/firestore'
 import { useAuth } from '../../contexts/AuthContext'
+import { useLanguage } from '../../contexts/LanguageContext'
 import { showSuccess, showError, showConfirm } from '../../utils/alert'
 import { adminUpdateCoins } from '../../firebase/coinService'
 import './UsersManagement.css'
 
 export default function UsersManagement() {
     const { user } = useAuth()
+    const { t } = useLanguage()
     const [users, setUsers] = useState([])
     const [loading, setLoading] = useState(true)
     const [searchQuery, setSearchQuery] = useState('')
@@ -33,8 +35,8 @@ export default function UsersManagement() {
             }))
             setUsers(usersData)
         } catch (error) {
-            console.error('Lỗi khi tải người dùng:', error)
-            showError('Không thể tải danh sách người dùng')
+            console.error('Error loading users:', error)
+            showError('Cannot load user list')
         } finally {
             setLoading(false)
         }
@@ -49,19 +51,19 @@ export default function UsersManagement() {
     const handleAddCoins = async (action) => {
         const amount = parseInt(coinAmount) || 0
         if (amount === 0) {
-            showError('Vui lòng nhập số xu hợp lệ')
+            showError('Please enter a valid amount')
             return
         }
 
         if (amount < 0) {
-            showError('Số xu phải là số dương')
+            showError('Amount must be positive')
             return
         }
 
         const finalAmount = action === 'subtract' ? -amount : amount
-        const actionText = action === 'subtract' ? 'trừ' : 'cộng'
+        const actionText = action === 'subtract' ? 'subtract' : 'add'
         const confirmed = await showConfirm(
-            `Xác nhận ${actionText} ${amount.toLocaleString()} xu cho ${coinModal.email}?`
+            `Confirm ${actionText} ${amount.toLocaleString()} coins for ${coinModal.email}?`
         )
 
         if (!confirmed) return
@@ -72,21 +74,22 @@ export default function UsersManagement() {
                 uid: user.uid
             })
 
-            showSuccess(`Đã ${actionText} ${amount.toLocaleString()} xu!`)
+            showSuccess(`${actionText.charAt(0).toUpperCase() + actionText.slice(1)} ${amount.toLocaleString()} coins!`)
             setCoinModal(null)
             fetchUsers()
         } catch (error) {
-            console.error('Lỗi khi cập nhật xu:', error)
-            showError(error || 'Không thể cập nhật xu')
+            console.error('Error updating coins:', error)
+            showError(error || 'Cannot update coins')
         }
     }
 
     const handleToggleLock = async (userId, currentStatus) => {
         const targetUser = users.find(u => u.id === userId)
-        const action = currentStatus ? 'mở khóa' : 'khóa'
+        const action = currentStatus ? 'unlock' : 'lock'
+        const actionText = currentStatus ? 'unlock' : 'lock'
 
         const confirmed = await showConfirm(
-            `Bạn có chắc muốn ${action} tài khoản ${targetUser.email}?`
+            `Are you sure you want to ${action} account ${targetUser.email}?`
         )
 
         if (!confirmed) return
@@ -96,12 +99,12 @@ export default function UsersManagement() {
             await updateDoc(userRef, {
                 isLocked: !currentStatus
             })
-            showSuccess(`Đã ${action} tài khoản!`)
+            showSuccess(`Account ${action === 'lock' ? 'locked' : 'unlocked'}!`)
             setOpenDropdown(null)
             fetchUsers()
         } catch (error) {
-            console.error('Lỗi khi cập nhật trạng thái:', error)
-            showError(`Không thể ${action} tài khoản`)
+            console.error('Error updating status:', error)
+            showError(`Cannot ${action} account`)
         }
     }
 
@@ -119,10 +122,10 @@ export default function UsersManagement() {
         return (
             <div className="admin-page">
                 <div className="admin-page-header">
-                    <h1>👥 Quản lý người dùng</h1>
+                    <h1>👥 {t('admin.usersTitle')}</h1>
                 </div>
                 <div className="users-loading">
-                    Đang tải...
+                    {t('admin.loadingData')}
                 </div>
             </div>
         )
@@ -131,10 +134,10 @@ export default function UsersManagement() {
     return (
         <div className="admin-page">
             <div className="admin-page-header">
-                <h1>👥 Quản lý người dùng</h1>
+                <h1>👥 {t('admin.usersTitle')}</h1>
                 <input
                     type="text"
-                    placeholder="🔍 Tìm kiếm..."
+                    placeholder={t('admin.search')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="users-search-input"
@@ -145,9 +148,9 @@ export default function UsersManagement() {
                 <table className="admin-table">
                     <thead>
                         <tr>
-                            <th>Người dùng</th>
-                            <th>Số xu</th>
-                            <th>Trạng thái</th>
+                            <th>{t('admin.user')}</th>
+                            <th>{t('admin.coins')}</th>
+                            <th>{t('common.confirm')}</th>
                             <th style={{ width: '80px' }}></th>
                         </tr>
                     </thead>
@@ -155,7 +158,7 @@ export default function UsersManagement() {
                         {filteredUsers.length === 0 ? (
                             <tr>
                                 <td colSpan="4" className="users-table-empty">
-                                    {searchQuery ? 'Không tìm thấy người dùng' : 'Chưa có người dùng'}
+                                    {searchQuery ? t('admin.userNotFound') : t('admin.noUsers')}
                                 </td>
                             </tr>
                         ) : (
@@ -167,10 +170,10 @@ export default function UsersManagement() {
                                             <div
                                                 onClick={() => {
                                                     navigator.clipboard.writeText(u.id)
-                                                    showSuccess('Đã sao chép ID!')
+                                                    showSuccess('ID copied!')
                                                 }}
                                                 className="users-info-cell"
-                                                title="Click để sao chép ID"
+                                                title="Click to copy ID"
                                             >
                                                 <div className="users-email">
                                                     {u.email}
@@ -204,13 +207,13 @@ export default function UsersManagement() {
                                                         onClick={() => handleManageCoins(u)}
                                                         className="users-dropdown-item"
                                                     >
-                                                        💰 Quản lý xu
+                                                        💰 {t('admin.addCoins')}
                                                     </div>
                                                     <div
                                                         onClick={() => handleToggleLock(u.id, u.isLocked)}
                                                         className="users-dropdown-item"
                                                     >
-                                                        {u.isLocked ? '🔓 Mở khóa' : '🔒 Khóa tài khoản'}
+                                                        {u.isLocked ? '🔓 Unlock' : '🔒 Lock'}
                                                     </div>
                                                 </div>
                                             )}
@@ -224,38 +227,38 @@ export default function UsersManagement() {
             </div>
 
             <div className="users-stats-footer">
-                <span>Tổng: <strong className="total">{users.length}</strong> người dùng</span>
+                <span>Total: <strong className="total">{users.length}</strong> users</span>
                 <span>•</span>
-                <span>Hiển thị: <strong className="total">{filteredUsers.length}</strong></span>
+                <span>Showing: <strong className="total">{filteredUsers.length}</strong></span>
                 <span>•</span>
-                <span>Hoạt động: <strong className="active">{activeUsers}</strong></span>
+                <span>Active: <strong className="active">{activeUsers}</strong></span>
                 <span>•</span>
-                <span>Bị khóa: <strong className="locked">{lockedUsers}</strong></span>
+                <span>Locked: <strong className="locked">{lockedUsers}</strong></span>
             </div>
 
-            {/* Modal Quản lý xu */}
+            {/* Coin Management Modal */}
             {coinModal && (
                 <div className="coin-modal-overlay" onClick={() => setCoinModal(null)}>
                     <div className="coin-modal-content" onClick={(e) => e.stopPropagation()}>
-                        <h2 className="coin-modal-header">💰 Quản lý xu</h2>
+                        <h2 className="coin-modal-header">💰 {t('admin.addCoins')}</h2>
                         <div className="coin-modal-user-info">
                             <div className="coin-modal-email">
                                 {coinModal.email}
                             </div>
                             <div className="coin-modal-balance">
-                                Số dư: {(coinModal.coins || 0).toLocaleString()} xu
+                                Balance: {(coinModal.coins || 0).toLocaleString()} {t('admin.coins')}
                             </div>
                         </div>
 
                         <div className="coin-modal-input-group">
                             <label className="coin-modal-label">
-                                Nhập số xu:
+                                Enter amount:
                             </label>
                             <input
                                 type="number"
                                 value={coinAmount}
                                 onChange={(e) => setCoinAmount(e.target.value)}
-                                placeholder="Nhập số xu..."
+                                placeholder="Enter amount..."
                                 className="coin-modal-input"
                                 min="0"
                             />
@@ -266,19 +269,19 @@ export default function UsersManagement() {
                                 onClick={() => setCoinModal(null)}
                                 className="admin-btn admin-btn-secondary"
                             >
-                                Hủy
+                                {t('admin.cancel')}
                             </button>
                             <button
                                 onClick={() => handleAddCoins('add')}
                                 className="coin-modal-btn-add"
                             >
-                                ➕ Cộng
+                                ➕ Add
                             </button>
                             <button
                                 onClick={() => handleAddCoins('subtract')}
                                 className="coin-modal-btn-subtract"
                             >
-                                ➖ Trừ
+                                ➖ Subtract
                             </button>
                         </div>
                     </div>
