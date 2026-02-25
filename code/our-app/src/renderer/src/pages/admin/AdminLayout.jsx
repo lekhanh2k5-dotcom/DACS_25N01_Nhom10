@@ -7,6 +7,7 @@ import Dashboard from './Dashboard'
 import UsersManagement from './UsersManagement'
 import SongsManagement from './SongsManagement'
 import TransactionsManagement from './TransactionsManagement'
+import AdminSettings from './AdminSettings'
 
 export default function AdminLayout() {
     const [activeTab, setActiveTab] = useState('dashboard')
@@ -19,6 +20,7 @@ export default function AdminLayout() {
         { id: 'users', label: t('admin.usersManagement'), icon: '👥' },
         { id: 'songs', label: t('admin.songsManagement'), icon: '🎵' },
         { id: 'transactions', label: t('admin.transactionsManagement'), icon: '💰' },
+        { id: 'settings', label: t('settings.title'), icon: '⚙️' },
     ]
 
     return (
@@ -57,6 +59,7 @@ export default function AdminLayout() {
                 {activeTab === 'users' && <UsersManagement />}
                 {activeTab === 'songs' && <SongsManagement />}
                 {activeTab === 'transactions' && <TransactionsManagement />}
+                {activeTab === 'settings' && <AdminSettings />}
             </main>
         </div>
     )

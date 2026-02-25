@@ -183,7 +183,6 @@ export default function AccountPage() {
                     <div className="acc-card-head">
                         <div>
                             <div className="acc-card-title">Thông tin & bảo mật</div>
-                            <div className="acc-card-desc">Tên đăng nhập, email, mật khẩu</div>
                         </div>
                         <span className="acc-pill">👤 Profile</span>
                     </div>

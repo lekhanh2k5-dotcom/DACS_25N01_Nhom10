@@ -1,0 +1,76 @@
+/* Admin Settings */
+.admin-settings-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.admin-settings-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--divider);
+}
+
+.admin-settings-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.admin-settings-label {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.admin-settings-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.admin-settings-current {
+    font-size: 12px;
+    color: var(--text-sub);
+}
+
+.admin-settings-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.admin-settings-btn {
+    padding: 8px 16px;
+    border: 1px solid var(--border);
+    background: var(--bg-secondary);
+    color: var(--text-main);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.admin-settings-btn:hover {
+    background: var(--bg-hover);
+    border-color: var(--primary);
+}
+
+.admin-settings-btn.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+@media (max-width: 768px) {
+    .admin-settings-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
