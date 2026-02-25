@@ -86,47 +86,7 @@
 }
 
 .btn-mode:hover {
-    background: var(--bg-hover);
     color: var(--text-main);
-}
-
-/* Once mode - white/gray */
-.btn-mode[data-mode="once"] {
-    color: var(--text-sub);
-}
-
-.btn-mode[data-mode="once"]:hover {
-    color: var(--text-main);
-}
-
-/* Sequence mode - green (active repeat) */
-.btn-mode[data-mode="sequence"] {
-    color: var(--primary);
-}
-
-.btn-mode[data-mode="sequence"]:hover {
-    background: rgba(29, 185, 84, 0.15);
-    color: var(--primary-hover);
-}
-
-/* Shuffle mode - green */
-.btn-mode[data-mode="shuffle"] {
-    color: var(--primary);
-}
-
-.btn-mode[data-mode="shuffle"]:hover {
-    background: rgba(29, 185, 84, 0.15);
-    color: var(--primary-hover);
-}
-
-/* Repeat-one mode - green */
-.btn-mode[data-mode="repeat-one"] {
-    color: var(--primary);
-}
-
-.btn-mode[data-mode="repeat-one"]:hover {
-    background: rgba(29, 185, 84, 0.15);
-    color: var(--primary-hover);
 }
 
 /* Main Controls */
