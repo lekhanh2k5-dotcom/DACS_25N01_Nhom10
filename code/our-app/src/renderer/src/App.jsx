@@ -2,6 +2,7 @@ import { AppProvider, useApp } from './contexts/AppContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
+import { setAlertLocale } from './utils/alert';
 import Sidebar from './components/Sidebar';
 import PlayerBar from './components/PlayerBar';
 import Store from './pages/Store';
@@ -16,8 +17,17 @@ import './assets/theme.css';
 function AppContent() {
   const { activeTab, loading: appLoading, togglePlayback, playNext, playPrev } = useApp();
   const { loading: authLoading } = useAuth();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
+  // Sync alert locale with current language
+  useEffect(() => {
+    setAlertLocale({
+      success: t('common.success'),
+      error: t('common.error'),
+      cancel: t('common.cancel'),
+    });
+  }, [language, t]);
 
   // Keyboard shortcuts - nhận từ Main Process (hoạt động kể cả khi minimize)
   useEffect(() => {

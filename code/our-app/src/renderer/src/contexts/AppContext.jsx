@@ -4,6 +4,7 @@ import { loadSongsFromFirebase } from '../firebase/songService';
 import { showAlert, showConfirm, showImportSuccess, showImportFail } from '../utils/alert';
 import { purchaseSong } from '../firebase/coinService';
 import { useAuth } from './AuthContext';
+import { useLanguage } from './LanguageContext';
 
 const AppContext = createContext();
 
@@ -26,7 +27,9 @@ export const AppProvider = ({ children }) => {
     const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
+    const [playbackContext, setPlaybackContext] = useState('all'); // 'all' | 'favorites'
     const { currentUser, userData } = useAuth();
+    const { t, tf } = useLanguage();
 
     const playRef = useRef({
         realStartTime: 0,
@@ -36,13 +39,19 @@ export const AppProvider = ({ children }) => {
     const currentSongRef = useRef(currentSong);
     const songsRef = useRef(songs);
     const isPlayingRef = useRef(isPlaying);
+    const playbackContextRef = useRef(playbackContext);
 
     useEffect(() => { playbackModeRef.current = playbackMode; }, [playbackMode]);
     useEffect(() => { currentSongRef.current = currentSong; }, [currentSong]);
     useEffect(() => { songsRef.current = songs; }, [songs]);
     useEffect(() => { isPlayingRef.current = isPlaying; }, [isPlaying]);
+    useEffect(() => { playbackContextRef.current = playbackContext; }, [playbackContext]);
+    const userDataRef = useRef(userData);
+    useEffect(() => { userDataRef.current = userData; }, [userData]);
 
     const selectSongRef = useRef(null);
+    const shuffleHistoryRef = useRef([]);
+    const shuffleQueueRef = useRef([]);
     useEffect(() => {
         if (!isPlaying) return
         playRef.current.startedAt = performance.now()
@@ -68,7 +77,6 @@ export const AppProvider = ({ children }) => {
                 console.error('Không load được Firebase songs:', e);
             }
 
-            // Load favorites from localStorage
             try {
                 const savedFavorites = localStorage.getItem('favoriteSongs');
                 if (savedFavorites) {
@@ -135,49 +143,65 @@ export const AppProvider = ({ children }) => {
                 const allSongs = songsRef.current;
 
                 if (mode === 'once') {
-                    // Dừng, không làm gì thêm
                     return;
                 }
 
                 if (mode === 'repeat-one') {
-                    // Phát lại chính bài này
                     if (song && selectSongRef.current) {
-                        selectSongRef.current(song.key, { autoStart: true });
+                        selectSongRef.current(song.key, { autoStart: true, context: playbackContextRef.current });
                     }
                     return;
                 }
 
+                const ctx = playbackContextRef.current;
+                const owned = userDataRef.current?.ownedSongs || {};
+
+                const getPool = (excludeKey = null) => {
+                    return Object.keys(allSongs).filter(k => {
+                        if (k === excludeKey) return false;
+                        const s = allSongs[k];
+                        if (!s) return false;
+                        const permitted = s.isImported || !s.price || s.price === 0 || !!owned[k];
+                        if (!permitted) return false;
+                        if (ctx === 'favorites') return !!s.isFavorite;
+                        return true;
+                    });
+                };
+
                 if (mode === 'sequence') {
-                    // Phát bài kế tiếp theo thứ tự
                     if (!song) return;
-                    const songKeys = Object.keys(allSongs);
-                    const currentIndex = songKeys.findIndex(k => k === song.key);
-                    for (let i = 1; i <= songKeys.length; i++) {
-                        const nextIndex = (currentIndex + i) % songKeys.length;
-                        const nextKey = songKeys[nextIndex];
-                        const s = allSongs[nextKey];
-                        if (!s) continue;
-                        const permitted = s.isImported || !s.price || s.price === 0
-                            || !!(s.isFromFirebase);
-                        if (permitted && selectSongRef.current) {
-                            selectSongRef.current(nextKey, { autoStart: true });
-                            return;
-                        }
+                    const pool = getPool();
+                    if (pool.length === 0) return;
+                    const currentIndex = pool.findIndex(k => k === song.key);
+                    const nextIndex = (currentIndex + 1) % pool.length;
+                    const nextKey = pool[nextIndex];
+                    if (selectSongRef.current) {
+                        selectSongRef.current(nextKey, { autoStart: true, context: ctx });
                     }
                     return;
                 }
 
                 if (mode === 'shuffle') {
-                    // Phát ngẫu nhiên
-                    const songKeys = Object.keys(allSongs);
-                    const available = songKeys.filter(k => {
-                        if (k === song?.key) return false;
-                        const s = allSongs[k];
-                        return s.isImported || !s.price || s.price === 0 || s.isFromFirebase;
-                    });
-                    if (available.length > 0 && selectSongRef.current) {
-                        const randomKey = available[Math.floor(Math.random() * available.length)];
-                        selectSongRef.current(randomKey, { autoStart: true });
+                    const owned = userDataRef.current?.ownedSongs || {};
+                    if (shuffleQueueRef.current.length === 0) {
+                        const pool = Object.keys(allSongs).filter(k => {
+                            if (k === song?.key) return false;
+                            const s = allSongs[k];
+                            if (!s) return false;
+                            const permitted = s.isImported || !s.price || s.price === 0 || !!owned[k];
+                            if (!permitted) return false;
+                            if (ctx === 'favorites') return !!s.isFavorite;
+                            return true;
+                        });
+                        for (let i = pool.length - 1; i > 0; i--) {
+                            const j = Math.floor(Math.random() * (i + 1));
+                            [pool[i], pool[j]] = [pool[j], pool[i]];
+                        }
+                        shuffleQueueRef.current = pool;
+                    }
+                    const nextKey = shuffleQueueRef.current.shift();
+                    if (nextKey && selectSongRef.current) {
+                        selectSongRef.current(nextKey, { autoStart: true, context: ctx, keepHistory: true });
                     }
                     return;
                 }
@@ -194,18 +218,23 @@ export const AppProvider = ({ children }) => {
         return !!userData?.ownedSongs?.[songKey];
     };
 
-    const selectSong = async (songKey, { autoStart = false } = {}) => {
+    const selectSong = async (songKey, { autoStart = false, context = undefined, keepHistory = false } = {}) => {
         const song = songs[songKey];
         if (!song) return;
+        if (!keepHistory) { shuffleHistoryRef.current = []; shuffleQueueRef.current = []; }
+        // Set playback context: use passed context, or infer from current tab
+        const newCtx = context !== undefined
+            ? context
+            : (activeTab === 'library' && activeLibraryTab === 'favorites' ? 'favorites' : 'all');
+        setPlaybackContext(newCtx);
         const isImported = song.isImported;
         const isFromFirebase = song.isFromFirebase;
         const isBought = !!userData?.ownedSongs?.[songKey];
         if (isFromFirebase && !isBought && !isImported) {
-            await showAlert(`Bạn cần mua bài "${song.name}" để phát.`);
+            await showAlert(tf('validation.needToBuy', { name: song.name }));
             return;
         }
 
-        // Dừng bài hiện tại nếu đang phát
         window.api.autoPlay.stop();
         setIsPlaying(false);
         setCurrentTime(0);
@@ -220,7 +249,7 @@ export const AppProvider = ({ children }) => {
                 finalNotes = result.songNotes;
                 setCurrentSong(prev => ({ ...prev, songNotes: finalNotes }));
             } else {
-                await showAlert('Không tải được dữ liệu bài hát từ cloud: ' + result.message);
+                await showAlert(t('validation.noDataFromCloud') + result.message);
                 return;
             }
         }
@@ -231,7 +260,6 @@ export const AppProvider = ({ children }) => {
             setDuration(finalDuration);
         }
 
-        // Tự động phát nếu được yêu cầu (từ next/prev khi đang chơi)
         if (autoStart && finalNotes.length > 0) {
             const settings = JSON.parse(localStorage.getItem('appSettings') || '{}');
             const gameType = settings.game || 'Sky';
@@ -240,13 +268,11 @@ export const AppProvider = ({ children }) => {
         }
     };
 
-    // Giữ selectSongRef luôn trỏ tới phiên bản mới nhất
     useEffect(() => { selectSongRef.current = selectSong; });
 
     const togglePlayback = () => {
         if (!currentSong) return;
         if (!isPlaying) {
-            // Lấy game type từ settings
             const settings = JSON.parse(localStorage.getItem('appSettings') || '{}');
             const gameType = settings.game || 'Sky';
 
@@ -263,35 +289,65 @@ export const AppProvider = ({ children }) => {
         setCurrentTime(timeMs);
     };
 
+    const buildPool = (ctx, excludeKey = null) => {
+        const owned = userData?.ownedSongs || {};
+        return Object.keys(songs).filter(k => {
+            if (k === excludeKey) return false;
+            const s = songs[k];
+            if (!s) return false;
+            const permitted = s.isImported || !s.price || s.price === 0 || !!owned[k];
+            if (!permitted) return false;
+            if (ctx === 'favorites') return !!s.isFavorite;
+            return true;
+        });
+    };
+
     const playNext = () => {
-        const songKeys = Object.keys(songs);
-        if (songKeys.length === 0 || !currentSong) return;
+        if (!currentSong) return;
+        const ctx = playbackContext;
 
-        const currentIndex = songKeys.findIndex(key => key === currentSong.key);
-        for (let i = 1; i <= songKeys.length; i++) {
-            const nextIndex = (currentIndex + i) % songKeys.length;
-            const nextKey = songKeys[nextIndex];
-
-            if (hasPermission(nextKey)) {
-                selectSong(nextKey, { autoStart: isPlaying });
-                return;
+        if (playbackMode === 'shuffle') {
+            shuffleHistoryRef.current.push(currentSong.key);
+            if (shuffleQueueRef.current.length === 0) {
+                const pool = buildPool(ctx, currentSong.key);
+                for (let i = pool.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [pool[i], pool[j]] = [pool[j], pool[i]];
+                }
+                shuffleQueueRef.current = pool;
             }
+            const nextKey = shuffleQueueRef.current.shift();
+            if (nextKey) selectSong(nextKey, { autoStart: isPlaying, context: ctx, keepHistory: true });
+        } else {
+            const pool = buildPool(ctx);
+            if (pool.length === 0) return;
+            const currentIndex = pool.findIndex(key => key === currentSong.key);
+            const nextIndex = (currentIndex + 1) % pool.length;
+            selectSong(pool[nextIndex], { autoStart: isPlaying, context: ctx });
         }
     };
 
     const playPrev = () => {
-        const songKeys = Object.keys(songs);
-        if (songKeys.length === 0 || !currentSong) return;
+        if (!currentSong) return;
+        const ctx = playbackContext;
 
-        const currentIndex = songKeys.findIndex(key => key === currentSong.key);
-        for (let i = 1; i <= songKeys.length; i++) {
-            const prevIndex = (currentIndex - i + songKeys.length) % songKeys.length;
-            const prevKey = songKeys[prevIndex];
-
-            if (hasPermission(prevKey)) {
-                selectSong(prevKey, { autoStart: isPlaying });
-                return;
+        if (playbackMode === 'shuffle') {
+            const history = shuffleHistoryRef.current;
+            if (history.length > 0) {
+                const prevKey = history.pop();
+                selectSong(prevKey, { autoStart: isPlaying, context: ctx, keepHistory: true });
+            } else {
+                const pool = buildPool(ctx, currentSong.key);
+                if (pool.length === 0) return;
+                const randomKey = pool[Math.floor(Math.random() * pool.length)];
+                selectSong(randomKey, { autoStart: isPlaying, context: ctx, keepHistory: true });
             }
+        } else {
+            const pool = buildPool(ctx);
+            if (pool.length === 0) return;
+            const currentIndex = pool.findIndex(key => key === currentSong.key);
+            const prevIndex = (currentIndex - 1 + pool.length) % pool.length;
+            selectSong(pool[prevIndex], { autoStart: isPlaying, context: ctx });
         }
     };
 
@@ -311,32 +367,31 @@ export const AppProvider = ({ children }) => {
             uid: currentUser?.uid
         });
         if (!currentUser) {
-            await showAlert('Vui lòng đăng nhập để mua bài hát!');
+            await showAlert(t('validation.loginToBuy'));
             return false;
         }
 
         const song = songs[songKey];
         if (!song) return false;
 
-        const ok = await showConfirm(`Bạn có muốn dùng ${price} xu để mua bài "${song.name}" không?`);
+        const ok = await showConfirm(tf('validation.buyConfirm', { price, name: song.name }));
         if (!ok) return false;
 
         try {
             const result = await purchaseSong(currentUser.uid, { ...song, id: songKey, price });
 
             if (result.success) {
-                await showAlert('Mua hàng thành công! Bài hát đã có trong thư viện của bạn.');
-                // Redirect to Library and show All Songs tab
+                await showAlert(t('validation.buySuccess'));
                 setActiveTab('library');
                 setActiveLibraryTab('all');
                 return true;
             } else {
-                await showAlert(result.message || 'Giao dịch thất bại.');
+                await showAlert(result.message || t('validation.transactionFailed'));
                 return false;
             }
         } catch (error) {
             console.error('Lỗi buySong:', error);
-            await showAlert('Đã xảy ra lỗi trong quá trình giao dịch.');
+            await showAlert(t('validation.transactionError'));
             return false;
         }
     };
@@ -345,7 +400,7 @@ export const AppProvider = ({ children }) => {
         const result = await window.api.sheet.open()
         if (!result || result.ok === false) {
             if (result?.canceled) return
-            await showImportFail(result?.message || 'Không đọc được file sheet')
+            await showImportFail(result?.message || t('validation.importFailed'))
             return
         }
 
@@ -397,7 +452,7 @@ export const AppProvider = ({ children }) => {
         const maxTime = Math.max(...song.songNotes.map(n => Number(n.time) || 0))
         setDuration(maxTime + 1000)
 
-        await showImportSuccess('Import thành công!')
+        await showImportSuccess(t('validation.importSuccess'))
     }
 
 
@@ -408,11 +463,11 @@ export const AppProvider = ({ children }) => {
         if (!song) return;
 
         if (!song.isImported) {
-            await showAlert('Chỉ có thể xóa bài đã import từ máy.');
+            await showAlert(t('validation.localSongsOnly'));
             return;
         }
 
-        const ok = await showConfirm(`Xóa bài "${song.name}" khỏi thư viện?`);
+        const ok = await showConfirm(tf('validation.deleteConfirm', { name: song.name }));
         if (!ok) return;
 
         if (currentSong?.key === songKey) {
@@ -441,6 +496,7 @@ export const AppProvider = ({ children }) => {
         playbackSpeed,
         currentTime,
         duration,
+        playbackContext,
         setActiveTab,
         setActiveLibraryTab,
         setPlaybackMode,

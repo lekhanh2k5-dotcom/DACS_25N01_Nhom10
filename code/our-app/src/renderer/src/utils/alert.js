@@ -4,6 +4,19 @@ const smallPopupStyle = {
   popup: "swal-dark-popup swal-small-popup swal-tiny-popup",
 };
 
+let _locale = { success: 'Thành công', error: 'Lỗi', cancel: 'Hủy' };
+export function setAlertLocale(locale) {
+  _locale = { ..._locale, ...locale };
+}
+
+function getThemeColors() {
+  const isLight = document.documentElement.classList.contains('light');
+  return {
+    background: isLight ? '#ffffff' : '#282828',
+    color: isLight ? '#1a1a1a' : '#ffffff',
+  };
+}
+
 const importSuccessIcon =
   '<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="16" cy="16" r="16" fill="#1db954"/><path d="M10 17.5L14 21L22 13" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const importFailIcon =
@@ -58,11 +71,10 @@ export async function showAlert(titleOrMessage, maybeMessage, details) {
   await Swal.fire({
   title: "",
   html,
-  icon: "info",                 // ✅ luôn info
+  icon: "info",                 
   confirmButtonText: "OK",
   confirmButtonColor: "#1db954",
-  background: "#282828",
-  color: "#fff",
+  ...getThemeColors(),
   customClass: smallPopupStyle,
   width: 260,
   padding: "0.8em",
@@ -85,7 +97,7 @@ export async function showError(message, details) {
     html: `
       <div style="display:flex;flex-direction:column;align-items:center;">
         <div style="margin-bottom:6px;">${errorIcon}</div>
-        <div style="font-weight:600;">Lỗi</div>
+        <div style="font-weight:600;">${_locale.error}</div>
         <div style="margin-top:2px;">${message}</div>
         ${
           details
@@ -97,8 +109,7 @@ export async function showError(message, details) {
     showConfirmButton: true,
     confirmButtonText: "OK",
     confirmButtonColor: "#1db954",
-    background: "#282828",
-    color: "#fff",
+    ...getThemeColors(),
     customClass: smallPopupStyle,
     width: 260,
     padding: "0.8em",
@@ -111,7 +122,7 @@ export async function showSuccess(message, details) {
     html: `
       <div style="display:flex;flex-direction:column;align-items:center;">
         <div style="margin-bottom:6px;">${importSuccessIcon}</div>
-        <div style="font-weight:600;">Thành công</div>
+        <div style="font-weight:600;">${_locale.success}</div>
         <div style="margin-top:2px;">${message}</div>
         ${
           details
@@ -121,8 +132,7 @@ export async function showSuccess(message, details) {
       </div>
     `,
     showConfirmButton: false,
-    background: "#282828",
-    color: "#fff",
+    ...getThemeColors(),
     customClass: smallPopupStyle,
     width: 260,
     padding: "0.8em",
@@ -137,11 +147,10 @@ export async function showConfirm(message) {
     icon: "question",
     showCancelButton: true,
     confirmButtonText: "OK",
-    cancelButtonText: "Hủy",
+    cancelButtonText: _locale.cancel,
     confirmButtonColor: "#1db954",
     cancelButtonColor: "#d33",
-    background: "#282828",
-    color: "#fff",
+    ...getThemeColors(),
     customClass: smallPopupStyle,
     width: 240,
     padding: "0.8em",
@@ -155,8 +164,7 @@ export async function showImportSuccess(message) {
     title: "",
     html: `<div style='display:flex;flex-direction:column;align-items:center;'><div style='margin-bottom:0.5em;'>${importSuccessIcon}</div><div>${message}</div></div>`,
     showConfirmButton: false,
-    background: "#282828",
-    color: "#fff",
+    ...getThemeColors(),
     customClass: smallPopupStyle,
     width: 240,
     padding: "0.8em",
@@ -169,8 +177,7 @@ export async function showImportFail(message) {
     title: "",
     html: `<div style='display:flex;flex-direction:column;align-items:center;'><div style='margin-bottom:0.5em;'>${importFailIcon}</div><div>${message}</div></div>`,
     showConfirmButton: false,
-    background: "#282828",
-    color: "#fff",
+    ...getThemeColors(),
     customClass: smallPopupStyle,
     width: 240,
     padding: "0.8em",

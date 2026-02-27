@@ -10,19 +10,13 @@ const translations = {
 };
 
 export function LanguageProvider({ children }) {
-    const [language, setLanguage] = useState('vi');
-
-    // Load language from localStorage on mount
-    useEffect(() => {
+    const [language, setLanguage] = useState(() => {
         try {
-            const savedLanguage = localStorage.getItem('appLanguage');
-            if (savedLanguage && ['vi', 'en'].includes(savedLanguage)) {
-                setLanguage(savedLanguage);
-            }
-        } catch (e) {
-            console.error('Error loading language preference:', e);
-        }
-    }, []);
+            const saved = localStorage.getItem('appLanguage');
+            if (saved && ['vi', 'en'].includes(saved)) return saved;
+        } catch (e) { /* ignore */ }
+        return 'vi';
+    });
 
     // Save language to localStorage when changed
     useEffect(() => {
@@ -42,7 +36,7 @@ export function LanguageProvider({ children }) {
     const t = (key) => {
         const keys = key.split('.');
         let value = translations[language];
-        
+
         for (const k of keys) {
             if (value && typeof value === 'object') {
                 value = value[k];
@@ -51,12 +45,21 @@ export function LanguageProvider({ children }) {
                 return key;
             }
         }
-        
+
         return value || key;
     };
 
+    // Template function: replaces {name}, {price} etc. with provided params
+    const tf = (key, params = {}) => {
+        let str = t(key);
+        Object.entries(params).forEach(([k, v]) => {
+            str = str.replace(new RegExp(`\\{${k}\\}`, 'g'), String(v));
+        });
+        return str;
+    };
+
     return (
-        <LanguageContext.Provider value={{ language, toggleLanguage, t }}>
+        <LanguageContext.Provider value={{ language, toggleLanguage, t, tf }}>
             {children}
         </LanguageContext.Provider>
     );

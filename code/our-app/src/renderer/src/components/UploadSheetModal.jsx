@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { showSuccess, showError } from '../utils/alert';
 import { uploadSheetToFirebase } from '../firebase/uploadService';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import './UploadSheetModal.css';
 
 export default function UploadSheetModal({ onClose, onSuccess }) {
     const { user } = useAuth();
+    const { t } = useLanguage();
     const [metadata, setMetadata] = useState(null);
     const [fileContent, setFileContent] = useState('');
     const [uploading, setUploading] = useState(false);
@@ -22,29 +24,29 @@ export default function UploadSheetModal({ onClose, onSuccess }) {
                 setFileContent(result.fileContent);
 
                 if (!result.isValid) {
-                    showError('⚠️ File không có songNotes hợp lệ!');
+                    showError(t('validation.fileNoNotes'));
                 }
             } else {
-                showError('Không thể đọc file: ' + (result.error || 'Unknown error'));
+                showError(t('validation.fileReadError') + (result.error || 'Unknown error'));
             }
         } catch (error) {
-            showError('Lỗi khi chọn file: ' + error.message);
+            showError(t('validation.fileSelectError') + error.message);
         }
     };
 
     const handleUpload = async () => {
         if (!metadata || !fileContent) {
-            showError('Vui lòng chọn file trước!');
+            showError(t('validation.chooseFileFirst'));
             return;
         }
 
         if (metadata.songNotes.length === 0) {
-            showError('File không có notes để upload!');
+            showError(t('validation.fileEmptyNotes'));
             return;
         }
 
         if (!metadata.name.trim()) {
-            showError('Tên bài hát không được rỗng!');
+            showError(t('validation.nameRequired'));
             return;
         }
 
@@ -60,24 +62,24 @@ export default function UploadSheetModal({ onClose, onSuccess }) {
             );
 
             if (result.success) {
-                showSuccess(`✅ Upload thành công! ID: ${result.songId}`);
+                showSuccess(t('validation.uploadSuccess') + result.songId);
                 onSuccess();
                 onClose();
             }
         } catch (error) {
             console.error('Upload failed:', error);
-            showError('❌ Upload thất bại: ' + error.message);
+            showError(t('validation.uploadFailed') + error.message);
         } finally {
             setUploading(false);
         }
     };
 
     const regions = [
-        { value: 'vietnam', label: '🇻🇳 Việt Nam', code: 'vn' },
-        { value: 'chinese', label: '🇨🇳 Trung Quốc', code: 'cn' },
-        { value: 'korean', label: '🇰🇷 Hàn Quốc', code: 'kr' },
-        { value: 'japanese', label: '🇯🇵 Nhật Bản', code: 'jp' },
-        { value: 'world', label: '🌍 Âu Mỹ', code: 'wd' }
+        { value: 'vietnam', label: t('store.vietnam'), code: 'vn' },
+        { value: 'chinese', label: t('store.china'), code: 'cn' },
+        { value: 'korean', label: t('store.korea'), code: 'kr' },
+        { value: 'japanese', label: t('store.japan'), code: 'jp' },
+        { value: 'world', label: t('store.world'), code: 'wd' }
     ];
 
     return (
@@ -92,15 +94,15 @@ export default function UploadSheetModal({ onClose, onSuccess }) {
                     {!metadata ? (
                         <div className="upload-select-file">
                             <div className="upload-icon">📁</div>
-                            <p>Chọn file .txt hoặc .json để upload</p>
+                            <p>{t('modal.selectFile')}</p>
                             <button className="upload-btn-primary" onClick={handleSelectFile}>
-                                Chọn file
+                                {t('modal.chooseFile')}
                             </button>
                         </div>
                     ) : (
                         <div className="upload-form">
                             <div className="form-group">
-                                <label>Tên bài hát *</label>
+                                <label>{t('modal.songName')} *</label>
                                 <input
                                     type="text"
                                     value={metadata.name}
@@ -112,7 +114,7 @@ export default function UploadSheetModal({ onClose, onSuccess }) {
 
                             <div className="form-row">
                                 <div className="form-group">
-                                    <label>Tác giả</label>
+                                    <label>{t('modal.author')}</label>
                                     <input
                                         type="text"
                                         value={metadata.author}
@@ -136,7 +138,7 @@ export default function UploadSheetModal({ onClose, onSuccess }) {
 
                             <div className="form-row">
                                 <div className="form-group">
-                                    <label>Region *</label>
+                                    <label>{t('modal.region')} *</label>
                                     <select
                                         value={metadata.region}
                                         onChange={(e) => setMetadata({ ...metadata, region: e.target.value })}
@@ -151,7 +153,7 @@ export default function UploadSheetModal({ onClose, onSuccess }) {
                                 </div>
 
                                 <div className="form-group">
-                                    <label>Giá (xu) *</label>
+                                    <label>{t('modal.price')} *</label>
                                     <input
                                         type="number"
                                         value={metadata.price}
@@ -164,7 +166,7 @@ export default function UploadSheetModal({ onClose, onSuccess }) {
                             </div>
 
                             <div className="form-group">
-                                <label>Tên file gốc</label>
+                                <label>{t('modal.fileName')}</label>
                                 <input
                                     type="text"
                                     value={metadata.fileName || ''}
@@ -195,14 +197,14 @@ export default function UploadSheetModal({ onClose, onSuccess }) {
                                     onClick={() => setMetadata(null)}
                                     disabled={uploading}
                                 >
-                                    ← Chọn file khác
+                                    {t('modal.chooseOtherFile')}
                                 </button>
                                 <button
                                     className="upload-btn-primary"
                                     onClick={handleUpload}
                                     disabled={uploading}
                                 >
-                                    {uploading ? '⏳ Đang upload...' : '🚀 Upload'}
+                                    {uploading ? t('modal.uploading') : t('modal.upload')}
                                 </button>
                             </div>
                         </div>

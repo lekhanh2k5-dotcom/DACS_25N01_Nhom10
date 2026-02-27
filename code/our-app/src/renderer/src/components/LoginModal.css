@@ -312,12 +312,17 @@
     text-decoration: none;
     padding: 0;
     font-family: inherit;
-    transition: all 0.2s ease;
+    transition: color 0.2s ease;
+    display: inline;
+    width: auto;
+    -webkit-appearance: none;
+    appearance: none;
+    outline: none;
 }
 
 .modal-btn-toggle:hover:not(:disabled) {
-    color: var(--secondary);
-    text-decoration: underline;
+    color: #4ade80;
+    background: none;
 }
 
 .modal-btn-toggle:disabled {
@@ -335,14 +340,19 @@
     font-weight: 600;
     padding: 0;
     font-family: inherit;
-    text-align: right;
+    align-self: flex-end;
     margin-top: -8px;
-    transition: all 0.2s ease;
+    transition: color 0.2s ease;
+    display: inline;
+    width: auto;
+    -webkit-appearance: none;
+    appearance: none;
+    outline: none;
 }
 
 .modal-forgot-password:hover:not(:disabled) {
-    color: var(--secondary);
-    text-decoration: underline;
+    color: #4ade80;
+    background: none;
 }
 
 .modal-forgot-password:disabled {
@@ -399,11 +409,6 @@
         opacity: 1;
         transform: translateY(0);
     }
-}
-
-.modal-btn-toggle:hover:not(:disabled) {
-    color: var(--secondary);
-    text-decoration: underline;
 }
 
 .modal-btn-toggle:disabled {

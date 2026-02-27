@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { showSuccess } from '../utils/alert';
+import { showAlert, showSuccess } from '../utils/alert';
+import { useLanguage } from '../contexts/LanguageContext';
 import './LoginModal.css';
 
 export default function LoginModal({ isOpen, onClose }) {
@@ -16,6 +17,7 @@ export default function LoginModal({ isOpen, onClose }) {
     const [resetSuccess, setResetSuccess] = useState(false);
 
     const { login, register, resetPassword } = useAuth();
+    const { t } = useLanguage();
     const RESET_COOLDOWN_SECONDS = 60;
     const RESET_COOLDOWN_KEY = "reset_pw_cooldown_until";
 
@@ -57,22 +59,22 @@ export default function LoginModal({ isOpen, onClose }) {
             if (showRegister) {
                 // Validate registration form
                 if (!username.trim()) {
-                    setError('Vui lòng nhập tên tài khoản');
+                    setError(t('auth.errUsernameRequired'));
                     setLoading(false);
                     return;
                 }
                 if (password.length < 6) {
-                    setError('Mật khẩu phải có ít nhất 6 ký tự');
+                    setError(t('auth.errPasswordTooShort'));
                     setLoading(false);
                     return;
                 }
                 if (password !== confirmPassword) {
-                    setError('Mật khẩu không khớp');
+                    setError(t('auth.errPasswordMismatch'));
                     setLoading(false);
                     return;
                 }
                 await register(email, password, username);
-                showSuccess('Đăng ký thành công! Bạn đã nhận 1000 xu');
+                showSuccess(t('validation.registerSuccess'));
                 setEmail('');
                 setPassword('');
                 setConfirmPassword('');
@@ -81,7 +83,7 @@ export default function LoginModal({ isOpen, onClose }) {
             } else {
                 // Login validation
                 if (!email.trim() || !password.trim()) {
-                    setError('Vui lòng nhập tài khoản và mật khẩu');
+                    setError(t('auth.errFieldsRequired'));
                     setLoading(false);
                     return;
                 }
@@ -92,21 +94,21 @@ export default function LoginModal({ isOpen, onClose }) {
             }
         } catch (err) {
             if (err.code === 'auth/user-not-found') {
-                setError('Email không tồn tại');
+                setError(t('auth.errEmailNotFound'));
             } else if (err.code === 'auth/wrong-password') {
-                setError('Mật khẩu không đúng');
+                setError(t('auth.errWrongPassword'));
             } else if (err.code === 'auth/email-already-in-use') {
-                setError('Email đã được sử dụng');
+                setError(t('auth.errEmailExists'));
             } else if (err.code === 'auth/invalid-email') {
-                setError('Email không hợp lệ');
+                setError(t('auth.errInvalidEmail'));
             } else if (err.code === 'auth/invalid-username') {
-                setError('Tên tài khoản chỉ được chứa chữ cái, số, dấu _ và -');
+                setError(t('auth.errInvalidUsername'));
             } else if (err.code === 'auth/username-too-short') {
-                setError('Tên tài khoản phải có ít nhất 3 ký tự');
+                setError(t('auth.errUsernameTooShort'));
             } else if (err.code === 'auth/username-already-exists') {
-                setError('Tên tài khoản đã được sử dụng');
+                setError(t('auth.errUsernameExists'));
             } else {
-                setError(err.message || 'Đã xảy ra lỗi');
+                setError(err.message || t('auth.errGeneric'));
             }
         } finally {
             setLoading(false);
@@ -169,7 +171,7 @@ export default function LoginModal({ isOpen, onClose }) {
                 <div className="modal-header">
                     <h2>🎵 SkyBard</h2>
                     <p className="modal-subtitle">
-                        {showForgotPassword ? 'Khôi phục mật khẩu' : (showRegister ? 'Tạo tài khoản mới' : 'Đăng nhập để tiếp tục')}
+                        {showForgotPassword ? t('auth.subtitleForgot') : (showRegister ? t('auth.subtitleRegister') : t('auth.subtitleLogin'))}
                     </p>
                 </div>
 
@@ -182,7 +184,7 @@ export default function LoginModal({ isOpen, onClose }) {
 
                     {resetSuccess && (
                         <div className="modal-success">
-                            ✓ Email khôi phục đã được gửi! Vui lòng kiểm tra hộp thư.
+                            {t('auth.resetEmailSent')}
                         </div>
                     )}
 
@@ -195,11 +197,11 @@ export default function LoginModal({ isOpen, onClose }) {
                                     id="resetEmail"
                                     value={resetEmail}
                                     onChange={(e) => setResetEmail(e.target.value)}
-                                    placeholder="Nhập email của bạn"
+                                    placeholder={t('auth.emailPlaceholder')}
                                     required
                                     disabled={loading}
                                 />
-                                <small className="modal-form-hint">Chúng tôi sẽ gửi link khôi phục đến email này</small>
+                                <small className="modal-form-hint">{t('auth.hints.email')}</small>
                             </div>
 
                             <button
@@ -208,10 +210,10 @@ export default function LoginModal({ isOpen, onClose }) {
                                 disabled={loading || resetCooldown > 0}
                             >
                                 {loading
-                                    ? 'Đang gửi...'
+                                    ? t('auth.sendingEmail')
                                     : resetCooldown > 0
-                                        ? `Thử lại sau ${resetCooldown}s`
-                                        : 'Gửi email khôi phục'}
+                                        ? `${t('auth.retryIn')} ${resetCooldown}s`
+                                        : t('auth.sendReset')}
                             </button>
 
 
@@ -226,30 +228,30 @@ export default function LoginModal({ isOpen, onClose }) {
                                 }}
                                 disabled={loading}
                             >
-                                ← Quay lại đăng nhập
+                                ← {t('auth.backToLogin')}
                             </button>
                         </>
                     ) : showRegister ? (
                         <>
                             <div className="modal-form-group">
-                                <label htmlFor="username">Tên tài khoản</label>
+                                <label htmlFor="username">{t('auth.username')}</label>
                                 <input
                                     type="text"
                                     id="username"
                                     value={username}
                                     onChange={(e) => setUsername(e.target.value)}
-                                    placeholder="Nhập tên tài khoản"
+                                    placeholder={t('auth.usernamePlaceholder')}
                                     required
                                     disabled={loading}
                                     pattern="[a-zA-Z0-9_-]+"
-                                    title="Chỉ được chứa chữ cái, số, dấu _ và -"
+                                    title={t('auth.usernameTitle')}
                                     minLength={3}
                                 />
-                                <small className="modal-form-hint">Chỉ chữ cái, số, dấu _ và - (tối thiểu 3 ký tự)</small>
+                                <small className="modal-form-hint">{t('auth.hints.username')}</small>
                             </div>
 
                             <div className="modal-form-group">
-                                <label htmlFor="email">Email</label>
+                                <label htmlFor="email">{t('auth.email')}</label>
                                 <input
                                     type="email"
                                     id="email"
@@ -262,7 +264,7 @@ export default function LoginModal({ isOpen, onClose }) {
                             </div>
 
                             <div className="modal-form-group">
-                                <label htmlFor="password">Mật khẩu</label>
+                                <label htmlFor="password">{t('auth.password')}</label>
                                 <input
                                     type="password"
                                     id="password"
@@ -273,11 +275,11 @@ export default function LoginModal({ isOpen, onClose }) {
                                     disabled={loading}
                                     minLength={6}
                                 />
-                                <small className="modal-form-hint">Tối thiểu 6 ký tự</small>
+                                <small className="modal-form-hint">{t('auth.hints.password')}</small>
                             </div>
 
                             <div className="modal-form-group">
-                                <label htmlFor="confirmPassword">Nhập lại mật khẩu</label>
+                                <label htmlFor="confirmPassword">{t('auth.confirmPassword')}</label>
                                 <input
                                     type="password"
                                     id="confirmPassword"
@@ -295,26 +297,26 @@ export default function LoginModal({ isOpen, onClose }) {
                                 className="modal-btn-auth"
                                 disabled={loading}
                             >
-                                {loading ? 'Đang xử lý...' : 'Đăng ký'}
+                                {loading ? t('auth.loading') : t('auth.register')}
                             </button>
                         </>
                     ) : (
                         <>
                             <div className="modal-form-group">
-                                <label htmlFor="email">Tài khoản (Email hoặc tên tk)</label>
+                                <label htmlFor="email">{t('auth.accountLabel')}</label>
                                 <input
                                     type="text"
                                     id="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    placeholder="Nhập email hoặc tên tài khoản"
+                                    placeholder={t('auth.accountPlaceholder')}
                                     required
                                     disabled={loading}
                                 />
                             </div>
 
                             <div className="modal-form-group">
-                                <label htmlFor="password">Mật khẩu</label>
+                                <label htmlFor="password">{t('auth.password')}</label>
                                 <input
                                     type="password"
                                     id="password"
@@ -336,7 +338,7 @@ export default function LoginModal({ isOpen, onClose }) {
                                 }}
                                 disabled={loading}
                             >
-                                Quên mật khẩu?
+                                {t('auth.forgotPassword')}
                             </button>
 
                             <button
@@ -344,26 +346,15 @@ export default function LoginModal({ isOpen, onClose }) {
                                 className="modal-btn-auth"
                                 disabled={loading}
                             >
-                                {loading ? 'Đang xử lý...' : 'Đăng nhập'}
+                                {loading ? t('auth.loading') : t('auth.login')}
                             </button>
 
-                            <div className="modal-divider">Hoặc</div>
+                            <div className="modal-divider">{t('auth.or')}</div>
                             <button
                                 type="button"
                                 className="modal-btn-google"
-                                disabled={loading}
-                                onClick={async () => {
-                                    try {
-                                        setLoading(true);
-                                        setError("");
-                                        await loginWithGoogle();
-                                        onClose();
-                                    } catch (err) {
-                                        setError(err.message || "Đăng nhập Google thất bại");
-                                    } finally {
-                                        setLoading(false);
-                                    }
-                                }}
+                                style={{ opacity: 0.6, width: '100%' }}
+                                onClick={() => showAlert(t('auth.googleComingSoon'))}
                             >
                                 <svg className="google-icon" viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg">
                                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -371,7 +362,7 @@ export default function LoginModal({ isOpen, onClose }) {
                                     <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
                                     <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
                                 </svg>
-                                Đăng nhập bằng Google
+                                {t('auth.loginWithGoogle')}
                             </button>
                         </>
                     )}
@@ -386,8 +377,8 @@ export default function LoginModal({ isOpen, onClose }) {
                             disabled={loading}
                         >
                             {showRegister
-                                ? 'Đã có tài khoản? Đăng nhập ngay'
-                                : 'Chưa có tài khoản? Đăng ký ngay'}
+                                ? t('auth.hasAccount')
+                                : t('auth.noAccount')}
                         </button>
                     </div>
                 )}

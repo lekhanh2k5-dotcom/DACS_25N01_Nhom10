@@ -1,5 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 
+/* Đảm bảo SweetAlert2 luôn hiện trên tất cả modal */
+.swal2-container {
+    z-index: 100000 !important;
+}
+
 * {
     box-sizing: border-box;
     user-select: none;
