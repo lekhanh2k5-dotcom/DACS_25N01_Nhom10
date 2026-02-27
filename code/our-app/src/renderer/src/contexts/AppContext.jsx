@@ -8,6 +8,37 @@ import { useLanguage } from './LanguageContext';
 
 const AppContext = createContext();
 
+// Helper to safely call window.api
+const safeAutoPlay = {
+    start: (songNotes, offsetMs = 0, playbackSpeed = 1.0, gameType = 'Sky') => {
+        try {
+            if (window.api?.autoPlay?.start) {
+                window.api.autoPlay.start(songNotes, offsetMs, playbackSpeed, gameType);
+            }
+        } catch (e) {
+            console.error('❌ Error calling autoPlay.start:', e);
+        }
+    },
+    stop: () => {
+        try {
+            if (window.api?.autoPlay?.stop) {
+                window.api.autoPlay.stop();
+            }
+        } catch (e) {
+            console.error('❌ Error calling autoPlay.stop:', e);
+        }
+    },
+    onEnd: (callback) => {
+        try {
+            if (window.api?.autoPlay?.onEnd) {
+                window.api.autoPlay.onEnd(callback);
+            }
+        } catch (e) {
+            console.error('❌ Error calling autoPlay.onEnd:', e);
+        }
+    }
+};
+
 export const useApp = () => {
     const context = useContext(AppContext);
     if (!context) {
@@ -52,11 +83,36 @@ export const AppProvider = ({ children }) => {
     const selectSongRef = useRef(null);
     const shuffleHistoryRef = useRef([]);
     const shuffleQueueRef = useRef([]);
+    const stateRef = useRef({});
     useEffect(() => {
         if (!isPlaying) return
         playRef.current.startedAt = performance.now()
         playRef.current.baseTime = currentTime
     }, [isPlaying, currentTime])
+
+    useEffect(() => {
+        stateRef.current = {
+            songs,
+            currentSong,
+            playbackMode,
+            playbackSpeed,
+            userData
+        };
+    }, [songs, currentSong, playbackMode, playbackSpeed, userData]);
+
+    // Helper function to check permission
+    const hasPermissionRef = (songKey) => {
+        const state = stateRef.current;
+        const song = state.songs[songKey];
+        if (!song) return false;
+
+        // Có thể phát nếu:
+        // 1. Bài hát là local import, HOẶC
+        // 2. Bài từ Firebase mà user đã mua
+        if (song.isImported) return true;
+        if (song.isFromFirebase && state.userData?.ownedSongs?.[songKey]) return true;
+        return false;
+    };
 
     useEffect(() => {
         const loadSongs = async () => {
@@ -132,89 +188,26 @@ export const AppProvider = ({ children }) => {
             const clamped = Math.min(nextTime, duration);
             setCurrentTime(clamped);
 
+            // Chỉ dừng interval khi hết bài, việc chuyển bài do onEnd handler đảm nhiệm
             if (nextTime >= duration) {
                 clearInterval(id);
-                window.api.autoPlay.stop();
-                setIsPlaying(false);
                 setCurrentTime(0);
-
-                const mode = playbackModeRef.current;
-                const song = currentSongRef.current;
-                const allSongs = songsRef.current;
-
-                if (mode === 'once') {
-                    return;
-                }
-
-                if (mode === 'repeat-one') {
-                    if (song && selectSongRef.current) {
-                        selectSongRef.current(song.key, { autoStart: true, context: playbackContextRef.current });
-                    }
-                    return;
-                }
-
-                const ctx = playbackContextRef.current;
-                const owned = userDataRef.current?.ownedSongs || {};
-
-                const getPool = (excludeKey = null) => {
-                    return Object.keys(allSongs).filter(k => {
-                        if (k === excludeKey) return false;
-                        const s = allSongs[k];
-                        if (!s) return false;
-                        const permitted = s.isImported || !s.price || s.price === 0 || !!owned[k];
-                        if (!permitted) return false;
-                        if (ctx === 'favorites') return !!s.isFavorite;
-                        return true;
-                    });
-                };
-
-                if (mode === 'sequence') {
-                    if (!song) return;
-                    const pool = getPool();
-                    if (pool.length === 0) return;
-                    const currentIndex = pool.findIndex(k => k === song.key);
-                    const nextIndex = (currentIndex + 1) % pool.length;
-                    const nextKey = pool[nextIndex];
-                    if (selectSongRef.current) {
-                        selectSongRef.current(nextKey, { autoStart: true, context: ctx });
-                    }
-                    return;
-                }
-
-                if (mode === 'shuffle') {
-                    const owned = userDataRef.current?.ownedSongs || {};
-                    if (shuffleQueueRef.current.length === 0) {
-                        const pool = Object.keys(allSongs).filter(k => {
-                            if (k === song?.key) return false;
-                            const s = allSongs[k];
-                            if (!s) return false;
-                            const permitted = s.isImported || !s.price || s.price === 0 || !!owned[k];
-                            if (!permitted) return false;
-                            if (ctx === 'favorites') return !!s.isFavorite;
-                            return true;
-                        });
-                        for (let i = pool.length - 1; i > 0; i--) {
-                            const j = Math.floor(Math.random() * (i + 1));
-                            [pool[i], pool[j]] = [pool[j], pool[i]];
-                        }
-                        shuffleQueueRef.current = pool;
-                    }
-                    const nextKey = shuffleQueueRef.current.shift();
-                    if (nextKey && selectSongRef.current) {
-                        selectSongRef.current(nextKey, { autoStart: true, context: ctx, keepHistory: true });
-                    }
-                    return;
-                }
             }
         }, 16);
 
-        return () => clearInterval(id);
+        return () => {
+            clearInterval(id);
+        };
     }, [isPlaying, playbackSpeed, duration]);
 
     const hasPermission = (songKey) => {
         const song = songs[songKey];
         if (!song) return false;
+        // Can play if: imported, free price, or user bought it
         if (song.isImported || !song.price || song.price === 0) return true;
+        // Or if it's a mock/preloaded song without price set
+        if (!song.isImported && !song.isFromFirebase) return true;
+        // Firebase songs need to be bought
         return !!userData?.ownedSongs?.[songKey];
     };
 
@@ -239,7 +232,6 @@ export const AppProvider = ({ children }) => {
         setIsPlaying(false);
         setCurrentTime(0);
         setCurrentSong({ ...song, key: songKey });
-
         let finalNotes = song.songNotes || [];
         let finalDuration = 0;
 
@@ -277,7 +269,7 @@ export const AppProvider = ({ children }) => {
             const gameType = settings.game || 'Sky';
 
             setIsPlaying(true);
-            window.api.autoPlay.start(currentSong.songNotes, currentTime, playbackSpeed, gameType);
+            safeAutoPlay.start(currentSong.songNotes, currentTime, playbackSpeed, gameType);
         } else {
             setIsPlaying(false);
             window.api.autoPlay.stop();
@@ -471,7 +463,7 @@ export const AppProvider = ({ children }) => {
         if (!ok) return;
 
         if (currentSong?.key === songKey) {
-            window.api.autoPlay.stop();
+            safeAutoPlay.stop();
             setIsPlaying(false);
             setCurrentSong(null);
             setCurrentTime(0);
@@ -484,6 +476,166 @@ export const AppProvider = ({ children }) => {
             return copy;
         });
     };
+
+    // Set up listener for when auto-play ends (register only once)
+    useEffect(() => {
+        const playSongDirect = async (song, songKey) => {
+            if (!song) return false;
+
+            console.log(`[playSongDirect] Song: ${song.name}, Has songNotes: ${!!song.songNotes}, txtFilePath: ${song.txtFilePath}`);
+
+            let songNotes = song.songNotes;
+
+            // If song has txtFilePath and NO notes (undefined or empty array), need to load from cloud
+            if (song.txtFilePath && (!songNotes || songNotes.length === 0)) {
+                console.log(`[playSongDirect] Loading notes from cloud: ${song.txtFilePath}`);
+                try {
+                    const result = await window.api?.sheet?.secureLoad(song.txtFilePath);
+                    console.log(`[playSongDirect] Cloud load result:`, result);
+                    if (result && result.ok && result.songNotes) {
+                        songNotes = result.songNotes;
+                        console.log(`[playSongDirect] ✅ Loaded ${songNotes.length} notes from cloud`);
+                    } else {
+                        console.error('⚠️ Failed to load song notes from cloud:', result?.message);
+                        return false;
+                    }
+                } catch (e) {
+                    console.error('❌ Error loading song notes:', e);
+                    return false;
+                }
+            }
+
+            if (!songNotes || songNotes.length === 0) {
+                console.error(`⚠️ Song has no notes to play - songNotes: ${songNotes}, length: ${songNotes?.length}`);
+                console.error(`   Song data:`, song);
+                return false;
+            }
+
+            // Calculate duration
+            const lastNote = songNotes[songNotes.length - 1];
+            const songDuration = (lastNote?.time || 0) + 1000;
+
+            const settings = JSON.parse(localStorage.getItem('appSettings') || '{}');
+            const gameType = settings.game || 'Sky';
+
+            console.log(`▶️ Phát: ${song.name}`);
+
+            // Stop current playback
+            safeAutoPlay.stop();
+
+            // Wait a bit for stop to complete (giảm delay để nhanh hơn)
+            await new Promise(r => setTimeout(r, 30));
+
+            // Stop interval by setting isPlaying to false
+            setIsPlaying(false);
+
+            // Update song and timing data while isPlaying is false
+            setCurrentSong({ ...song, key: songKey, songNotes });
+            setCurrentTime(0);
+            setDuration(songDuration);
+
+            // Chờ state update (giảm delay)
+            await new Promise(r => setTimeout(r, 40));
+
+            // Start fresh playback
+            setIsPlaying(true);
+            safeAutoPlay.start(songNotes, 0, stateRef.current.playbackSpeed, gameType);
+
+            return true;
+        };
+
+        const handleSongEnded = async () => {
+            const state = stateRef.current;
+            console.log(`\n\n🎵🎵🎵 SONG ENDED - Mode: ${state.playbackMode}`);
+            console.log('Current song:', state.currentSong?.name);
+            console.log('Total songs available:', Object.keys(state.songs).length);
+
+            if (state.playbackMode === 'once') {
+                console.log('📍 Mode ONCE: Stopping playback');
+                setIsPlaying(false);
+            }
+            else if (state.playbackMode === 'sequence') {
+                console.log('📍 Mode SEQUENCE: Chuyển sang bài tiếp theo');
+                const songKeys = Object.keys(state.songs);
+                if (songKeys.length === 0 || !state.currentSong) {
+                    setIsPlaying(false);
+                    return;
+                }
+
+                const currentIndex = songKeys.findIndex(key => key === state.currentSong.key);
+
+                for (let i = 1; i <= songKeys.length; i++) {
+                    const nextIndex = (currentIndex + i) % songKeys.length;
+                    const nextKey = songKeys[nextIndex];
+
+                    if (hasPermissionRef(nextKey)) {
+                        const song = state.songs[nextKey];
+                        console.log(`✅ Bài tiếp theo: ${song.name}`);
+
+                        const played = await playSongDirect(song, nextKey);
+                        if (played) return;
+                    }
+                }
+                console.log('⚠️ Không tìm được bài tiếp theo');
+                setIsPlaying(false);
+            }
+            else if (state.playbackMode === 'shuffle') {
+                console.log('📍 Mode SHUFFLE: Finding random song');
+                const allKeys = Object.keys(state.songs);
+                console.log('  All songs count:', allKeys.length);
+                const playableKeys = allKeys.filter(key => {
+                    const allowed = hasPermissionRef(key);
+                    if (!allowed) console.log(`    ❌ Not allowed: ${state.songs[key]?.name}`);
+                    return allowed;
+                });
+                console.log('  Playable songs count:', playableKeys.length);
+
+                if (playableKeys.length === 0) {
+                    console.log('❌ NO PLAYABLE SONGS!');
+                    setIsPlaying(false);
+                    return;
+                }
+
+                const randomIndex = Math.floor(Math.random() * playableKeys.length);
+                const randomKey = playableKeys[randomIndex];
+                const randomSong = state.songs[randomKey];
+                console.log(`✅ Selected: ${randomSong?.name}`);
+
+                if (!randomSong) {
+                    setIsPlaying(false);
+                    return;
+                }
+
+                const played = await playSongDirect(randomSong, randomKey);
+                if (!played) {
+                    console.log('⚠️ Lỗi phát bài ngẫu nhiên');
+                    setIsPlaying(false);
+                }
+            }
+            else if (state.playbackMode === 'repeat-one') {
+                console.log('📍 Mode REPEAT-ONE: Phát lại từ đầu');
+
+                if (state.currentSong) {
+                    const played = await playSongDirect(state.currentSong, state.currentSong.key);
+                    if (!played) {
+                        console.log('⚠️ Lỗi phát lại bài');
+                        setIsPlaying(false);
+                    }
+                } else {
+                    setIsPlaying(false);
+                }
+            }
+        };
+
+        console.log('✅ Listener sẵn sàng');
+        console.log('[APPCONTEXT] Calling safeAutoPlay.onEnd now...');
+        safeAutoPlay.onEnd(handleSongEnded);
+        console.log('[APPCONTEXT] safeAutoPlay.onEnd setup completed');
+
+        return () => {
+            // No cleanup needed
+        };
+    }, []); // Only register once on mount
 
     const value = {
         songs,
